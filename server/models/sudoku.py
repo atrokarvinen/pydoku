@@ -3,16 +3,14 @@ from models.elimination import Elimination
 from models.eliminationReason import EliminationReason
 from testing.easySudoku import easySudoku
 
-class Sudoku:
-  def __init__(self, board):
-    self.board = board
-    self.solved_board = board
-    self.solved = False
+type Board = list[list[Square]]
 
-  def parse(self):
-    print("Solving sudoku...")
-    print("easy sudoku:" + str(easySudoku))
-    
+class Sudoku:
+  def __init__(self):
+    self.board = []
+    self.eliminations = []
+
+  def parse(self) -> Board:
     size = 9
     sudokuLength = len(easySudoku)
     if (sudokuLength != size*size):
@@ -29,26 +27,34 @@ class Sudoku:
           charAsNumber = 0
         else:
           charAsNumber = int(char)
-        row.append(charAsNumber)
+        square = Square(i,j,charAsNumber)
+        row.append(square)
       board.append(row)
-      print(str(row))
     
     return board
   
-  def addInitialPossibilities(self, board):
+  def flattenBoard(self, board: Board) -> list[Square]:
+    flatBoard = []
+    for row in board:
+      for square in row:
+        flatBoard.append(square)
+    return flatBoard
+  
+  def addInitialPossibilities(self, board: Board) -> Board:
     initializedBoard = []
     size = len(board)
     for i in range(size):
       boardRow = []
       for j in range(size):
-        number = board[i][j]
-        square = Square(i,j)
+        square = board[i][j]
+        number = square.number
+        newSquare = Square(i,j,number)
         if (number == 0):
           possibleNumbers = [1,2,3,4,5,6,7,8,9]
-          square.setPossibleNumbers(possibleNumbers)
+          newSquare.setPossibleNumbers(possibleNumbers)
         else:
-          square.setNumber(number)
-        boardRow.append(square)
+          newSquare.setNumber(number)
+        boardRow.append(newSquare)
       initializedBoard.append(boardRow)
     
     return initializedBoard
