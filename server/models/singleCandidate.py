@@ -1,10 +1,10 @@
-class EliminationReason:
-    def __init__(self, row: int, column: int, number: int):
-        self.row = row
+class SingleCandidate:
+    def __init__(self, row: int, column: int, number: int) -> None:
         self.column = column
         self.number = number
+        self.row = row
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return {
             "row": self.row,
             "column": self.column,
