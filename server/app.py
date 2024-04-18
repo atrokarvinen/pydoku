@@ -18,6 +18,11 @@ def after_request(response):
     return response
 
 
+@app.route("/")
+def tester():
+    return "Hello"
+
+
 @app.route("/sudoku")
 def getSudoku():
     sudoku = Sudoku()
@@ -110,5 +115,5 @@ def serializeEliminations(eliminations):
     return [elimination.serialize() for elimination in eliminations]
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.run()
