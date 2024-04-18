@@ -1,7 +1,8 @@
 <script lang="ts">
 	export let note: number;
+	export let isTarget: boolean;
 
-	const getNoteClass = (note: number) => {
+	const getNoteClass = (note: number, isTarget: boolean) => {
 		let noteStyle = 'position: absolute text-center';
 		if (note === 1 || note === 4 || note === 7) {
 			noteStyle += ' left-0';
@@ -17,8 +18,12 @@
 		} else {
 			noteStyle += ' bottom-0';
 		}
+		if (isTarget) {
+			noteStyle += ' border border-red-500';
+		}
 		return noteStyle;
 	};
 </script>
 
-<span class={getNoteClass(note)} style="font-size: xx-small; line-height: 1;">{note}</span>
+<span class={getNoteClass(note, isTarget)} style="font-size: xx-small; line-height: 1;">{note}</span
+>

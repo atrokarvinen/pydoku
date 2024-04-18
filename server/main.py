@@ -41,7 +41,8 @@ def scanSudokuRows():
     board = sudoku.board
     eliminations = sudoku.scanRows(board)
     eliminatedSudoku = sudoku.applyEliminations(board, eliminations)
-    return serializeBoard(eliminatedSudoku)
+    # return serializeBoard(eliminatedSudoku)
+    return serializeEliminations(eliminations)
 
 
 @app.route("/sudoku/column-scan", methods=["POST"])
