@@ -33,6 +33,11 @@
 		const response = await axios.post<Sudoku>('/sudoku/single-candidate', { sudoku });
 		sudoku = response.data;
 	};
+
+	const isSolved = async () => {
+		const response = await axios.post('/sudoku/is-solved', { sudoku });
+		const errors = response.data;
+	};
 </script>
 
 <div class="flex flex-col gap-5">
@@ -44,5 +49,6 @@
 		<button class="btn variant-filled-primary" on:click={boxScan}>Box scan</button>
 		<button class="btn variant-filled-primary" on:click={allScan}>All scan</button>
 		<button class="btn variant-filled-primary" on:click={singleCandidate}>Single candidate</button>
+		<button class="btn variant-filled-primary" on:click={isSolved}>Is solved</button>
 	</div>
 </div>

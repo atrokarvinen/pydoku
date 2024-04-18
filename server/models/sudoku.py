@@ -184,6 +184,37 @@ class Sudoku:
 
         return singleCandidates
 
+    def isSolved(self, board: Board) -> list[Square]:
+        boxSize = math.sqrt(len(board))
+        flatSquares = self.flattenBoard(board)
+        errorSquares = []
+        board[0][0].number = 3
+        for square in flatSquares:
+            row = square.row
+            column = square.column
+            box = square.getBox(boxSize)
+            if (square.number == 0):
+                errorSquares.append(square)
+                continue
+
+            squaresInRow = board[row]
+            squaresInColumn = [board[i][column] for i in range(len(board))]
+            squaresInBox = self.getSquaresInBox(board, box)
+
+            otherSquares = squaresInRow + squaresInColumn + squaresInBox
+            for otherSquare in otherSquares:
+                if (otherSquare.row == row and otherSquare.column == column):
+                    continue
+                if (otherSquare.number == square.number):
+                    errorSquares.append(square)
+                    errorSquares.append(otherSquare)
+
+        uniqueErrorSquares = []
+        for errorSquare in errorSquares:
+            if (errorSquare not in uniqueErrorSquares):
+                uniqueErrorSquares.append(errorSquare)
+        return uniqueErrorSquares
+
     def applyEliminations(self, board: Board, eliminations: list[Elimination]) -> Board:
         boardCopy = copy.deepcopy(board)
         for elimination in eliminations:

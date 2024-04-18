@@ -91,6 +91,16 @@ def getSingleCandidates():
     return serializeBoard(newSudoku)
 
 
+@app.route("/sudoku/is-solved", methods=["POST"])
+def checkSudokuSolved():
+    sudokuJson = request.get_json()
+    mapper = SudokuMapper()
+    sudoku = mapper.mapFromJson(sudokuJson)
+    board = sudoku.board
+    errorSquares = sudoku.isSolved(board)
+    return [square.serialize() for square in errorSquares]
+
+
 def serializeBoard(board):
     return [[square.serialize() for square in row] for row in board]
 
