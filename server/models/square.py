@@ -3,26 +3,26 @@ class Square:
         self.row = row
         self.column = column
         self.number = number
-        self.possibleNumbers = []
+        self.possible_numbers = []
 
-    def getBox(self, boxSize: int) -> int:
-        return (self.row // boxSize) * boxSize + self.column // boxSize
+    def get_box(self, box_size: int) -> int:
+        return (self.row // box_size) * box_size + self.column // box_size
 
-    def setNumber(self, number: int):
+    def set_number(self, number: int):
         self.number = number
-        self.possibleNumbers = []
+        self.possible_numbers = []
 
-    def setPossibleNumbers(self, possibleNumbers: list[int]):
-        self.possibleNumbers = possibleNumbers
+    def set_possible_numbers(self, possible_numbers: list[int]):
+        self.possible_numbers = possible_numbers
 
-    def removePossibleNumber(self, number: int):
-        if (number in self.possibleNumbers):
-            self.possibleNumbers.remove(number)
+    def remove_possible_number(self, number: int):
+        if (number in self.possible_numbers):
+            self.possible_numbers.remove(number)
 
     def serialize(self):
         return {
             "row": self.row,
             "column": self.column,
             "number": self.number,
-            "possibleNumbers": self.possibleNumbers
+            "possibleNumbers": self.possible_numbers
         }

@@ -24,87 +24,86 @@ def tester():
 
 
 @app.route("/sudoku")
-def getSudoku():
+def get_sudoku():
     sudoku = Sudoku()
     board = sudoku.parse()
-    return serializeBoard(board)
+    return serialize_board(board)
 
 
 @app.route("/sudoku/notes")
-def getSudokuNotes():
+def get_sudoku_notes():
     sudoku = Sudoku()
     board = sudoku.parse()
-    initializedBoard = sudoku.addInitialPossibilities(board)
-    return serializeBoard(initializedBoard)
+    initialized_board = sudoku.add_initial_possibilities(board)
+    return serialize_board(initialized_board)
 
 
 @app.route("/sudoku/row-scan", methods=["POST"])
-def scanSudokuRows():
-    sudokuJson = request.get_json()
+def scan_sudoku_rows():
+    sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.mapFromJson(sudokuJson)
+    sudoku = mapper.map_from_json(sudoku_json)
     board = sudoku.board
-    eliminations = sudoku.scanRows(board)
-    return serializeEliminations(eliminations)
+    eliminations = sudoku.scan_rows(board)
+    return serialize_eliminations(eliminations)
 
 
 @app.route("/sudoku/column-scan", methods=["POST"])
-def scanSudokuColumns():
-    sudokuJson = request.get_json()
+def scan_sudoku_columns():
+    sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.mapFromJson(sudokuJson)
+    sudoku = mapper.map_from_json(sudoku_json)
     board = sudoku.board
-    eliminations = sudoku.scanColumns(board)
-    return serializeEliminations(eliminations)
+    eliminations = sudoku.scan_columns(board)
+    return serialize_eliminations(eliminations)
 
 
 @app.route("/sudoku/box-scan", methods=["POST"])
-def scanSudokuBoxes():
-    sudokuJson = request.get_json()
+def scan_sudoku_boxes():
+    sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.mapFromJson(sudokuJson)
+    sudoku = mapper.map_from_json(sudoku_json)
     board = sudoku.board
-    eliminations = sudoku.scanBoxes(board)
-    return serializeEliminations(eliminations)
+    eliminations = sudoku.scan_boxes(board)
+    return serialize_eliminations(eliminations)
 
 
 @app.route("/sudoku/all-scan", methods=["POST"])
-def scanSudokuAll():
-    sudokuJson = request.get_json()
+def scan_sudoku_all():
+    sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.mapFromJson(sudokuJson)
+    sudoku = mapper.map_from_json(sudoku_json)
     board = sudoku.board
-    rowEliminations = sudoku.scanRows(board)
-    columnEliminations = sudoku.scanColumns(board)
-    boxEliminations = sudoku.scanBoxes(board)
-    eliminations = rowEliminations + columnEliminations + boxEliminations
-    eliminatedSudoku = sudoku.applyEliminations(board, eliminations)
-    return serializeBoard(eliminatedSudoku)
+    row_eliminations = sudoku.scan_rows(board)
+    column_eliminations = sudoku.scan_columns(board)
+    box_eliminations = sudoku.scan_boxes(board)
+    eliminations = row_eliminations + column_eliminations + box_eliminations
+    return serialize_eliminations(eliminations)
 
 
 @app.route("/sudoku/single-candidate", methods=["POST"])
-def getSingleCandidates():
-    sudokuJson = request.get_json()
+def get_single_candidates():
+    sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.mapFromJson(sudokuJson)
+    sudoku = mapper.map_from_json(sudoku_json)
     board = sudoku.board
-    singleCandidates = sudoku.getSingleCandidates(board)
-    return [square.serialize() for square in singleCandidates]
+    single_candidates = sudoku.get_single_candidates(board)
+    return [square.serialize() for square in single_candidates]
 
 
 @app.route("/sudoku/is-solved", methods=["POST"])
-def checkSudokuSolved():
-    sudokuJson = request.get_json()
+def check_sudoku_solved():
+    sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.mapFromJson(sudokuJson)
+    sudoku = mapper.map_from_json(sudoku_json)
     board = sudoku.board
-    errorSquares = sudoku.isSolved(board)
-    return [square.serialize() for square in errorSquares]
+    error_squares = sudoku.is_solved(board)
+    return [square.serialize() for square in error_squares]
 
 
-def serializeBoard(board):
+def serialize_board(board):
     return [[square.serialize() for square in row] for row in board]
 
 
-def serializeEliminations(eliminations):
+def serialize_eliminations(eliminations):
     return [elimination.serialize() for elimination in eliminations]

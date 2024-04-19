@@ -3,7 +3,7 @@ from models.square import Square
 
 
 class SudokuMapper:
-    def mapFromJson(self, data) -> Sudoku:
+    def map_from_json(self, data) -> Sudoku:
         sudokuJson = data["sudoku"]
 
         board = []
@@ -14,11 +14,11 @@ class SudokuMapper:
                     square["row"], square["column"], square["number"])
                 possibleNumbers = [
                     number for number in square["possibleNumbers"]]
-                mappedSquare.setPossibleNumbers(possibleNumbers)
+                mappedSquare.set_possible_numbers(possibleNumbers)
                 squares.append(mappedSquare)
             board.append(squares)
 
         sudoku = Sudoku()
-        sudoku.setBoard(board)
+        sudoku.set_board(board)
 
         return sudoku
