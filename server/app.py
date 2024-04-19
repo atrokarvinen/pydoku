@@ -45,8 +45,6 @@ def scanSudokuRows():
     sudoku = mapper.mapFromJson(sudokuJson)
     board = sudoku.board
     eliminations = sudoku.scanRows(board)
-    eliminatedSudoku = sudoku.applyEliminations(board, eliminations)
-    # return serializeBoard(eliminatedSudoku)
     return serializeEliminations(eliminations)
 
 
@@ -57,8 +55,7 @@ def scanSudokuColumns():
     sudoku = mapper.mapFromJson(sudokuJson)
     board = sudoku.board
     eliminations = sudoku.scanColumns(board)
-    eliminatedSudoku = sudoku.applyEliminations(board, eliminations)
-    return serializeBoard(eliminatedSudoku)
+    return serializeEliminations(eliminations)
 
 
 @app.route("/sudoku/box-scan", methods=["POST"])
@@ -68,8 +65,7 @@ def scanSudokuBoxes():
     sudoku = mapper.mapFromJson(sudokuJson)
     board = sudoku.board
     eliminations = sudoku.scanBoxes(board)
-    eliminatedSudoku = sudoku.applyEliminations(board, eliminations)
-    return serializeBoard(eliminatedSudoku)
+    return serializeEliminations(eliminations)
 
 
 @app.route("/sudoku/all-scan", methods=["POST"])
@@ -93,8 +89,7 @@ def getSingleCandidates():
     sudoku = mapper.mapFromJson(sudokuJson)
     board = sudoku.board
     singleCandidates = sudoku.getSingleCandidates(board)
-    newSudoku = sudoku.applySingleCandidates(board, singleCandidates)
-    return serializeBoard(newSudoku)
+    return [square.serialize() for square in singleCandidates]
 
 
 @app.route("/sudoku/is-solved", methods=["POST"])
@@ -113,7 +108,3 @@ def serializeBoard(board):
 
 def serializeEliminations(eliminations):
     return [elimination.serialize() for elimination in eliminations]
-
-
-# if __name__ == "__main__":
-#     app.run()
