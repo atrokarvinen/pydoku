@@ -7,11 +7,13 @@ class Elimination:
         self.column = column
         self.number = number
         self.caused_by = caused_by
+        self.solutionIndex = 0
 
     def serialize(self):
         return {
             "row": self.row,
             "column": self.column,
             "number": self.number,
-            "causedBy": self.caused_by.serialize()
+            "causedBy": self.caused_by.serialize(),
+            "solutionIndex": self.solutionIndex
         }

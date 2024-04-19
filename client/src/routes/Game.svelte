@@ -2,14 +2,17 @@
 	import { axios } from '$lib/axios';
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
+	import type { Solution } from '$lib/types/solution';
 	import type { Sudoku } from '$lib/types/sudoku';
 	import EliminationInfo from './EliminationInfo.svelte';
 	import SingleCandidateInfo from './SingleCandidateInfo.svelte';
+	import SolutionInfo from './SolutionInfo.svelte';
 	import SudokuBoard from './SudokuBoard.svelte';
 	export let sudoku: Sudoku;
 	let eliminations: Elimination[] = [];
 	let selectedElimination: Elimination | undefined;
 	let singleCandidates: SingleCandidate[] = [];
+	let solution: Solution = { eliminations: [], singleCandidates: [] };
 
 	const fillNotes = async () => {
 		const response = await axios.get<Sudoku>('/sudoku/notes');
@@ -32,8 +35,8 @@
 	};
 
 	const allScan = async () => {
-		const response = await axios.post<Sudoku>('/sudoku/all-scan', { sudoku });
-		sudoku = response.data;
+		const response = await axios.post<Elimination[]>('/sudoku/all-scan', { sudoku });
+		eliminations = response.data;
 	};
 
 	const singleCandidate = async () => {
@@ -46,30 +49,58 @@
 		const errors = response.data;
 	};
 
-	const applyEliminations = () => {
-		eliminations.forEach((elimination) => {
-			const { row, column, number } = elimination;
-			const square = sudoku[row][column];
-			square.possibleNumbers = square.possibleNumbers.filter((n) => n !== number);
-			sudoku = sudoku;
-		});
-	};
-
 	const eliminationClicked = (elimination: Elimination) => {
 		selectedElimination = elimination;
 	};
 
-	const applySingleCandidates = () => {
-		singleCandidates.forEach((singleCandidate) => {
-			const { row, column, number } = singleCandidate;
-			sudoku[row][column].number = number;
-			sudoku = sudoku;
-		});
+	const applyEliminations = () => eliminations.forEach(applyElimination);
+	const applyElimination = (elimination: Elimination) => {
+		const { row, column, number } = elimination;
+		const square = sudoku[row][column];
+		square.possibleNumbers = square.possibleNumbers.filter((n) => n !== number);
+		sudoku = sudoku;
+	};
+
+	const applySingleCandidates = () => singleCandidates.forEach(applySingleCandidate);
+	const applySingleCandidate = (singleCandidate: SingleCandidate) => {
+		const { row, column, number } = singleCandidate;
+		sudoku[row][column].number = number;
+		sudoku = sudoku;
+	};
+
+	const solve = async () => {
+		const response = await axios.post<Solution>('/sudoku/solve', { sudoku });
+		solution = response.data;
+	};
+
+	const playSolution = async () => {
+		const actions: (Elimination | SingleCandidate)[] = [
+			...solution.eliminations,
+			...solution.singleCandidates
+		].sort((a, b) => a.solutionIndex - b.solutionIndex);
+		for (const action of actions) {
+			const index = action.solutionIndex;
+			const nextElimination = solution.eliminations.find(
+				(elimination) => elimination.solutionIndex === index
+			);
+			const nextSingleCandidate = solution.singleCandidates.find(
+				(singleCandidate) => singleCandidate.solutionIndex === index
+			);
+			if (nextElimination) {
+				applyElimination(nextElimination);
+			} else if (nextSingleCandidate) {
+				applySingleCandidate(nextSingleCandidate);
+			}
+			await new Promise((resolve) => setTimeout(resolve, 20));
+		}
 	};
 </script>
 
 <div class="flex flex-col gap-5">
 	<SudokuBoard {sudoku} {selectedElimination} />
+	<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
+	<button class="btn variant-filled-primary" on:click={playSolution}>Play solution</button>
+	<SolutionInfo {solution} />
 	<button class="btn variant-filled-primary" on:click={applyEliminations}>Apply eliminations</button
 	>
 	<EliminationInfo {eliminations} {eliminationClicked} />

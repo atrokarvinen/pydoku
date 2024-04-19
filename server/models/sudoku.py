@@ -4,6 +4,7 @@ from models.square import Square
 from models.elimination import Elimination
 from models.eliminationReason import EliminationReason
 from models.singleCandidate import SingleCandidate
+from models.solution import Solution
 from testing.easySudoku import easy_sudoku
 
 type Board = list[list[Square]]
@@ -57,7 +58,7 @@ class Sudoku:
                 number = square.number
                 new_square = Square(i, j, number)
                 if (number == 0):
-                    possible_numbers = range(1, size+1)
+                    possible_numbers = [*range(1, size+1)]
                     new_square.set_possible_numbers(possible_numbers)
                 else:
                     new_square.set_number(number)
@@ -87,7 +88,7 @@ class Sudoku:
                             continue
                         if (number == other_number):
                             caused_by = EliminationReason(
-                                row, compare_column, number)
+                                row, compare_column, number, "row-scan")
                             elimination = Elimination(
                                 row, column, number, caused_by)
                             eliminations.append(elimination)
@@ -115,7 +116,7 @@ class Sudoku:
                         continue
                     if (number == other_number):
                         caused_by = EliminationReason(
-                            compare_row, column, number)
+                            compare_row, column, number, "column-scan")
                         elimination = Elimination(
                             row, column, number, caused_by)
                         eliminations.append(elimination)
@@ -156,7 +157,7 @@ class Sudoku:
                         continue
                     if (number == other_number):
                         caused_by = EliminationReason(
-                            other_square.row, other_square.column, number)
+                            other_square.row, other_square.column, number, "box-scan")
                         elimination = Elimination(
                             row, column, number, caused_by)
                         eliminations.append(elimination)
@@ -188,7 +189,6 @@ class Sudoku:
         box_size = math.sqrt(len(board))
         flat_squares = self.flatten_board(board)
         error_squares = []
-        board[0][0].number = 3
         for square in flat_squares:
             row = square.row
             column = square.column
@@ -214,6 +214,54 @@ class Sudoku:
             if (error_square not in unique_error_squares):
                 unique_error_squares.append(error_square)
         return unique_error_squares
+
+    def solve(self, board: Board) -> Solution:
+        board_copy = copy.deepcopy(board)
+        iteration = 0
+        solution = Solution()
+        while (iteration < 100):
+            eliminations = self.scan_rows(board_copy) + self.scan_columns(
+                board_copy) + self.scan_boxes(board_copy)
+            unique_eliminations = self.filter_unique_eliminations(eliminations)
+            board_copy = self.apply_eliminations(
+                board_copy, unique_eliminations)
+
+            single_candidates = self.get_single_candidates(board_copy)
+            board_copy = self.apply_single_candidates(
+                board_copy, single_candidates)
+
+            solution.add_eliminations(unique_eliminations)
+            solution.add_single_candidates(single_candidates)
+
+            print("Iteration: " + str(iteration))
+            error_squares = self.is_solved(board_copy)
+            if (len(error_squares) == 0):
+                print("Sudoku solved")
+                break
+
+            iteration += 1
+        print("Found eliminations: " + str(len(solution.eliminations)))
+        print("Found single candidates: " +
+              str(len(solution.singleCandidates)))
+        return solution
+
+    def elimination_matches(self, elimination: Elimination, other_elimination: Elimination) -> bool:
+        return elimination.row == other_elimination.row \
+            and elimination.column == other_elimination.column \
+            and elimination.number == other_elimination.number
+
+    def filter_unique_eliminations(self, eliminations: list[Elimination]) -> list[Elimination]:
+        unique_eliminations: list[Elimination] = []
+        for elimination in eliminations:
+            already_added = False
+            for added_elimination in unique_eliminations:
+                if (self.elimination_matches(elimination, added_elimination)):
+                    already_added = True
+                    break
+            if (not already_added):
+                unique_eliminations.append(elimination)
+
+        return unique_eliminations
 
     def apply_eliminations(self, board: Board, eliminations: list[Elimination]) -> Board:
         board_copy = copy.deepcopy(board)

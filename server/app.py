@@ -3,6 +3,7 @@ from flask_cors import CORS
 
 from models.sudoku import Sudoku
 from mappers.sudokuMapper import SudokuMapper
+from models.solution import Solution
 
 app = Flask(__name__)
 CORS(app)
@@ -101,9 +102,23 @@ def check_sudoku_solved():
     return [square.serialize() for square in error_squares]
 
 
+@app.route("/sudoku/solve", methods=["POST"])
+def solve_sudoku():
+    sudoku_json = request.get_json()
+    mapper = SudokuMapper()
+    sudoku = mapper.map_from_json(sudoku_json)
+    board = sudoku.board
+    solution = sudoku.solve(board)
+    return serialize_solution(solution)
+
+
 def serialize_board(board):
     return [[square.serialize() for square in row] for row in board]
 
 
 def serialize_eliminations(eliminations):
     return [elimination.serialize() for elimination in eliminations]
+
+
+def serialize_solution(solution: Solution):
+    return solution.serialize()

@@ -5,4 +5,5 @@ export type Elimination = {
 	column: number;
 	number: number;
 	causedBy: EliminationReason;
+	solutionIndex: number;
 };
