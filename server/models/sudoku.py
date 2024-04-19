@@ -5,7 +5,7 @@ from models.elimination import Elimination
 from models.eliminationReason import EliminationReason
 from models.singleCandidate import SingleCandidate
 from models.solution import Solution
-from testing.easySudoku import easy_sudoku
+from testing.sudokus import expert_sudoku1
 
 type Board = list[list[Square]]
 
@@ -20,12 +20,13 @@ class Sudoku:
 
     def parse(self) -> Board:
         size = 9
-        sudoku_length = len(easy_sudoku)
+        testSudoku = expert_sudoku1
+        sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
             return
 
-        char_array = list(easy_sudoku)
+        char_array = list(testSudoku)
         board = []
         for i in range(size):
             row = []
@@ -217,9 +218,12 @@ class Sudoku:
 
     def solve(self, board: Board) -> Solution:
         board_copy = copy.deepcopy(board)
+        board_copy = self.add_initial_possibilities(board_copy)
         iteration = 0
+        size = len(board)
         solution = Solution()
-        while (iteration < 100):
+        max_iterations = math.pow(size, 2)
+        while (iteration < max_iterations):
             eliminations = self.scan_rows(board_copy) + self.scan_columns(
                 board_copy) + self.scan_boxes(board_copy)
             unique_eliminations = self.filter_unique_eliminations(eliminations)
@@ -235,6 +239,10 @@ class Sudoku:
 
             print("Iteration: " + str(iteration))
             error_squares = self.is_solved(board_copy)
+            if (len(eliminations) == 0 and len(single_candidates) == 0):
+                print(
+                    "No eliminations or single candidates found. Unable to solve sudoku")
+                break
             if (len(error_squares) == 0):
                 print("Sudoku solved")
                 break
