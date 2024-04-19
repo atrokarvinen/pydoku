@@ -79,12 +79,12 @@
 			...solution.singleCandidates
 		].sort((a, b) => a.solutionIndex - b.solutionIndex);
 		for (const action of actions) {
-			const index = action.solutionIndex;
+			const nextIndex = action.solutionIndex;
 			const nextElimination = solution.eliminations.find(
-				(elimination) => elimination.solutionIndex === index
+				(elimination) => elimination.solutionIndex === nextIndex
 			);
 			const nextSingleCandidate = solution.singleCandidates.find(
-				(singleCandidate) => singleCandidate.solutionIndex === index
+				(singleCandidate) => singleCandidate.solutionIndex === nextIndex
 			);
 			if (nextElimination) {
 				applyElimination(nextElimination);
