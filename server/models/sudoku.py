@@ -201,6 +201,7 @@ class Sudoku:
                     "No eliminations or single candidates found. Unable to solve sudoku")
                 break
             if (len(error_squares) == 0):
+                solution.is_solved = True
                 print("Sudoku solved")
                 break
 

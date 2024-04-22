@@ -8,6 +8,7 @@ class Solution:
         self.singleCandidates = []
         self.solutionIndex = 0
         self.initial_board = initial_board
+        self.is_solved = False
 
     def add_elimination(self, elimination: Elimination) -> None:
         elimination.solutionIndex = self.solutionIndex
@@ -29,6 +30,7 @@ class Solution:
 
     def serialize(self) -> dict:
         return {
+            "isSolved": self.is_solved,
             "sudoku": self.initial_board.serialize(),
             "eliminations": [elimination.serialize() for elimination in self.eliminations],
             "singleCandidates": [singleCandidate.serialize() for singleCandidate in self.singleCandidates]

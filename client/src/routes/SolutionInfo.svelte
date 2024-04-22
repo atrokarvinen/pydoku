@@ -28,7 +28,11 @@
 </script>
 
 <div class="flex flex-col gap-5 h-96 overflow-auto">
-	<span>Solved after ({actions.length}) steps.</span>
+	{#if solution.isSolved}
+		<span>Solved after ({actions.length}) steps.</span>
+	{:else}
+		<span>Unable to solve sudoku</span>
+	{/if}
 	{#each actions as action, step}
 		{#if isElimination(action)}
 			<SolutionInfoElimination

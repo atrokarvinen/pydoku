@@ -2,7 +2,7 @@
 	import { axios } from '$lib/axios';
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
-	import type { Solution } from '$lib/types/solution';
+	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Sudoku } from '$lib/types/sudoku';
 	import EliminationInfo from './EliminationInfo.svelte';
 	import SingleCandidateInfo from './SingleCandidateInfo.svelte';
@@ -13,7 +13,7 @@
 	let selectedElimination: Elimination | undefined;
 	let selectedCandidate: SingleCandidate | undefined;
 	let singleCandidates: SingleCandidate[] = [];
-	let solution: Solution = { eliminations: [], singleCandidates: [], sudoku: [] };
+	let solution: Solution = defaultSolution;
 
 	const fillNotes = async () => {
 		const response = await axios.get<Sudoku>('/sudoku/notes');
