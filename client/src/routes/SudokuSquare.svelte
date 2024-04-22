@@ -1,17 +1,16 @@
 <script lang="ts">
-	import type { Elimination } from '$lib/types/elimination';
+	import type { EliminationGroup } from '$lib/types/elimination-group';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import type { Square } from '$lib/types/sudoku';
 	import SudokuNote from './SudokuNote.svelte';
 
 	export let square: Square;
 	export let size: number;
-	export let selectedElimination: Elimination | undefined;
+	export let selectedElimination: EliminationGroup | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
 
 	$: rowNumber = square.row;
 	$: colNumber = square.column;
-	$: causedBy = selectedElimination?.causedBy;
 	$: targetSquare = selectedElimination
 		? {
 				row: selectedElimination.row,
@@ -25,9 +24,10 @@
 				column: selectedCandidate.column
 			}
 		: undefined;
-	$: isTarget =
-		!!targetSquare && square.row === targetSquare.row && square.column === targetSquare.column;
-	$: isCausedBy = !!causedBy && square.row === causedBy.row && square.column === causedBy.column;
+	$: isCausedBy =
+		!!selectedElimination &&
+		square.row === selectedElimination.row &&
+		square.column === selectedElimination.column;
 	$: isCandidate =
 		!!candidateSquare &&
 		square.row === candidateSquare.row &&
@@ -63,6 +63,18 @@
 		}
 		return borderStyle;
 	};
+
+	const isNoteEliminated = (note: number, row: number, col: number) => {
+		if (!selectedElimination || !selectedElimination.eliminatedNotes) {
+			return false;
+		}
+		return selectedElimination.eliminatedNotes.some(
+			(eliminationNote) =>
+				eliminationNote.row === row &&
+				eliminationNote.column === col &&
+				eliminationNote.number === note
+		);
+	};
 </script>
 
 <div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
@@ -70,7 +82,7 @@
 		<button class="w-full h-full p-0.5">
 			<div class="w-full h-full position: relative">
 				{#each square.possibleNumbers as note}
-					<SudokuNote {note} isTarget={isTarget && note === targetNote} />
+					<SudokuNote {note} isEliminated={isNoteEliminated(note, square.row, square.column)} />
 				{/each}
 			</div>
 		</button>

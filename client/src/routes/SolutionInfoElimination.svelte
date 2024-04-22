@@ -1,12 +1,14 @@
 <script lang="ts">
-	import type { Elimination } from '$lib/types/elimination';
+	import type { EliminationGroup } from '$lib/types/elimination-group';
 
 	export let step: number;
-	export let elimination: Elimination;
-	export let eliminationClicked: (elimination: Elimination) => void;
+	export let elimination: EliminationGroup;
+	export let eliminationClicked: (elimination: EliminationGroup) => void;
 
 	const strategyToString = (strategy: string) => {
 		switch (strategy) {
+			case 'scan':
+				return 'Scan';
 			case 'row-scan':
 				return 'Row scan';
 			case 'column-scan':
@@ -29,6 +31,6 @@
 		<span>{`(${elimination.column + 1}, ${elimination.row + 1})`}</span>
 		<span>{`number: ${elimination.number}`}</span>
 		<span>,</span>
-		<span>{strategyToString(elimination.causedBy.strategy)}</span>
+		<span>{strategyToString(elimination.technique)}</span>
 	</button>
 </div>

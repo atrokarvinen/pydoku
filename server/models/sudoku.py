@@ -6,6 +6,8 @@ from models.eliminationReason import EliminationReason
 from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
+from models.eliminationGroup import EliminationGroup
+from models.eliminationNote import EliminationNote
 from testing.sudokus import hard_sudoku1
 
 
@@ -174,29 +176,65 @@ class Sudoku:
                 unique_error_squares.append(error_square)
         return unique_error_squares
 
+    def scan(self, board: Board) -> list[EliminationGroup]:
+        elimination_groups = []
+        flat_squares = board.flatten()
+        for square in flat_squares:
+            if (square.is_empty()):
+                continue
+            row = square.row
+            column = square.column
+            number = square.number
+
+            squares_in_row = board.get_squares_in_row(row)
+            squares_in_column = board.get_squares_in_column(column)
+            squares_in_box = board.get_squares_in_box(square)
+
+            other_squares = squares_in_row + squares_in_column + squares_in_box
+
+            eliminated_notes = []
+            elimination_group = EliminationGroup(
+                row=row,
+                column=column,
+                number=number,
+                technique="scan",
+                eliminated_notes=eliminated_notes,
+            )
+            for other_square in other_squares:
+                if (other_square.row == row and other_square.column == column):
+                    continue
+                if (other_square.possible_numbers.count(number)):
+                    eliminated_note = EliminationNote(
+                        other_square.row,
+                        other_square.column,
+                        number)
+                    eliminated_notes.append(eliminated_note)
+            if (len(eliminated_notes) > 0):
+                elimination_groups.append(elimination_group)
+
+        return elimination_groups
+
     def solve(self, empty_board: Board) -> Solution:
         board = copy.deepcopy(empty_board)
         self.add_initial_possibilities(board)
         iteration = 0
         solution = Solution(board)
-        max_iterations = math.pow(board.size, 2)
-        while (iteration < max_iterations):
-            eliminations = self.scan_rows(board) + self.scan_columns(
-                board) + self.scan_boxes(board)
-            unique_eliminations = self.filter_unique_eliminations(eliminations)
-            board = self.apply_eliminations(
-                board, unique_eliminations)
+        max_iterations = math.pow(board.size, 3)
+        while (True):
+            elimination_groups = self.scan(board)
+            if (len(elimination_groups) > 0):
+                first_group = elimination_groups[0]
+                board = self.apply_elimination_group(board, first_group)
+                solution.add_elimination_group(first_group)
 
             single_candidates = self.get_single_candidates(board)
-            board = self.apply_single_candidates(
-                board, single_candidates)
+            board = self.apply_single_candidates(board, single_candidates)
 
-            solution.add_eliminations(unique_eliminations)
             solution.add_single_candidates(single_candidates)
 
             print("Iteration: " + str(iteration))
             error_squares = self.is_solved(board)
-            if (len(eliminations) == 0 and len(single_candidates) == 0):
+            if (len(elimination_groups) == 0 and len(single_candidates) == 0):
                 print(
                     "No eliminations or single candidates found. Unable to solve sudoku")
                 break
@@ -204,11 +242,15 @@ class Sudoku:
                 solution.is_solved = True
                 print("Sudoku solved")
                 break
+            if (iteration == max_iterations):
+                print("Max iterations reached, unable to solve sudoku")
+                break
 
             iteration += 1
-        print("Found eliminations: " + str(len(solution.eliminations)))
+
+        print("Found eliminations: " + str(len(solution.elimination_groups)))
         print("Found single candidates: " +
-              str(len(solution.singleCandidates)))
+              str(len(solution.single_candidates)))
         return solution
 
     def elimination_matches(self, elimination: Elimination, other_elimination: Elimination) -> bool:
@@ -228,6 +270,31 @@ class Sudoku:
                 unique_eliminations.append(elimination)
 
         return unique_eliminations
+
+    def apply_elimination_group(self, board: Board, eliminationGroup: EliminationGroup) -> Board:
+        board_copy = copy.deepcopy(board)
+        for elimination in eliminationGroup.eliminated_notes:
+            row = elimination.row
+            column = elimination.column
+            number = elimination.number
+
+            square = board_copy.get_square(row, column)
+            square.remove_possible_number(number)
+
+        return board_copy
+
+    def apply_elimination_groups(self, board: Board, eliminations: list[EliminationGroup]) -> Board:
+        board_copy = copy.deepcopy(board)
+        for eliminationGroup in eliminations:
+            for elimination in eliminationGroup.eliminated_notes:
+                row = elimination.row
+                column = elimination.column
+                number = elimination.number
+
+                square = board_copy.get_square(row, column)
+                square.remove_possible_number(number)
+
+        return board_copy
 
     def apply_eliminations(self, board: Board, eliminations: list[Elimination]) -> Board:
         board_copy = copy.deepcopy(board)

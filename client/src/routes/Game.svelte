@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { axios } from '$lib/axios';
-	import { moveToSolutionStep } from '$lib/sudoku-log/sudoku-log';
-	import type { Elimination } from '$lib/types/elimination';
+	import { getSolutionStepsCount, moveToSolutionStep } from '$lib/sudoku-log/sudoku-log';
+	import type { EliminationGroup } from '$lib/types/elimination-group';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Sudoku } from '$lib/types/sudoku';
 	import SolutionInfo from './SolutionInfo.svelte';
 	import SudokuBoard from './SudokuBoard.svelte';
 	export let sudoku: Sudoku;
-	let selectedElimination: Elimination | undefined;
+	let selectedElimination: EliminationGroup | undefined;
 	let selectedCandidate: SingleCandidate | undefined;
 	let solution: Solution = defaultSolution;
 	let currentSolutionStep = 0;
@@ -18,7 +18,12 @@
 		sudoku = response.data;
 	};
 
-	const eliminationClicked = (elimination: Elimination) => {
+	const resetSelections = () => {
+		selectedElimination = undefined;
+		selectedCandidate = undefined;
+	};
+
+	const eliminationClicked = (elimination: EliminationGroup) => {
 		const newSudoku = moveToSolutionStep(
 			sudoku,
 			currentSolutionStep,
@@ -27,6 +32,7 @@
 		);
 
 		selectedElimination = elimination;
+		selectedCandidate = undefined;
 		currentSolutionStep = elimination.solutionIndex;
 		sudoku = newSudoku;
 	};
@@ -40,6 +46,7 @@
 		);
 
 		selectedCandidate = candidate;
+		selectedElimination = undefined;
 		currentSolutionStep = candidate.solutionIndex;
 		sudoku = newSudoku;
 	};
@@ -51,23 +58,24 @@
 	};
 
 	const playSolution = async () => {
-		const steps = solution.eliminations.length + solution.singleCandidates.length;
-		for (let currentStep = 0; currentStep < steps; currentStep++) {
+		resetSelections();
+		const stepCount = getSolutionStepsCount(solution);
+		for (let currentStep = currentSolutionStep; currentStep < stepCount; currentStep++) {
 			const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep + 1);
 			sudoku = newSudoku;
 			await new Promise((resolve) => setTimeout(resolve, 20));
 		}
+		currentSolutionStep = stepCount;
 	};
 
 	const reverseSolution = async () => {
-		const steps = solution.eliminations.length + solution.singleCandidates.length;
-		const initialSudoku = moveToSolutionStep(sudoku, currentSolutionStep, solution, steps + 1);
-		sudoku = initialSudoku;
-		for (let currentStep = steps; currentStep > 0; currentStep--) {
+		resetSelections();
+		for (let currentStep = currentSolutionStep; currentStep > 0; currentStep--) {
 			const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep - 1);
 			sudoku = newSudoku;
 			await new Promise((resolve) => setTimeout(resolve, 20));
 		}
+		currentSolutionStep = 0;
 	};
 </script>
 

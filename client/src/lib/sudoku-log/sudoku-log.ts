@@ -1,31 +1,9 @@
 import type { Elimination } from '$lib/types/elimination';
+import type { EliminationGroup } from '$lib/types/elimination-group';
 import type { SingleCandidate } from '$lib/types/single-candidate';
 import type { Solution } from '$lib/types/solution';
 import type { Sudoku } from '$lib/types/sudoku';
 import _ from 'lodash';
-
-export const playSolution = (solution: Solution) => {
-	const actions: (Elimination | SingleCandidate)[] = [
-		...solution.eliminations,
-		...solution.singleCandidates
-	].sort((a, b) => a.solutionIndex - b.solutionIndex);
-
-	const sudoku = solution.sudoku;
-	for (const action of actions) {
-		const nextIndex = action.solutionIndex;
-		const nextElimination = solution.eliminations.find(
-			(elimination) => elimination.solutionIndex === nextIndex
-		);
-		const nextSingleCandidate = solution.singleCandidates.find(
-			(singleCandidate) => singleCandidate.solutionIndex === nextIndex
-		);
-		if (nextElimination) {
-			applyElimination(sudoku, nextElimination);
-		} else if (nextSingleCandidate) {
-			applySingleCandidate(sudoku, nextSingleCandidate);
-		}
-	}
-};
 
 export const moveToSolutionStep = (
 	current: Sudoku,
@@ -44,10 +22,6 @@ export const moveToSolutionStep = (
 		(_, i) => i + Math.min(...stepRange)
 	);
 
-	console.log('moving from step', currentStep, ' to step', targetStep);
-	console.log('isCurrentCloser', isCurrentCloser, ' isReverse', isReverse);
-	console.log('includedSteps', includedSteps);
-
 	let steps = getSolutionSteps(solution).filter((step) =>
 		includedSteps.includes(step.solutionIndex)
 	);
@@ -59,32 +33,47 @@ export const moveToSolutionStep = (
 	return sudoku;
 };
 
-const getSolutionSteps = (solution: Solution) => {
-	const steps: (Elimination | SingleCandidate)[] = [
-		...solution.eliminations,
+export const getSolutionStepsCount = (solution: Solution) => {
+	return solution.eliminationGroups.length + solution.singleCandidates.length;
+};
+
+export const getSolutionSteps = (solution: Solution) => {
+	const steps: (EliminationGroup | SingleCandidate)[] = [
+		...solution.eliminationGroups,
 		...solution.singleCandidates
-	];
+	].sort((a, b) => a.solutionIndex - b.solutionIndex);
 	return steps;
 };
 
-const undoStep = (sudoku: Sudoku, step: Elimination | SingleCandidate) => {
+const undoStep = (sudoku: Sudoku, step: EliminationGroup | SingleCandidate) => {
 	if (step.type === 'elimination') {
-		undoElimination(sudoku, step);
+		undoEliminationGroup(sudoku, step);
 	}
 	if (step.type === 'single-candidate') {
 		undoSingleCandidate(sudoku, step);
 	}
 };
 
-const applyStep = (sudoku: Sudoku, step: Elimination | SingleCandidate) => {
+const applyStep = (sudoku: Sudoku, step: EliminationGroup | SingleCandidate) => {
 	if (step.type === 'elimination') {
-		applyElimination(sudoku, step);
+		applyEliminationGroup(sudoku, step);
 	}
 	if (step.type === 'single-candidate') {
 		applySingleCandidate(sudoku, step);
 	}
 };
 
+const applyEliminationGroup = (sudoku: Sudoku, eliminationGroup: EliminationGroup) => {
+	const eliminations: Elimination[] = eliminationGroup.eliminatedNotes.map((note) => ({
+		row: note.row,
+		column: note.column,
+		number: note.number,
+		causedBy: {} as any,
+		solutionIndex: eliminationGroup.solutionIndex,
+		type: 'elimination'
+	}));
+	applyEliminations(sudoku, eliminations);
+};
 const applyEliminations = (sudoku: Sudoku, eliminations: Elimination[]) => {
 	eliminations.forEach((e) => applyElimination(sudoku, e));
 };
@@ -102,6 +91,20 @@ const applySingleCandidate = (sudoku: Sudoku, singleCandidate: SingleCandidate) 
 	sudoku[row][column].number = number;
 };
 
+const undoEliminationGroup = (sudoku: Sudoku, eliminationGroup: EliminationGroup) => {
+	const eliminations: Elimination[] = eliminationGroup.eliminatedNotes.map((note) => ({
+		row: note.row,
+		column: note.column,
+		number: note.number,
+		causedBy: {} as any,
+		solutionIndex: eliminationGroup.solutionIndex,
+		type: 'elimination'
+	}));
+	undoEliminations(sudoku, eliminations);
+};
+const undoEliminations = (sudoku: Sudoku, eliminations: Elimination[]) => {
+	eliminations.forEach((e) => undoElimination(sudoku, e));
+};
 const undoElimination = (sudoku: Sudoku, elimination: Elimination) => {
 	const { row, column, number } = elimination;
 	const square = sudoku[row][column];
