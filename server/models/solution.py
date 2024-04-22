@@ -3,10 +3,11 @@ from models.singleCandidate import SingleCandidate
 
 
 class Solution:
-    def __init__(self) -> None:
+    def __init__(self, initial_board) -> None:
         self.eliminations = []
         self.singleCandidates = []
         self.solutionIndex = 0
+        self.initial_board = initial_board
 
     def add_elimination(self, elimination: Elimination) -> None:
         elimination.solutionIndex = self.solutionIndex
@@ -28,6 +29,7 @@ class Solution:
 
     def serialize(self) -> dict:
         return {
+            "sudoku": self.initial_board.serialize(),
             "eliminations": [elimination.serialize() for elimination in self.eliminations],
             "singleCandidates": [singleCandidate.serialize() for singleCandidate in self.singleCandidates]
         }

@@ -5,14 +5,13 @@ from models.elimination import Elimination
 from models.eliminationReason import EliminationReason
 from models.singleCandidate import SingleCandidate
 from models.solution import Solution
-from testing.sudokus import expert_sudoku1
-
-type Board = list[list[Square]]
+from models.board import Board
+from testing.sudokus import hard_sudoku1
 
 
 class Sudoku:
     def __init__(self):
-        self.board = []
+        self.board = Board(9)
         self.eliminations = []
 
     def set_board(self, board: Board):
@@ -20,14 +19,14 @@ class Sudoku:
 
     def parse(self) -> Board:
         size = 9
-        testSudoku = expert_sudoku1
+        testSudoku = hard_sudoku1
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
             return
 
         char_array = list(testSudoku)
-        board = []
+        board = Board(size)
         for i in range(size):
             row = []
             for j in range(size):
@@ -42,78 +41,70 @@ class Sudoku:
 
         return board
 
-    def flatten_board(self, board: Board) -> list[Square]:
-        flat_board = []
-        for row in board:
-            for square in row:
-                flat_board.append(square)
-        return flat_board
-
     def add_initial_possibilities(self, board: Board) -> Board:
-        initialized_board = []
-        size = len(board)
-        for i in range(size):
-            boardRow = []
-            for j in range(size):
-                square = board[i][j]
-                number = square.number
-                new_square = Square(i, j, number)
-                if (number == 0):
-                    possible_numbers = [*range(1, size+1)]
-                    new_square.set_possible_numbers(possible_numbers)
-                else:
-                    new_square.set_number(number)
-                boardRow.append(new_square)
-            initialized_board.append(boardRow)
+        # initialized_board = []
+        # size = board.size
+        # for i in range(size):
+        #     boardRow = []
+        #     for j in range(size):
+        #         square = board[i][j]
+        #         number = square.number
+        #         new_square = Square(i, j, number)
+        #         if (number == 0):
+        #             possible_numbers = [*range(1, size+1)]
+        #             new_square.set_possible_numbers(possible_numbers)
+        #         else:
+        #             new_square.set_number(number)
+        #         boardRow.append(new_square)
+        #     initialized_board.append(boardRow)
 
-        return initialized_board
+        board.add_initial_possibilities()
+        return board
 
     def scan_rows(self, board: Board) -> list[Elimination]:
-        size = len(board)
-        rows = board
-
-        eliminations = []
-        for row in range(size):
-            for column in range(size):
-                square = rows[row][column]
-                square_number = square.number
-                if (square_number != 0):
-                    continue
-                for number in square.possible_numbers:
-                    for compare_column in range(size):
-                        if (compare_column == column):
-                            continue
-                        other_square = rows[row][compare_column]
-                        other_number = other_square.number
-                        if (other_number == 0):
-                            continue
-                        if (number == other_number):
-                            caused_by = EliminationReason(
-                                row, compare_column, number, "row-scan")
-                            elimination = Elimination(
-                                row, column, number, caused_by)
-                            eliminations.append(elimination)
-
-        return eliminations
-
-    def scan_columns(self, board: Board) -> list[Elimination]:
-        size = len(board)
-        flat_squares = self.flatten_board(board)
+        size = board.size
+        flat_squares = board.flatten()
 
         eliminations = []
         for square in flat_squares:
             row = square.row
             column = square.column
-            number = square.number
-            if (number != 0):
+            if (not square.is_empty()):
+                continue
+            for number in square.possible_numbers:
+                for compare_column in range(size):
+                    if (compare_column == column):
+                        continue
+                    other_square = board.get_square(row, compare_column)
+                    other_number = other_square.number
+                    if (other_square.is_empty()):
+                        continue
+                    if (number == other_number):
+                        caused_by = EliminationReason(
+                            row, compare_column, number, "row-scan")
+                        elimination = Elimination(
+                            row, column, number, caused_by)
+                        eliminations.append(elimination)
+
+        return eliminations
+
+    def scan_columns(self, board: Board) -> list[Elimination]:
+        size = board.size
+        flat_squares = board.flatten()
+
+        eliminations = []
+        for square in flat_squares:
+            row = square.row
+            column = square.column
+            if (not square.is_empty()):
                 continue
             for number in square.possible_numbers:
                 for compare_row in range(size):
                     if (compare_row == row):
                         continue
-                    other_square = board[compare_row][column]
+                    other_square = board.get_square(compare_row, column)
                     other_number = other_square.number
-                    if (other_number == 0):
+                    if (other_square.is_empty()):
                         continue
                     if (number == other_number):
                         caused_by = EliminationReason(
@@ -124,37 +115,23 @@ class Sudoku:
 
         return eliminations
 
-    def get_squares_in_box(self, board: Board, boxIndex: int) -> list[Square]:
-        size = len(board)
-        box_size = int(math.sqrt(size))
-        flat_squares = self.flatten_board(board)
-        squares = []
-        for square in flat_squares:
-            box = square.get_box(box_size)
-            if (box == boxIndex):
-                squares.append(square)
-        return squares
-
     def scan_boxes(self, board: Board) -> list[Elimination]:
-        size = len(board)
-        box_size = math.sqrt(size)
         eliminations = []
-        flat_squares = self.flatten_board(board)
+        flat_squares = board.flatten()
 
         for square in flat_squares:
             row = square.row
             column = square.column
             number = square.number
-            box = square.get_box(box_size)
-            if (number != 0):
+            if (not square.is_empty()):
                 continue
-            squares_in_box = self.get_squares_in_box(board, box)
+            squares_in_box = board.get_squares_in_box(square)
             for number in square.possible_numbers:
                 for other_square in squares_in_box:
                     if (other_square.row == row and other_square.column == column):
                         continue
                     other_number = other_square.number
-                    if (other_number == 0):
+                    if (other_square.is_empty()):
                         continue
                     if (number == other_number):
                         caused_by = EliminationReason(
@@ -166,14 +143,13 @@ class Sudoku:
         return eliminations
 
     def get_single_candidates(self, board: Board) -> list[SingleCandidate]:
-        flat_squares = self.flatten_board(board)
+        flat_squares = board.flatten()
 
         single_candidates = []
         for square in flat_squares:
             row = square.row
             column = square.column
-            number = square.number
-            if (number != 0):
+            if (not square.is_empty()):
                 continue
             possible_numbers = square.possible_numbers
             if (len(possible_numbers) == 0):
@@ -187,20 +163,18 @@ class Sudoku:
         return single_candidates
 
     def is_solved(self, board: Board) -> list[Square]:
-        box_size = math.sqrt(len(board))
-        flat_squares = self.flatten_board(board)
+        flat_squares = board.flatten()
         error_squares = []
         for square in flat_squares:
             row = square.row
             column = square.column
-            box = square.get_box(box_size)
-            if (square.number == 0):
+            if (square.is_empty()):
                 error_squares.append(square)
                 continue
 
-            squares_in_row = board[row]
-            squares_in_column = [board[i][column] for i in range(len(board))]
-            squares_in_box = self.get_squares_in_box(board, box)
+            squares_in_row = board.get_squares_in_row(row)
+            squares_in_column = board.get_squares_in_column(column)
+            squares_in_box = board.get_squares_in_box(square)
 
             other_Squares = squares_in_row + squares_in_column + squares_in_box
             for other_square in other_Squares:
@@ -216,29 +190,28 @@ class Sudoku:
                 unique_error_squares.append(error_square)
         return unique_error_squares
 
-    def solve(self, board: Board) -> Solution:
-        board_copy = copy.deepcopy(board)
-        board_copy = self.add_initial_possibilities(board_copy)
+    def solve(self, empty_board: Board) -> Solution:
+        board = copy.deepcopy(empty_board)
+        self.add_initial_possibilities(board)
         iteration = 0
-        size = len(board)
-        solution = Solution()
-        max_iterations = math.pow(size, 2)
+        solution = Solution(board)
+        max_iterations = math.pow(board.size, 2)
         while (iteration < max_iterations):
-            eliminations = self.scan_rows(board_copy) + self.scan_columns(
-                board_copy) + self.scan_boxes(board_copy)
+            eliminations = self.scan_rows(board) + self.scan_columns(
+                board) + self.scan_boxes(board)
             unique_eliminations = self.filter_unique_eliminations(eliminations)
-            board_copy = self.apply_eliminations(
-                board_copy, unique_eliminations)
+            board = self.apply_eliminations(
+                board, unique_eliminations)
 
-            single_candidates = self.get_single_candidates(board_copy)
-            board_copy = self.apply_single_candidates(
-                board_copy, single_candidates)
+            single_candidates = self.get_single_candidates(board)
+            board = self.apply_single_candidates(
+                board, single_candidates)
 
             solution.add_eliminations(unique_eliminations)
             solution.add_single_candidates(single_candidates)
 
             print("Iteration: " + str(iteration))
-            error_squares = self.is_solved(board_copy)
+            error_squares = self.is_solved(board)
             if (len(eliminations) == 0 and len(single_candidates) == 0):
                 print(
                     "No eliminations or single candidates found. Unable to solve sudoku")
@@ -278,7 +251,7 @@ class Sudoku:
             column = elimination.column
             number = elimination.number
 
-            square = board_copy[row][column]
+            square = board_copy.get_square(row, column)
             square.remove_possible_number(number)
 
         return board_copy
@@ -290,7 +263,7 @@ class Sudoku:
             column = candidate.column
             number = candidate.number
 
-            square = board_copy[row][column]
+            square = board_copy.get_square(row, column)
             square.set_number(number)
 
         return board_copy

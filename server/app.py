@@ -28,15 +28,15 @@ def tester():
 def get_sudoku():
     sudoku = Sudoku()
     board = sudoku.parse()
-    return serialize_board(board)
+    return board.serialize()
 
 
 @app.route("/sudoku/notes")
 def get_sudoku_notes():
     sudoku = Sudoku()
     board = sudoku.parse()
-    initialized_board = sudoku.add_initial_possibilities(board)
-    return serialize_board(initialized_board)
+    sudoku.add_initial_possibilities(board)
+    return board.serialize()
 
 
 @app.route("/sudoku/row-scan", methods=["POST"])
@@ -110,10 +110,6 @@ def solve_sudoku():
     board = sudoku.board
     solution = sudoku.solve(board)
     return serialize_solution(solution)
-
-
-def serialize_board(board):
-    return [[square.serialize() for square in row] for row in board]
 
 
 def serialize_eliminations(eliminations):

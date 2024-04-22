@@ -12,7 +12,7 @@
 	let eliminations: Elimination[] = [];
 	let selectedElimination: Elimination | undefined;
 	let singleCandidates: SingleCandidate[] = [];
-	let solution: Solution = { eliminations: [], singleCandidates: [] };
+	let solution: Solution = { eliminations: [], singleCandidates: [], sudoku: [] };
 
 	const fillNotes = async () => {
 		const response = await axios.get<Sudoku>('/sudoku/notes');
@@ -71,6 +71,7 @@
 	const solve = async () => {
 		const response = await axios.post<Solution>('/sudoku/solve', { sudoku });
 		solution = response.data;
+		sudoku = solution.sudoku;
 	};
 
 	const playSolution = async () => {
@@ -98,8 +99,10 @@
 
 <div class="flex flex-col gap-5">
 	<SudokuBoard {sudoku} {selectedElimination} />
-	<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
-	<button class="btn variant-filled-primary" on:click={playSolution}>Play solution</button>
+	<div class="flex flex-row gap-5">
+		<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
+		<button class="btn variant-filled-primary" on:click={playSolution}>Play solution</button>
+	</div>
 	<SolutionInfo {solution} />
 	<button class="btn variant-filled-primary" on:click={applyEliminations}>Apply eliminations</button
 	>

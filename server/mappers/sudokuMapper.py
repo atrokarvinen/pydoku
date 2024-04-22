@@ -1,12 +1,13 @@
 from models.sudoku import Sudoku
 from models.square import Square
+from models.board import Board
 
 
 class SudokuMapper:
     def map_from_json(self, data) -> Sudoku:
         sudokuJson = data["sudoku"]
 
-        board = []
+        board = Board(len(sudokuJson))
         for row in sudokuJson:
             squares = []
             for square in row:

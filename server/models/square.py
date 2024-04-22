@@ -5,8 +5,8 @@ class Square:
         self.number = number
         self.possible_numbers = []
 
-    def get_box(self, box_size: int) -> int:
-        return (self.row // box_size) * box_size + self.column // box_size
+    def is_empty(self) -> bool:
+        return self.number == 0
 
     def set_number(self, number: int):
         self.number = number
