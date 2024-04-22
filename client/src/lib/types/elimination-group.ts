@@ -6,6 +6,7 @@ export type EliminationGroup = {
 	column: number;
 	number: number;
 	technique: string;
+	formingNotes: EliminationNote[];
 	eliminatedNotes: EliminationNote[];
 	solutionIndex: number;
 };

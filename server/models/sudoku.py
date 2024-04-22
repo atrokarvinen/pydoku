@@ -2,15 +2,14 @@ import copy
 import math
 from models.square import Square
 from models.elimination import Elimination
-from models.eliminationReason import EliminationReason
 from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
 from models.eliminationGroup import EliminationGroup
-from models.eliminationNote import EliminationNote
+from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import hard_sudoku1
+from testing.sudokus import expert_sudoku1
 
 
 class Sudoku:
@@ -19,13 +18,14 @@ class Sudoku:
         self.eliminations = []
         self.scan_technique = Scan()
         self.single_candidate_technique = SingleCandidateTechnique()
+        self.naked_pair_technique = NakedPair()
 
     def set_board(self, board: Board):
         self.board = board
 
     def parse(self) -> Board:
         size = 9
-        testSudoku = hard_sudoku1
+        testSudoku = expert_sudoku1
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
@@ -86,7 +86,10 @@ class Sudoku:
         solution = Solution(board)
         max_iterations = math.pow(board.size, 3)
         while (True):
-            elimination_groups = self.scan_technique.scan(board)
+            scan_groups = self.scan_technique.scan(board)
+            naked_pair_groups = self.naked_pair_technique.get_naked_pairs(
+                board)
+            elimination_groups = scan_groups + naked_pair_groups
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]
                 board = self.apply_elimination_group(board, first_group)

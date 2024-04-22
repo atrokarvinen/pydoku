@@ -29,6 +29,7 @@ class Scan:
                 column=column,
                 number=number,
                 technique="scan",
+                forming_notes=[],
                 eliminated_notes=eliminated_notes,
             )
             for other_square in other_squares:

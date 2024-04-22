@@ -1,6 +1,7 @@
 <script lang="ts">
 	export let note: number;
 	export let isEliminated: boolean;
+	export let isForming: boolean;
 
 	let className = '';
 	$: {
@@ -21,6 +22,9 @@
 		}
 		if (isEliminated) {
 			noteStyle += ' border border-red-500';
+		}
+		if (isForming) {
+			noteStyle += ' border border-green-500';
 		}
 		className = noteStyle;
 	}

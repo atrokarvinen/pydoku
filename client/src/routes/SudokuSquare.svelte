@@ -75,6 +75,18 @@
 				eliminationNote.number === note
 		);
 	};
+
+	const isNoteForming = (note: number, row: number, col: number) => {
+		if (!selectedElimination || !selectedElimination.formingNotes) {
+			return false;
+		}
+		return selectedElimination.formingNotes.some(
+			(eliminationNote) =>
+				eliminationNote.row === row &&
+				eliminationNote.column === col &&
+				eliminationNote.number === note
+		);
+	};
 </script>
 
 <div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
@@ -82,7 +94,11 @@
 		<button class="w-full h-full p-0.5">
 			<div class="w-full h-full position: relative">
 				{#each square.possibleNumbers as note}
-					<SudokuNote {note} isEliminated={isNoteEliminated(note, square.row, square.column)} />
+					<SudokuNote
+						{note}
+						isEliminated={isNoteEliminated(note, square.row, square.column)}
+						isForming={isNoteForming(note, square.row, square.column)}
+					/>
 				{/each}
 			</div>
 		</button>

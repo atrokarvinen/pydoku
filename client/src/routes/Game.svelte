@@ -55,6 +55,8 @@
 		const response = await axios.post<Solution>('/sudoku/solve', { sudoku });
 		solution = response.data;
 		sudoku = solution.sudoku;
+		currentSolutionStep = 0;
+		resetSelections();
 	};
 
 	const playSolution = async () => {

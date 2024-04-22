@@ -9,12 +9,8 @@
 		switch (strategy) {
 			case 'scan':
 				return 'Scan';
-			case 'row-scan':
-				return 'Row scan';
-			case 'column-scan':
-				return 'Column scan';
-			case 'box-scan':
-				return 'Box scan';
+			case 'naked-pair':
+				return 'Naked Pair';
 			default:
 				return 'Unknown strategy';
 		}
