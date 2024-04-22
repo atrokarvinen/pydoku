@@ -42,22 +42,6 @@ class Sudoku:
         return board
 
     def add_initial_possibilities(self, board: Board) -> Board:
-        # initialized_board = []
-        # size = board.size
-        # for i in range(size):
-        #     boardRow = []
-        #     for j in range(size):
-        #         square = board[i][j]
-        #         number = square.number
-        #         new_square = Square(i, j, number)
-        #         if (number == 0):
-        #             possible_numbers = [*range(1, size+1)]
-        #             new_square.set_possible_numbers(possible_numbers)
-        #         else:
-        #             new_square.set_number(number)
-        #         boardRow.append(new_square)
-        #     initialized_board.append(boardRow)
-
         board.add_initial_possibilities()
         return board
 

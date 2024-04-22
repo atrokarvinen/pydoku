@@ -6,6 +6,8 @@
 	import SolutionInfoSingleCandidate from './SolutionInfoSingleCandidate.svelte';
 
 	export let solution: Solution;
+	export let eliminationClicked: (elimination: Elimination) => void;
+	export let candidateClicked: (candidate: SingleCandidate) => void;
 
 	let actions: (Elimination | SingleCandidate)[] = [];
 	$: actions = [...solution.eliminations, ...solution.singleCandidates].sort(
@@ -32,13 +34,13 @@
 			<SolutionInfoElimination
 				step={step + 1}
 				elimination={toElimination(action)}
-				eliminationClicked={() => {}}
+				{eliminationClicked}
 			/>
 		{:else}
 			<SolutionInfoSingleCandidate
 				step={step + 1}
 				candidate={toSingleCandidate(action)}
-				candidateClicked={() => {}}
+				{candidateClicked}
 			/>
 		{/if}
 	{/each}

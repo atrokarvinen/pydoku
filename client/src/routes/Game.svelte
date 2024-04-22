@@ -11,6 +11,7 @@
 	export let sudoku: Sudoku;
 	let eliminations: Elimination[] = [];
 	let selectedElimination: Elimination | undefined;
+	let selectedCandidate: SingleCandidate | undefined;
 	let singleCandidates: SingleCandidate[] = [];
 	let solution: Solution = { eliminations: [], singleCandidates: [], sudoku: [] };
 
@@ -51,6 +52,10 @@
 
 	const eliminationClicked = (elimination: Elimination) => {
 		selectedElimination = elimination;
+	};
+
+	const candidateClicked = (candidate: SingleCandidate) => {
+		selectedCandidate = candidate;
 	};
 
 	const applyEliminations = () => eliminations.forEach(applyElimination);
@@ -98,12 +103,12 @@
 </script>
 
 <div class="flex flex-col gap-5">
-	<SudokuBoard {sudoku} {selectedElimination} />
+	<SudokuBoard {sudoku} {selectedElimination} {selectedCandidate} />
 	<div class="flex flex-row gap-5">
 		<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
 		<button class="btn variant-filled-primary" on:click={playSolution}>Play solution</button>
 	</div>
-	<SolutionInfo {solution} />
+	<SolutionInfo {solution} {candidateClicked} {eliminationClicked} />
 	<button class="btn variant-filled-primary" on:click={applyEliminations}>Apply eliminations</button
 	>
 	<EliminationInfo {eliminations} {eliminationClicked} />
