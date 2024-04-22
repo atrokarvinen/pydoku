@@ -3,6 +3,7 @@ from models.eliminationReason import EliminationReason
 
 class Elimination:
     def __init__(self, row: int, column: int, number: int, caused_by: EliminationReason):
+        self.type = "elimination"
         self.row = row
         self.column = column
         self.number = number
@@ -11,6 +12,7 @@ class Elimination:
 
     def serialize(self):
         return {
+            "type": self.type,
             "row": self.row,
             "column": self.column,
             "number": self.number,
