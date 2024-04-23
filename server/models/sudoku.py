@@ -6,6 +6,7 @@ from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
 from models.eliminationGroup import EliminationGroup
+from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
@@ -19,6 +20,7 @@ class Sudoku:
         self.scan_technique = Scan()
         self.single_candidate_technique = SingleCandidateTechnique()
         self.naked_pair_technique = NakedPair()
+        self.pointing_technique = Pointing()
 
     def set_board(self, board: Board):
         self.board = board
@@ -84,12 +86,15 @@ class Sudoku:
         self.add_initial_possibilities(board)
         iteration = 0
         solution = Solution(board)
-        max_iterations = math.pow(board.size, 3)
+        max_iterations = 100
         while (True):
+            print("Iteration: " + str(iteration) +
+                  ", solution index: " + str(solution.solution_index))
             scan_groups = self.scan_technique.scan(board)
             naked_pair_groups = self.naked_pair_technique.get_naked_pairs(
                 board)
-            elimination_groups = scan_groups + naked_pair_groups
+            pointing_groups = self.pointing_technique.get_pointing(board)
+            elimination_groups = scan_groups + naked_pair_groups + pointing_groups
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]
                 board = self.apply_elimination_group(board, first_group)
@@ -101,7 +106,6 @@ class Sudoku:
 
             solution.add_single_candidates(single_candidates)
 
-            print("Iteration: " + str(iteration))
             error_squares = self.is_solved(board)
             if (len(elimination_groups) == 0 and len(single_candidates) == 0):
                 print(

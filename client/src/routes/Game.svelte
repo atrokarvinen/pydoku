@@ -5,13 +5,16 @@
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Sudoku } from '$lib/types/sudoku';
+	import GameActionButtons from './GameActionButtons.svelte';
 	import SolutionInfo from './SolutionInfo.svelte';
 	import SudokuBoard from './SudokuBoard.svelte';
 	export let sudoku: Sudoku;
+	let selectedNumber: number | undefined;
 	let selectedElimination: EliminationGroup | undefined;
 	let selectedCandidate: SingleCandidate | undefined;
 	let solution: Solution = defaultSolution;
 	let currentSolutionStep = 0;
+	$: boardSize = sudoku.length;
 
 	const fillNotes = async () => {
 		const response = await axios.get<Sudoku>('/sudoku/notes');
@@ -19,6 +22,7 @@
 	};
 
 	const resetSelections = () => {
+		selectedNumber = undefined;
 		selectedElimination = undefined;
 		selectedCandidate = undefined;
 	};
@@ -79,10 +83,16 @@
 		}
 		currentSolutionStep = 0;
 	};
+
+	const numberClicked = (n: number) => {
+		resetSelections();
+		selectedNumber = n;
+	};
 </script>
 
 <div class="flex flex-col gap-5">
-	<SudokuBoard {sudoku} {selectedElimination} {selectedCandidate} />
+	<SudokuBoard {sudoku} {selectedElimination} {selectedCandidate} {selectedNumber} />
+	<GameActionButtons {boardSize} {numberClicked} />
 	<div class="flex flex-row gap-5">
 		<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
 		<button class="btn variant-filled-primary" on:click={playSolution}>Play</button>

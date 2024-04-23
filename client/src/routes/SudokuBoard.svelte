@@ -6,8 +6,7 @@
 	export let sudoku: Sudoku;
 	export let selectedElimination: EliminationGroup | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
-
-	$: console.log('selectedElimination', selectedElimination);
+	export let selectedNumber: number | undefined;
 
 	$: size = sudoku.length;
 </script>
@@ -15,7 +14,7 @@
 <div class="grid grid-cols-9">
 	{#each sudoku as row}
 		{#each row as square}
-			<SudokuSquare {square} {size} {selectedElimination} {selectedCandidate} />
+			<SudokuSquare {square} {size} {selectedElimination} {selectedCandidate} {selectedNumber} />
 		{/each}
 	{/each}
 </div>

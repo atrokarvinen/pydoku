@@ -11,6 +11,10 @@
 				return 'Scan';
 			case 'naked-pair':
 				return 'Naked Pair';
+			case 'pointing':
+				return 'Pointing';
+			case 'claiming':
+				return 'Claiming';
 			default:
 				return 'Unknown strategy';
 		}

@@ -20,13 +20,12 @@ class Board:
         return (square.row // self.box_size) * self.box_size + square.column // self.box_size
 
     def get_squares_in_box(self, square: Square) -> list[Square]:
+        box = self.get_box_of_square(square)
+        return self.get_squares_in_box_number(box)
+
+    def get_squares_in_box_number(self, box: int) -> list[Square]:
         flat_squares = self.flatten()
-        squares = []
-        for other_square in flat_squares:
-            box = self.get_box_of_square(square)
-            other_box = self.get_box_of_square(other_square)
-            if (box == other_box):
-                squares.append(other_square)
+        squares = [s for s in flat_squares if self.get_box_of_square(s) == box]
         return squares
 
     def append(self, row: list[Square]):

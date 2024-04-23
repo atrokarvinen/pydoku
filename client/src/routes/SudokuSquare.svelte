@@ -8,16 +8,10 @@
 	export let size: number;
 	export let selectedElimination: EliminationGroup | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
+	export let selectedNumber: number | undefined;
 
 	$: rowNumber = square.row;
 	$: colNumber = square.column;
-	$: targetSquare = selectedElimination
-		? {
-				row: selectedElimination.row,
-				column: selectedElimination.column
-			}
-		: undefined;
-	$: targetNote = selectedElimination?.number;
 	$: candidateSquare = selectedCandidate
 		? {
 				row: selectedCandidate.row,
@@ -32,6 +26,7 @@
 		!!candidateSquare &&
 		square.row === candidateSquare.row &&
 		square.column === candidateSquare.column;
+	$: isSelected = selectedNumber && square.number === selectedNumber;
 
 	const getBorderClass = (
 		row: number,
@@ -98,12 +93,13 @@
 						{note}
 						isEliminated={isNoteEliminated(note, square.row, square.column)}
 						isForming={isNoteForming(note, square.row, square.column)}
+						{selectedNumber}
 					/>
 				{/each}
 			</div>
 		</button>
 	{:else}
-		<span class="text-3xl">
+		<span class={`text-3xl text-center w-full ${isSelected ? 'bg-green-700' : ''}`}>
 			{square.number}
 		</span>
 	{/if}
