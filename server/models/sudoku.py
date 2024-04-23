@@ -1,11 +1,10 @@
 import copy
 import math
 from models.square import Square
-from models.elimination import Elimination
 from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
-from models.eliminationGroup import EliminationGroup
+from models.elimination import Elimination
 from techniques.claiming import Claiming
 from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
@@ -103,8 +102,8 @@ class Sudoku:
                 pointing_groups + claiming_groups
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]
-                board = self.apply_elimination_group(board, first_group)
-                solution.add_elimination_group(first_group)
+                board = self.apply_elimination(board, first_group)
+                solution.add_elimination(first_group)
 
             single_candidates = self.single_candidate_technique.get_single_candidates(
                 board)
@@ -127,57 +126,14 @@ class Sudoku:
 
             iteration += 1
 
-        print("Found eliminations: " + str(len(solution.elimination_groups)))
+        print("Found eliminations: " + str(len(solution.eliminations)))
         print("Found single candidates: " +
               str(len(solution.single_candidates)))
         return solution
 
-    def elimination_matches(self, elimination: Elimination, other_elimination: Elimination) -> bool:
-        return elimination.row == other_elimination.row \
-            and elimination.column == other_elimination.column \
-            and elimination.number == other_elimination.number
-
-    def filter_unique_eliminations(self, eliminations: list[Elimination]) -> list[Elimination]:
-        unique_eliminations: list[Elimination] = []
-        for elimination in eliminations:
-            already_added = False
-            for added_elimination in unique_eliminations:
-                if (self.elimination_matches(elimination, added_elimination)):
-                    already_added = True
-                    break
-            if (not already_added):
-                unique_eliminations.append(elimination)
-
-        return unique_eliminations
-
-    def apply_elimination_group(self, board: Board, eliminationGroup: EliminationGroup) -> Board:
+    def apply_elimination(self, board: Board, elimination: Elimination) -> Board:
         board_copy = copy.deepcopy(board)
-        for elimination in eliminationGroup.eliminated_notes:
-            row = elimination.row
-            column = elimination.column
-            number = elimination.number
-
-            square = board_copy.get_square(row, column)
-            square.remove_possible_number(number)
-
-        return board_copy
-
-    def apply_elimination_groups(self, board: Board, eliminations: list[EliminationGroup]) -> Board:
-        board_copy = copy.deepcopy(board)
-        for eliminationGroup in eliminations:
-            for elimination in eliminationGroup.eliminated_notes:
-                row = elimination.row
-                column = elimination.column
-                number = elimination.number
-
-                square = board_copy.get_square(row, column)
-                square.remove_possible_number(number)
-
-        return board_copy
-
-    def apply_eliminations(self, board: Board, eliminations: list[Elimination]) -> Board:
-        board_copy = copy.deepcopy(board)
-        for elimination in eliminations:
+        for elimination in elimination.eliminated_notes:
             row = elimination.row
             column = elimination.column
             number = elimination.number

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { EliminationGroup } from '$lib/types/elimination-group';
+	import type { Elimination } from '$lib/types/elimination';
 
 	export let step: number;
-	export let elimination: EliminationGroup;
-	export let eliminationClicked: (elimination: EliminationGroup) => void;
+	export let elimination: Elimination;
+	export let eliminationClicked: (elimination: Elimination) => void;
 
 	const strategyToString = (strategy: string) => {
 		switch (strategy) {

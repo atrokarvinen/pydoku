@@ -1,5 +1,5 @@
 from models.board import Board
-from models.eliminationGroup import EliminationGroup
+from models.elimination import Elimination
 from models.eliminationNote import EliminationNote
 from models.square import Square
 
@@ -8,7 +8,7 @@ class Pointing:
     def __init__(self) -> None:
         pass
 
-    def get_pointing(self, board: Board) -> list[EliminationGroup]:
+    def get_pointing(self, board: Board) -> list[Elimination]:
         groups = []
         for i in range(board.size):
             squares_in_box = board.get_squares_in_box_number(i)
@@ -37,7 +37,7 @@ class Pointing:
                     ]
                     if (len(eliminated_notes) == 0):
                         continue
-                    elimination = EliminationGroup(
+                    elimination = Elimination(
                         row=squares_with_note[0].row,
                         column=squares_with_note[0].column,
                         number=note,
@@ -63,7 +63,7 @@ class Pointing:
                     ]
                     if (len(eliminated_notes) == 0):
                         continue
-                    elimination = EliminationGroup(
+                    elimination = Elimination(
                         row=squares_with_note[0].row,
                         column=squares_with_note[0].column,
                         number=note,

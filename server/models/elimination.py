@@ -1,14 +1,22 @@
-from models.eliminationReason import EliminationReason
+from models.eliminationNote import EliminationNote
 
 
 class Elimination:
-    def __init__(self, row: int, column: int, number: int, caused_by: EliminationReason):
+    def __init__(self,
+                 row: int,
+                 column: int,
+                 number: int,
+                 technique: str,
+                 forming_notes: list[EliminationNote],
+                 eliminated_notes: list[EliminationNote]):
         self.type = "elimination"
         self.row = row
         self.column = column
         self.number = number
-        self.caused_by = caused_by
-        self.solutionIndex = 0
+        self.forming_notes = forming_notes
+        self.technique = technique
+        self.eliminated_notes = eliminated_notes
+        self.solution_index = 0
 
     def serialize(self):
         return {
@@ -16,6 +24,8 @@ class Elimination:
             "row": self.row,
             "column": self.column,
             "number": self.number,
-            "causedBy": self.caused_by.serialize(),
-            "solutionIndex": self.solutionIndex
+            "formingNotes": [note.serialize() for note in self.forming_notes],
+            "technique": self.technique,
+            "eliminatedNotes": [note.serialize() for note in self.eliminated_notes],
+            "solutionIndex": self.solution_index
         }

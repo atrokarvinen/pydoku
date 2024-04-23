@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { axios } from '$lib/axios';
 	import { getSolutionStepsCount, moveToSolutionStep } from '$lib/sudoku-log/sudoku-log';
-	import type { EliminationGroup } from '$lib/types/elimination-group';
+	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Sudoku } from '$lib/types/sudoku';
@@ -10,7 +10,7 @@
 	import SudokuBoard from './SudokuBoard.svelte';
 	export let sudoku: Sudoku;
 	let selectedNumber: number | undefined;
-	let selectedElimination: EliminationGroup | undefined;
+	let selectedElimination: Elimination | undefined;
 	let selectedCandidate: SingleCandidate | undefined;
 	let solution: Solution = defaultSolution;
 	let currentSolutionStep = 0;
@@ -27,7 +27,7 @@
 		selectedCandidate = undefined;
 	};
 
-	const eliminationClicked = (elimination: EliminationGroup) => {
+	const eliminationClicked = (elimination: Elimination) => {
 		const newSudoku = moveToSolutionStep(
 			sudoku,
 			currentSolutionStep,

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { getSolutionSteps } from '$lib/sudoku-log/sudoku-log';
-	import type { EliminationGroup } from '$lib/types/elimination-group';
+	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import type { Solution } from '$lib/types/solution';
 	import SolutionInfoElimination from './SolutionInfoElimination.svelte';
 	import SolutionInfoSingleCandidate from './SolutionInfoSingleCandidate.svelte';
 
 	export let solution: Solution;
-	export let eliminationClicked: (elimination: EliminationGroup) => void;
+	export let eliminationClicked: (elimination: Elimination) => void;
 	export let candidateClicked: (candidate: SingleCandidate) => void;
 
 	$: solutionSteps = getSolutionSteps(solution);

@@ -1,5 +1,5 @@
 from models.board import Board
-from models.eliminationGroup import EliminationGroup
+from models.elimination import Elimination
 from models.eliminationNote import EliminationNote
 
 
@@ -7,7 +7,7 @@ class Claiming:
     def __init__(self) -> None:
         pass
 
-    def get_claiming(self, board: Board) -> list[EliminationGroup]:
+    def get_claiming(self, board: Board) -> list[Elimination]:
         elimination_groups = []
         columns = [board.get_empty_squares_in_column(
             i) for i in range(board.size)]
@@ -36,7 +36,7 @@ class Claiming:
                 ]
                 if len(claimed_squares) == 0:
                     continue
-                elimination_group = EliminationGroup(
+                elimination_group = Elimination(
                     row=squares_with_note[0].row,
                     column=squares_with_note[0].column,
                     number=note,

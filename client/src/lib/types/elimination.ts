@@ -1,10 +1,12 @@
-import type { EliminationReason } from './elimination-reason';
+import type { EliminationNote } from './elimination-note';
 
 export type Elimination = {
 	type: 'elimination';
 	row: number;
 	column: number;
 	number: number;
-	causedBy: EliminationReason;
+	technique: string;
+	formingNotes: EliminationNote[];
+	eliminatedNotes: EliminationNote[];
 	solutionIndex: number;
 };

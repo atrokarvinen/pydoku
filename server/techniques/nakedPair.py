@@ -1,6 +1,6 @@
 import math
 from models.board import Board
-from models.eliminationGroup import EliminationGroup
+from models.elimination import Elimination
 from models.eliminationNote import EliminationNote
 from models.square import Square
 
@@ -26,7 +26,7 @@ class NakedPair:
                 return False
         return True
 
-    def pair_to_elimination(self, pair: list[Square], eliminated_notes: list[EliminationNote]) -> EliminationGroup:
+    def pair_to_elimination(self, pair: list[Square], eliminated_notes: list[EliminationNote]) -> Elimination:
         row = pair[0].row
         column = pair[0].column
         number = pair[0].possible_numbers[0]
@@ -46,7 +46,7 @@ class NakedPair:
         else:
             technique = "naked-" + str(len(pair))
 
-        return EliminationGroup(
+        return Elimination(
             row=row,
             column=column,
             number=number,
@@ -72,7 +72,7 @@ class NakedPair:
                         note))
         return eliminates_notes
 
-    def get_naked_pairs(self, board: Board) -> list[EliminationGroup]:
+    def get_naked_pairs(self, board: Board) -> list[Elimination]:
         max_pair_count = math.floor(board.size/2)
         naked_pairs = []
         for pair_count in range(2, max_pair_count+1):
@@ -80,7 +80,7 @@ class NakedPair:
             naked_pairs += pairs
         return naked_pairs
 
-    def get_naked_pairs_of_n(self, board: Board, pair_count: int) -> list[EliminationGroup]:
+    def get_naked_pairs_of_n(self, board: Board, pair_count: int) -> list[Elimination]:
         row_eliminations = self.get_pairs_in_line(
             board,
             pair_count,
@@ -101,7 +101,7 @@ class NakedPair:
 
         return row_eliminations + column_eliminations + box_eliminations
 
-    def get_pairs_in_line(self, board: Board, pair_count: int, line_getter, line_getter_by_square) -> list[EliminationGroup]:
+    def get_pairs_in_line(self, board: Board, pair_count: int, line_getter, line_getter_by_square) -> list[Elimination]:
         naked_pairs = []
         lines = [line_getter(i) for i in range(board.size)]
         for line in lines:

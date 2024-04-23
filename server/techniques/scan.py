@@ -1,5 +1,5 @@
 from models.board import Board
-from models.eliminationGroup import EliminationGroup
+from models.elimination import Elimination
 from models.eliminationNote import EliminationNote
 
 
@@ -7,7 +7,7 @@ class Scan:
     def __init__(self):
         pass
 
-    def scan(self, board: Board) -> list[EliminationGroup]:
+    def scan(self, board: Board) -> list[Elimination]:
         elimination_groups = []
         flat_squares = board.flatten()
         for square in flat_squares:
@@ -24,7 +24,7 @@ class Scan:
             other_squares = squares_in_row + squares_in_column + squares_in_box
 
             eliminated_notes = []
-            elimination_group = EliminationGroup(
+            elimination_group = Elimination(
                 row=row,
                 column=column,
                 number=number,

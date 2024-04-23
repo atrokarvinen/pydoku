@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { EliminationGroup } from '$lib/types/elimination-group';
+	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import type { Square } from '$lib/types/sudoku';
 	import SudokuNote from './SudokuNote.svelte';
 
 	export let square: Square;
 	export let size: number;
-	export let selectedElimination: EliminationGroup | undefined;
+	export let selectedElimination: Elimination | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
 	export let selectedNumber: number | undefined;
 
@@ -85,12 +85,13 @@
 
 	$: possibleNotes = Array.from({ length: size }, (_, i) => i + 1);
 	$: boxSize = Math.sqrt(size);
+	$: contentClassName = `w-full h-full grid grid-cols-${boxSize} grid-rows-${boxSize}`;
 </script>
 
 <div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
 	{#if square.number === 0}
 		<button class="w-full h-full">
-			<div class={`w-full h-full grid grid-cols-${boxSize} grid-rows-${boxSize}`}>
+			<div class={contentClassName}>
 				{#each possibleNotes as note}
 					<div class="flex items-center justify-center">
 						{#if square.possibleNumbers.includes(note)}
