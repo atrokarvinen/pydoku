@@ -16,11 +16,17 @@ class Board:
     def get_empty_squares_in_row(self, row: int) -> list[Square]:
         return [square for square in self.rows[row] if square.is_empty()]
 
+    def get_empty_squares_in_row_by_square(self, square: Square) -> list[Square]:
+        return self.get_empty_squares_in_row(square.row)
+
     def get_squares_in_column(self, column: int) -> list[Square]:
         return [row[column] for row in self.rows]
 
     def get_empty_squares_in_column(self, column: int) -> list[Square]:
         return [row[column] for row in self.rows if row[column].is_empty()]
+
+    def get_empty_squares_in_column_by_square(self, square: Square) -> list[Square]:
+        return self.get_empty_squares_in_column(square.column)
 
     def get_box_of_square(self, square: Square):
         return (square.row // self.box_size) * self.box_size + square.column // self.box_size
@@ -36,6 +42,9 @@ class Board:
 
     def get_empty_squares_in_box_number(self, box: int) -> list[Square]:
         return [square for square in self.get_squares_in_box_number(box) if square.is_empty()]
+
+    def get_empty_squares_in_box_by_square(self, square: Square) -> list[Square]:
+        return self.get_empty_squares_in_box_number(self.get_box_of_square(square))
 
     def append(self, row: list[Square]):
         self.rows.append(row)
