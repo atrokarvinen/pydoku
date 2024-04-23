@@ -82,24 +82,33 @@
 				eliminationNote.number === note
 		);
 	};
+
+	$: possibleNotes = Array.from({ length: size }, (_, i) => i + 1);
+	$: boxSize = Math.sqrt(size);
 </script>
 
 <div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
 	{#if square.number === 0}
-		<button class="w-full h-full p-0.5">
-			<div class="w-full h-full position: relative">
-				{#each square.possibleNumbers as note}
-					<SudokuNote
-						{note}
-						isEliminated={isNoteEliminated(note, square.row, square.column)}
-						isForming={isNoteForming(note, square.row, square.column)}
-						{selectedNumber}
-					/>
+		<button class="w-full h-full">
+			<div class={`w-full h-full grid grid-cols-${boxSize} grid-rows-${boxSize}`}>
+				{#each possibleNotes as note}
+					<div class="flex items-center justify-center">
+						{#if square.possibleNumbers.includes(note)}
+							<SudokuNote
+								{note}
+								isEliminated={isNoteEliminated(note, square.row, square.column)}
+								isForming={isNoteForming(note, square.row, square.column)}
+								{selectedNumber}
+							/>
+						{:else}
+							<div />
+						{/if}
+					</div>
 				{/each}
 			</div>
 		</button>
 	{:else}
-		<span class={`text-3xl text-center w-full ${isSelected ? 'bg-green-700' : ''}`}>
+		<span class={`text-3xl text-center h-full w-full ${isSelected ? 'bg-green-700' : ''}`}>
 			{square.number}
 		</span>
 	{/if}
