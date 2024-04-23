@@ -35,8 +35,8 @@
 			elimination.solutionIndex
 		);
 
+		resetSelections();
 		selectedElimination = elimination;
-		selectedCandidate = undefined;
 		currentSolutionStep = elimination.solutionIndex;
 		sudoku = newSudoku;
 	};
@@ -48,9 +48,8 @@
 			solution,
 			candidate.solutionIndex
 		);
-
+		resetSelections();
 		selectedCandidate = candidate;
-		selectedElimination = undefined;
 		currentSolutionStep = candidate.solutionIndex;
 		sudoku = newSudoku;
 	};
@@ -85,6 +84,10 @@
 	};
 
 	const numberClicked = (n: number) => {
+		if (selectedNumber === n) {
+			selectedNumber = undefined;
+			return;
+		}
 		resetSelections();
 		selectedNumber = n;
 	};

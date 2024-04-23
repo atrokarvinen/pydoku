@@ -13,7 +13,7 @@
 	$: solutionSteps = getSolutionSteps(solution);
 </script>
 
-<div class="flex flex-col gap-5 h-96 overflow-auto">
+<div class="flex flex-col gap-5 h-48 overflow-auto">
 	{#if solution.isSolved}
 		<span>Solved after ({solutionSteps.length}) steps.</span>
 	{:else}

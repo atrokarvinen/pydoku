@@ -12,7 +12,10 @@ class SudokuMapper:
             squares = []
             for square in row:
                 mappedSquare = Square(
-                    square["row"], square["column"], square["number"])
+                    square["row"],
+                    square["column"],
+                    square["number"],
+                    square["box"])
                 possibleNumbers = [
                     number for number in square["possibleNumbers"]]
                 mappedSquare.set_possible_numbers(possibleNumbers)

@@ -1,9 +1,10 @@
 class Square:
-    def __init__(self, row: int, column: int, number: int):
+    def __init__(self, row: int, column: int, number: int, box: int):
         self.row = row
         self.column = column
         self.number = number
         self.possible_numbers = []
+        self.box = box
 
     def is_empty(self) -> bool:
         return self.number == 0
@@ -24,5 +25,6 @@ class Square:
             "row": self.row,
             "column": self.column,
             "number": self.number,
-            "possibleNumbers": self.possible_numbers
+            "possibleNumbers": self.possible_numbers,
+            "box": self.box
         }

@@ -6,6 +6,7 @@ from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
 from models.eliminationGroup import EliminationGroup
+from techniques.claiming import Claiming
 from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
@@ -21,12 +22,14 @@ class Sudoku:
         self.single_candidate_technique = SingleCandidateTechnique()
         self.naked_pair_technique = NakedPair()
         self.pointing_technique = Pointing()
+        self.claiming_technique = Claiming()
 
     def set_board(self, board: Board):
         self.board = board
 
     def parse(self) -> Board:
         size = 9
+        box_size = math.sqrt(size)
         testSudoku = expert_sudoku1
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
@@ -43,7 +46,8 @@ class Sudoku:
                     char_as_number = 0
                 else:
                     char_as_number = int(char)
-                square = Square(i, j, char_as_number)
+                box = math.floor(i/box_size)*box_size + math.floor(j/box_size)
+                square = Square(i, j, char_as_number, box)
                 row.append(square)
             board.append(row)
 
@@ -94,7 +98,9 @@ class Sudoku:
             naked_pair_groups = self.naked_pair_technique.get_naked_pairs(
                 board)
             pointing_groups = self.pointing_technique.get_pointing(board)
-            elimination_groups = scan_groups + naked_pair_groups + pointing_groups
+            claiming_groups = self.claiming_technique.get_claiming(board)
+            elimination_groups = scan_groups + naked_pair_groups + \
+                pointing_groups + claiming_groups
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]
                 board = self.apply_elimination_group(board, first_group)
