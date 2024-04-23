@@ -11,6 +11,12 @@
 				return 'Scan';
 			case 'naked-pair':
 				return 'Naked Pair';
+			case 'naked-triple':
+				return 'Naked Triple';
+			case 'naked-quadruple':
+				return 'Naked Quadruple';
+			case 'hidden-pair':
+				return 'Hidden Pair';
 			case 'pointing':
 				return 'Pointing';
 			case 'claiming':

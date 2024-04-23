@@ -1,3 +1,4 @@
+import math
 from models.board import Board
 from models.eliminationGroup import EliminationGroup
 from models.eliminationNote import EliminationNote
@@ -8,28 +9,48 @@ class NakedPair:
     def __init__(self) -> None:
         pass
 
-    def pairs_match(self, pair1: list[int], pair2: list[int]) -> bool:
-        sorted_pair1 = sorted(pair1)
-        sorted_pair2 = sorted(pair2)
-        return sorted_pair1 == sorted_pair2
+    def get_sets_of_n(self, sets, remaining_elements, pair, n):
+        if (len(pair) == n):
+            sets.append(pair)
+        for i in range(len(remaining_elements)):
+            picked = remaining_elements[i]
+            self.get_sets_of_n(
+                sets, remaining_elements[i+1:], pair + [picked], n)
+        return sets
+
+    def are_all_notes_same(self, squares: list[Square]) -> bool:
+        first_square = squares[0]
+        notes = first_square.possible_numbers
+        for square in squares:
+            if (square.possible_numbers != notes):
+                return False
+        return True
 
     def pair_to_elimination(self, pair: list[Square], eliminated_notes: list[EliminationNote]) -> EliminationGroup:
         row = pair[0].row
         column = pair[0].column
         number = pair[0].possible_numbers[0]
         forming_notes = []
-        # forming_notes = [square.possible_numbers for square in pair for square.possible_numbers in square]
         for square in pair:
             notes = square.possible_numbers
             for note in notes:
                 forming_notes.append(EliminationNote(
                     square.row, square.column, note))
 
+        if (len(pair) == 2):
+            technique = "naked-pair"
+        elif (len(pair) == 3):
+            technique = "naked-triple"
+        elif (len(pair) == 4):
+            technique = "naked-quad"
+        else:
+            technique = "naked-" + str(len(pair))
+
         return EliminationGroup(
             row=row,
             column=column,
             number=number,
-            technique="naked-pair",
+            technique=technique,
             forming_notes=forming_notes,
             eliminated_notes=eliminated_notes
         )
@@ -37,7 +58,7 @@ class NakedPair:
     def squares_outside_pair(self, squares: list[Square], pair: list[Square]) -> list[Square]:
         return [square for square in squares if square not in pair]
 
-    def get_eliminates_notes(self, pair: list[Square], square_set: list[Square]) -> list[EliminationNote]:
+    def get_eliminated_notes(self, pair: list[Square], square_set: list[Square]) -> list[EliminationNote]:
         eliminates_notes = []
         pair_to_look = pair[0].possible_numbers
         squares_outside_pair = self.squares_outside_pair(
@@ -52,61 +73,78 @@ class NakedPair:
         return eliminates_notes
 
     def get_naked_pairs(self, board: Board) -> list[EliminationGroup]:
-        flat_squares = board.flatten()
-
-        pair_count = 2
+        max_pair_count = math.floor(board.size/2)
         naked_pairs = []
-        for square in flat_squares:
-            row = square.row
-            column = square.column
-            if (not square.is_empty()):
-                continue
+        for pair_count in range(2, max_pair_count+1):
+            pairs = self.get_naked_pairs_of_n(board, pair_count)
+            naked_pairs += pairs
+        return naked_pairs
 
-            pair_to_look = square.possible_numbers
-            if (len(pair_to_look) != pair_count):
-                continue
-
-            squares_in_row = board.get_squares_in_row(row)
-            squares_in_column = board.get_squares_in_column(column)
-            squares_in_box = board.get_squares_in_box(square)
-
-            for other_square in squares_in_row:
-                if (other_square.row == row and other_square.column == column):
+    def get_naked_pairs_of_n(self, board: Board, pair_count: int) -> list[EliminationGroup]:
+        naked_pairs = []
+        rows = [board.get_empty_squares_in_row(i) for i in range(board.size)]
+        for row in rows:
+            sets = self.get_sets_of_n([], row, [], pair_count)
+            for pair in sets:
+                all_notes_same = self.are_all_notes_same(pair)
+                if (not all_notes_same):
                     continue
-                if (self.pairs_match(pair_to_look, other_square.possible_numbers)):
-                    pair = [square, other_square]
-                    eliminated_notes = self.get_eliminates_notes(
-                        pair, squares_in_row)
-                    if (len(eliminated_notes) == 0):
-                        continue
-                    elimination = self.pair_to_elimination(
-                        pair, eliminated_notes)
-                    naked_pairs.append(elimination)
-
-            for other_square in squares_in_column:
-                if (other_square.row == row and other_square.column == column):
+                all_notes_correct_length = len(
+                    pair[0].possible_numbers) == pair_count
+                if (not all_notes_correct_length):
                     continue
-                if (self.pairs_match(pair_to_look, other_square.possible_numbers)):
-                    pair = [square, other_square]
-                    eliminated_notes = self.get_eliminates_notes(
-                        pair, squares_in_column)
-                    if (len(eliminated_notes) == 0):
-                        continue
-                    elimination = self.pair_to_elimination(
-                        pair, eliminated_notes)
-                    naked_pairs.append(elimination)
-
-            for other_square in squares_in_box:
-                if (other_square.row == row and other_square.column == column):
+                squares_in_row = board.get_squares_in_row(pair[0].row)
+                other_squares_in_row = [
+                    s for s in squares_in_row if s not in pair]
+                eliminated_notes = self.get_eliminated_notes(
+                    pair, other_squares_in_row)
+                if (len(eliminated_notes) == 0):
                     continue
-                if (self.pairs_match(pair_to_look, other_square.possible_numbers)):
-                    pair = [square, other_square]
-                    eliminated_notes = self.get_eliminates_notes(
-                        pair, squares_in_box)
-                    if (len(eliminated_notes) == 0):
-                        continue
-                    elimination = self.pair_to_elimination(
-                        pair, eliminated_notes)
-                    naked_pairs.append(elimination)
+                elimination = self.pair_to_elimination(pair, eliminated_notes)
+                naked_pairs.append(elimination)
+
+        columns = [board.get_empty_squares_in_column(
+            i) for i in range(board.size)]
+        for column in columns:
+            sets = self.get_sets_of_n([], column, [], pair_count)
+            for pair in sets:
+                all_notes_same = self.are_all_notes_same(pair)
+                if (not all_notes_same):
+                    continue
+                all_notes_correct_length = len(
+                    pair[0].possible_numbers) == pair_count
+                if (not all_notes_correct_length):
+                    continue
+                squares_in_column = board.get_squares_in_column(pair[0].column)
+                other_squares_in_column = [
+                    s for s in squares_in_column if s not in pair]
+                eliminated_notes = self.get_eliminated_notes(
+                    pair, other_squares_in_column)
+                if (len(eliminated_notes) == 0):
+                    continue
+                elimination = self.pair_to_elimination(pair, eliminated_notes)
+                naked_pairs.append(elimination)
+
+        boxes = [board.get_empty_squares_in_box_number(
+            i) for i in range(board.size)]
+        for box in boxes:
+            sets = self.get_sets_of_n([], box, [], pair_count)
+            for pair in sets:
+                all_notes_same = self.are_all_notes_same(pair)
+                if (not all_notes_same):
+                    continue
+                all_notes_correct_length = len(
+                    pair[0].possible_numbers) == pair_count
+                if (not all_notes_correct_length):
+                    continue
+                squares_in_box = board.get_squares_in_box(pair[0])
+                other_squares_in_box = [
+                    s for s in squares_in_box if s not in pair]
+                eliminated_notes = self.get_eliminated_notes(
+                    pair, other_squares_in_box)
+                if (len(eliminated_notes) == 0):
+                    continue
+                elimination = self.pair_to_elimination(pair, eliminated_notes)
+                naked_pairs.append(elimination)
 
         return naked_pairs
