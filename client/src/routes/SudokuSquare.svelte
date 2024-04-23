@@ -20,8 +20,9 @@
 		: undefined;
 	$: isCausedBy =
 		!!selectedElimination &&
-		square.row === selectedElimination.row &&
-		square.column === selectedElimination.column;
+		!!selectedElimination.causingSquare &&
+		square.row === selectedElimination.causingSquare.row &&
+		square.column === selectedElimination.causingSquare.column;
 	$: isCandidate =
 		!!candidateSquare &&
 		square.row === candidateSquare.row &&
@@ -71,11 +72,11 @@
 		);
 	};
 
-	const isNoteForming = (note: number, row: number, col: number) => {
-		if (!selectedElimination || !selectedElimination.formingNotes) {
+	const isNoteCausing = (note: number, row: number, col: number) => {
+		if (!selectedElimination || !selectedElimination.causingNotes) {
 			return false;
 		}
-		return selectedElimination.formingNotes.some(
+		return selectedElimination.causingNotes.some(
 			(eliminationNote) =>
 				eliminationNote.row === row &&
 				eliminationNote.column === col &&
@@ -98,7 +99,7 @@
 							<SudokuNote
 								{note}
 								isEliminated={isNoteEliminated(note, square.row, square.column)}
-								isForming={isNoteForming(note, square.row, square.column)}
+								isCausing={isNoteCausing(note, square.row, square.column)}
 								{selectedNumber}
 							/>
 						{:else}

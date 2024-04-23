@@ -1,12 +1,11 @@
-import type { EliminationNote } from './elimination-note';
+import type { NumberedNote } from './numbered-note';
+import type { NumberedSquare } from './numbered-square';
 
 export type Elimination = {
 	type: 'elimination';
-	row: number;
-	column: number;
-	number: number;
 	technique: string;
-	formingNotes: EliminationNote[];
-	eliminatedNotes: EliminationNote[];
+	causingSquare?: NumberedSquare;
+	causingNotes: NumberedNote[];
+	eliminatedNotes: NumberedNote[];
 	solutionIndex: number;
 };

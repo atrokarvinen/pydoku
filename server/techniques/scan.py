@@ -1,6 +1,7 @@
 from models.board import Board
 from models.elimination import Elimination
-from models.eliminationNote import EliminationNote
+from models.numberedNote import NumberedNote
+from models.numberedSquare import NumberedSquare
 
 
 class Scan:
@@ -25,18 +26,16 @@ class Scan:
 
             eliminated_notes = []
             elimination_group = Elimination(
-                row=row,
-                column=column,
-                number=number,
                 technique="scan",
-                forming_notes=[],
+                causing_square=NumberedSquare(row, column, number),
+                causing_notes=[],
                 eliminated_notes=eliminated_notes,
             )
             for other_square in other_squares:
                 if (other_square.row == row and other_square.column == column):
                     continue
                 if (other_square.possible_numbers.count(number)):
-                    eliminated_note = EliminationNote(
+                    eliminated_note = NumberedNote(
                         other_square.row,
                         other_square.column,
                         number)

@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let note: number;
 	export let isEliminated: boolean;
-	export let isForming: boolean;
+	export let isCausing: boolean;
 	export let selectedNumber: number | undefined;
 
 	$: isSelected = selectedNumber === note;
@@ -12,7 +12,7 @@
 		if (isEliminated) {
 			noteStyle += ' border border-red-500';
 		}
-		if (isForming) {
+		if (isCausing) {
 			noteStyle += ' border border-green-500';
 		}
 		if (isSelected) {

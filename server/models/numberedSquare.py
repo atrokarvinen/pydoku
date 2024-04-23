@@ -1,4 +1,4 @@
-class EliminationNote:
+class NumberedSquare:
     def __init__(self, row: int, column: int, number: int):
         self.row = row
         self.column = column

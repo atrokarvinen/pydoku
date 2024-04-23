@@ -1,6 +1,6 @@
 from models.board import Board
 from models.elimination import Elimination
-from models.eliminationNote import EliminationNote
+from models.numberedNote import NumberedNote
 from models.square import Square
 
 
@@ -32,17 +32,15 @@ class Pointing:
                         s for s in squares_in_row if s not in squares_with_note and note in s.possible_numbers
                     ]
                     eliminated_notes = [
-                        EliminationNote(
+                        NumberedNote(
                             s.row, s.column, note) for s in other_squares_in_row
                     ]
                     if (len(eliminated_notes) == 0):
                         continue
                     elimination = Elimination(
-                        row=squares_with_note[0].row,
-                        column=squares_with_note[0].column,
-                        number=note,
                         technique="pointing",
-                        forming_notes=[EliminationNote(
+                        causing_square=None,
+                        causing_notes=[NumberedNote(
                             s.row, s.column, note) for s in squares_with_note],
                         eliminated_notes=eliminated_notes
                     )
@@ -58,17 +56,15 @@ class Pointing:
                         s for s in squares_in_column if s not in squares_with_note and note in s.possible_numbers
                     ]
                     eliminated_notes = [
-                        EliminationNote(
+                        NumberedNote(
                             s.row, s.column, note) for s in other_squares_in_column
                     ]
                     if (len(eliminated_notes) == 0):
                         continue
                     elimination = Elimination(
-                        row=squares_with_note[0].row,
-                        column=squares_with_note[0].column,
-                        number=note,
                         technique="pointing",
-                        forming_notes=[EliminationNote(
+                        causing_square=None,
+                        causing_notes=[NumberedNote(
                             s.row, s.column, note) for s in squares_with_note],
                         eliminated_notes=eliminated_notes
                     )

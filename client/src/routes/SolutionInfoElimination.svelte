@@ -34,8 +34,6 @@
 <div>
 	<button on:click={() => eliminationClicked(elimination)}>
 		<span>#{numToThreeDigits(step)}</span>
-		<span>{`(${elimination.column + 1}, ${elimination.row + 1})`}</span>
-		<span>{`number: ${elimination.number}`}</span>
 		<span>,</span>
 		<span>{strategyToString(elimination.technique)}</span>
 	</button>

@@ -1,6 +1,6 @@
 from models.board import Board
 from models.elimination import Elimination
-from models.eliminationNote import EliminationNote
+from models.numberedNote import NumberedNote
 
 
 class Claiming:
@@ -37,13 +37,11 @@ class Claiming:
                 if len(claimed_squares) == 0:
                     continue
                 elimination_group = Elimination(
-                    row=squares_with_note[0].row,
-                    column=squares_with_note[0].column,
-                    number=note,
                     technique="claiming",
-                    forming_notes=[EliminationNote(
+                    causing_square=None,
+                    causing_notes=[NumberedNote(
                         s.row, s.column, note) for s in squares_with_note],
-                    eliminated_notes=[EliminationNote(
+                    eliminated_notes=[NumberedNote(
                         s.row, s.column, note) for s in claimed_squares]
                 )
                 elimination_groups.append(elimination_group)
