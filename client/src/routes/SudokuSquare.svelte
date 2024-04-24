@@ -60,6 +60,18 @@
 		return borderStyle;
 	};
 
+	const getContentClassName = (size: number) => {
+		let className = 'w-full h-full grid';
+		if (size === 4) {
+			className += ' grid-cols-2 grid-rows-2';
+		} else if (size === 9) {
+			className += ' grid-cols-3 grid-rows-3';
+		} else if (size === 16) {
+			className += ' grid-cols-4 grid-rows-4';
+		}
+		return className;
+	};
+
 	const isNoteEliminated = (note: number, row: number, col: number) => {
 		if (!selectedElimination || !selectedElimination.eliminatedNotes) {
 			return false;
@@ -85,14 +97,12 @@
 	};
 
 	$: possibleNotes = Array.from({ length: size }, (_, i) => i + 1);
-	$: boxSize = Math.sqrt(size);
-	$: contentClassName = `w-full h-full grid grid-cols-${boxSize} grid-rows-${boxSize}`;
 </script>
 
 <div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
 	{#if square.number === 0}
 		<button class="w-full h-full">
-			<div class={contentClassName}>
+			<div class={getContentClassName(size)}>
 				{#each possibleNotes as note}
 					<div class="flex items-center justify-center">
 						{#if square.possibleNumbers.includes(note)}

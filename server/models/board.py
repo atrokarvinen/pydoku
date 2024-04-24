@@ -40,11 +40,11 @@ class Board:
         squares = [s for s in flat_squares if self.get_box_of_square(s) == box]
         return squares
 
-    def get_empty_squares_in_box_number(self, box: int) -> list[Square]:
+    def get_empty_squares_in_box(self, box: int) -> list[Square]:
         return [square for square in self.get_squares_in_box_number(box) if square.is_empty()]
 
     def get_empty_squares_in_box_by_square(self, square: Square) -> list[Square]:
-        return self.get_empty_squares_in_box_number(self.get_box_of_square(square))
+        return self.get_empty_squares_in_box(self.get_box_of_square(square))
 
     def append(self, row: list[Square]):
         self.rows.append(row)

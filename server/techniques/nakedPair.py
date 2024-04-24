@@ -94,7 +94,7 @@ class NakedPair:
         box_eliminations = self.get_pairs_in_line(
             board,
             pair_count,
-            board.get_empty_squares_in_box_number,
+            board.get_empty_squares_in_box,
             board.get_empty_squares_in_box_by_square)
 
         return row_eliminations + column_eliminations + box_eliminations

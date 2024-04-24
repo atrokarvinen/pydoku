@@ -100,16 +100,17 @@ class Sudoku:
             claiming_groups = self.claiming_technique.get_claiming(board)
             elimination_groups = scan_groups + naked_pair_groups + \
                 pointing_groups + claiming_groups
+
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]
                 board = self.apply_elimination(board, first_group)
                 solution.add_elimination(first_group)
+            else:
+                single_candidates = self.single_candidate_technique.get_single_candidates(
+                    board)
+                board = self.apply_single_candidates(board, single_candidates)
 
-            single_candidates = self.single_candidate_technique.get_single_candidates(
-                board)
-            board = self.apply_single_candidates(board, single_candidates)
-
-            solution.add_single_candidates(single_candidates)
+                solution.add_single_candidates(single_candidates)
 
             error_squares = self.is_solved(board)
             if (len(elimination_groups) == 0 and len(single_candidates) == 0):
