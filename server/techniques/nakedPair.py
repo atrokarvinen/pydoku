@@ -27,9 +27,6 @@ class NakedPair:
         return True
 
     def pair_to_elimination(self, pair: list[Square], eliminated_notes: list[NumberedNote]) -> Elimination:
-        row = pair[0].row
-        column = pair[0].column
-        number = pair[0].possible_numbers[0]
         causing_notes = []
         for square in pair:
             notes = square.possible_numbers

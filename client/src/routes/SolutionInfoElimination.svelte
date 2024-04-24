@@ -13,10 +13,14 @@
 				return 'Naked Pair';
 			case 'naked-triple':
 				return 'Naked Triple';
-			case 'naked-quadruple':
+			case 'naked-quad':
 				return 'Naked Quadruple';
 			case 'hidden-pair':
 				return 'Hidden Pair';
+			case 'hidden-triple':
+				return 'Hidden Triple';
+			case 'hidden-quad':
+				return 'Hidden Quadruple';
 			case 'pointing':
 				return 'Pointing';
 			case 'claiming':

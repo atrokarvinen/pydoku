@@ -5,12 +5,13 @@ from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
 from models.elimination import Elimination
+from techniques.hiddenPair import HiddenPair
 from techniques.claiming import Claiming
 from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import expert_sudoku1
+from testing.sudokus import expert_sudoku3
 
 
 class Sudoku:
@@ -22,6 +23,7 @@ class Sudoku:
         self.naked_pair_technique = NakedPair()
         self.pointing_technique = Pointing()
         self.claiming_technique = Claiming()
+        self.hidden_pair_technique = HiddenPair()
 
     def set_board(self, board: Board):
         self.board = board
@@ -29,7 +31,7 @@ class Sudoku:
     def parse(self) -> Board:
         size = 9
         box_size = math.sqrt(size)
-        testSudoku = expert_sudoku1
+        testSudoku = expert_sudoku3
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
@@ -93,13 +95,17 @@ class Sudoku:
         while (True):
             print("Iteration: " + str(iteration) +
                   ", solution index: " + str(solution.solution_index))
-            scan_groups = self.scan_technique.scan(board)
-            naked_pair_groups = self.naked_pair_technique.get_naked_pairs(
-                board)
-            pointing_groups = self.pointing_technique.get_pointing(board)
-            claiming_groups = self.claiming_technique.get_claiming(board)
-            elimination_groups = scan_groups + naked_pair_groups + \
-                pointing_groups + claiming_groups
+            scans = self.scan_technique.scan(board)
+            naked_pairs = self.naked_pair_technique.get_naked_pairs(board)
+            pointings = self.pointing_technique.get_pointing(board)
+            claimings = self.claiming_technique.get_claiming(board)
+            hidden_pairs = self.hidden_pair_technique.get_hidden_pairs(board)
+            elimination_groups = \
+                scans + \
+                naked_pairs + \
+                pointings + \
+                claimings + \
+                hidden_pairs
 
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]
