@@ -3,11 +3,21 @@ from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.square import Square
+from models.solutionStep import SolutionStep
+from techniques.eliminatorBase import EliminatorBase
 
 
-class NakedPair:
-    def __init__(self) -> None:
-        pass
+class NakedPair(EliminatorBase):
+    def get_next_solution(self, board: Board) -> SolutionStep:
+        max_pair_count = math.floor(board.size/2)
+        for pair_count in range(2, max_pair_count+1):
+            pair = self.find_naked_pair_of_n(board, pair_count)
+            if (pair is not None):
+                return pair
+        return None
+
+    def get_eliminations(self, board: Board) -> list[Elimination]:
+        return self.get_naked_pairs(board)
 
     def get_sets_of_n(self, sets, remaining_elements, pair, n):
         if (len(pair) == n):
@@ -67,38 +77,33 @@ class NakedPair:
                         note))
         return eliminates_notes
 
-    def get_naked_pairs(self, board: Board) -> list[Elimination]:
-        max_pair_count = math.floor(board.size/2)
-        naked_pairs = []
-        for pair_count in range(2, max_pair_count+1):
-            pairs = self.get_naked_pairs_of_n(board, pair_count)
-            naked_pairs += pairs
-        return naked_pairs
-
-    def get_naked_pairs_of_n(self, board: Board, pair_count: int) -> list[Elimination]:
-        row_eliminations = self.get_pairs_in_line(
+    def find_naked_pair_of_n(self, board: Board, pair_count: int) -> Elimination:
+        row_elimination = self.get_pair_in_region(
             board,
             pair_count,
             board.get_empty_squares_in_row,
             board.get_empty_squares_in_row_by_square)
+        if (row_elimination is not None):
+            return row_elimination
 
-        column_eliminations = self.get_pairs_in_line(
+        column_elimination = self.get_pair_in_region(
             board,
             pair_count,
             board.get_empty_squares_in_column,
             board.get_empty_squares_in_column_by_square)
+        if (column_elimination is not None):
+            return column_elimination
 
-        box_eliminations = self.get_pairs_in_line(
+        box_elimination = self.get_pair_in_region(
             board,
             pair_count,
             board.get_empty_squares_in_box,
             board.get_empty_squares_in_box_by_square)
+        if (box_elimination is not None):
+            return box_elimination
 
-        return row_eliminations + column_eliminations + box_eliminations
-
-    def get_pairs_in_line(self, board: Board, pair_count: int, line_getter, line_getter_by_square) -> list[Elimination]:
-        naked_pairs = []
-        lines = [line_getter(i) for i in range(board.size)]
+    def get_pair_in_region(self, board: Board, pair_count: int, region_getter, region_getter_by_square) -> Elimination:
+        lines = [region_getter(i) for i in range(board.size)]
         for line in lines:
             sets = self.get_sets_of_n([], line, [], pair_count)
             for pair in sets:
@@ -108,11 +113,11 @@ class NakedPair:
                 correct_count = len(pair[0].possible_numbers) == pair_count
                 if (not correct_count):
                     continue
-                squares_in_line = line_getter_by_square(pair[0])
+                squares_in_line = region_getter_by_square(pair[0])
                 squares = [s for s in squares_in_line if s not in pair]
                 eliminated_notes = self.get_eliminated_notes(pair, squares)
                 if (len(eliminated_notes) == 0):
                     continue
                 elimination = self.pair_to_elimination(pair, eliminated_notes)
-                naked_pairs.append(elimination)
-        return naked_pairs
+                return elimination
+        return None

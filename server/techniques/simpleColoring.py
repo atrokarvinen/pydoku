@@ -3,19 +3,16 @@ from models.board import Board
 from models.elimination import Elimination
 from models.square import Square
 from models.numberedNote import NumberedNote
+from models.solutionStep import SolutionStep
 from techniques.models.coloredNote import ColoredNote
+from techniques.eliminatorBase import EliminatorBase
 
 
-class SimpleColoring:
-    def __init__(self):
-        pass
-
-    def get_simple_colorings(self, board: Board) -> list[Elimination]:
-        simple_colorings = []
+class SimpleColoring(EliminatorBase):
+    def get_next_solution(self, board: Board) -> SolutionStep:
         squares = board.flatten()
         empty_squares = [s for s in squares if s.is_empty()]
         boardRange = board.get_range()
-        # boardRange = range(2, 3)
         for number in boardRange:
             squares_with_note = [
                 s for s in empty_squares if number in s.possible_numbers]
@@ -46,11 +43,11 @@ class SimpleColoring:
                     print("Conflicting color: " + str(conflicting_color))
                     elimination = self.to_elimination(
                         unique_chain, conflicting_color)
-                    simple_colorings.append(elimination)
+                    return elimination
 
                 chains.append(unique_chain)
 
-        return simple_colorings
+        return None
 
     def recurse_chain(
             self,

@@ -3,64 +3,59 @@ from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.square import Square
+from models.solutionStep import SolutionStep
+from techniques.eliminatorBase import EliminatorBase
 
 
-class HiddenPair:
-    def __init__(self) -> None:
-        pass
-
-    def get_sets_of_n(self, sets, remaining_elements, pair, n):
-        if (len(pair) == n):
-            sets.append(pair)
-        for i in range(len(remaining_elements)):
-            picked = remaining_elements[i]
-            self.get_sets_of_n(
-                sets, remaining_elements[i+1:], pair + [picked], n)
-        return sets
-
-    def get_hidden_pairs(self, board: Board) -> list[Elimination]:
+class HiddenPair(EliminatorBase):
+    def get_next_solution(self, board: Board) -> SolutionStep:
         max_pair_count = math.floor(board.size/2)
-        hidden_pairs = []
         for pair_count in range(2, max_pair_count+1):
-            pairs = self.get_hidden_pairs_of_n(board, pair_count)
-            hidden_pairs += pairs
-        return hidden_pairs
+            pair = self.find_hidden_pair_of_n(board, pair_count)
+            if (pair is not None):
+                return pair
+        return None
 
-    def get_hidden_pairs_of_n(self, board: Board, pair_count: int) -> list[Elimination]:
+    def find_hidden_pair_of_n(self, board: Board, pair_count: int) -> Elimination:
         board_range = range(board.size)
 
         rows = [board.get_empty_squares_in_row(i) for i in board_range]
-        row_eliminations = self.iterate_lines(rows, pair_count)
+        row_elimination = self.iterate_regions(rows, pair_count)
+        if (row_elimination is not None):
+            return row_elimination
 
         columns = [board.get_empty_squares_in_column(i) for i in board_range]
-        column_eliminations = self.iterate_lines(columns, pair_count)
+        column_elimination = self.iterate_regions(columns, pair_count)
+        if (column_elimination is not None):
+            return column_elimination
 
         boxes = [board.get_empty_squares_in_box(i) for i in board_range]
-        box_eliminations = self.iterate_lines(boxes, pair_count)
+        box_elimination = self.iterate_regions(boxes, pair_count)
+        if (box_elimination is not None):
+            return box_elimination
 
-        return row_eliminations + column_eliminations + box_eliminations
+        return None
 
-    def iterate_lines(self, lines: list[list[Square]], pair_count: int) -> list[Elimination]:
-        hidden_pairs = []
-        for line in lines:
-            square_sets = self.get_sets_of_n([], line, [], pair_count)
+    def iterate_regions(self, regions: list[list[Square]], pair_count: int) -> Elimination:
+        for region in regions:
+            square_sets = self.get_sets_of_n([], region, [], pair_count)
             for square_set in square_sets:
-                other_squares = [s for s in line if s not in square_set]
+                other_squares = [s for s in region if s not in square_set]
                 if (len(square_set) < pair_count or len(other_squares) == 0):
                     continue
-                pairs = self.get_pairs_in_line(
+                pair = self.find_pair_in_region(
                     pair_count, square_set, other_squares)
-                hidden_pairs += pairs
+                if (pair is not None):
+                    return pair
 
-        return hidden_pairs
+        return None
 
-    def get_pairs_in_line(
+    def find_pair_in_region(
             self,
             pair_count: int,
             squares: list[Square],
-            other_squares: list[Square]) -> list[Elimination]:
+            other_squares: list[Square]) -> Elimination:
 
-        naked_pairs = []
         all_squares = squares + other_squares
 
         notes_by_count = {}
@@ -113,6 +108,15 @@ class HiddenPair:
                 causing_notes=causing_notes,
                 eliminated_notes=eliminated_notes)
 
-            naked_pairs.append(elimination)
+            return elimination
 
-        return naked_pairs
+        return None
+
+    def get_sets_of_n(self, sets, remaining_elements, pair, n):
+        if (len(pair) == n):
+            sets.append(pair)
+        for i in range(len(remaining_elements)):
+            picked = remaining_elements[i]
+            self.get_sets_of_n(
+                sets, remaining_elements[i+1:], pair + [picked], n)
+        return sets

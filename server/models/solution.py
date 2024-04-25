@@ -14,9 +14,9 @@ class Solution:
         for group in eliminations:
             self.add_elimination(group)
 
-    def add_elimination(self, group: Elimination) -> None:
-        group.solution_index = self.solution_index
-        self.eliminations.append(group)
+    def add_elimination(self, elimination: Elimination) -> None:
+        elimination.solution_index = self.solution_index
+        self.eliminations.append(elimination)
         self.solution_index += 1
 
     def add_single_candidate(self, single_candidate: SingleCandidate) -> None:

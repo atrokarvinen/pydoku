@@ -5,6 +5,8 @@ from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
 from models.elimination import Elimination
+from techniques.eliminatorBase import EliminatorBase
+from techniques.solverBase import SolverBase
 from techniques.simpleColoring import SimpleColoring
 from techniques.hiddenPair import HiddenPair
 from techniques.claiming import Claiming
@@ -18,14 +20,15 @@ from testing.sudokus import expert_sudoku1
 class Sudoku:
     def __init__(self):
         self.board = Board(9)
-        self.eliminations = []
-        self.scan_technique = Scan()
-        self.single_candidate_technique = SingleCandidateTechnique()
-        self.naked_pair_technique = NakedPair()
-        self.pointing_technique = Pointing()
-        self.claiming_technique = Claiming()
-        self.hidden_pair_technique = HiddenPair()
-        self.simpleColoring = SimpleColoring()
+        self.techniques: list[SolverBase] = [
+            Scan(),
+            SingleCandidateTechnique(),
+            NakedPair(),
+            Pointing(),
+            Claiming(),
+            HiddenPair(),
+            SimpleColoring()
+        ]
 
     def set_board(self, board: Board):
         self.board = board
@@ -95,40 +98,27 @@ class Sudoku:
             self.add_initial_possibilities(board)
         iteration = 0
         solution = Solution(board)
-        max_iterations = 100
+        empty_square_count = len([s for s in board.flatten() if s.is_empty()])
+        max_iterations = (board.size + 1) * empty_square_count
         while (True):
-            print("Iteration: " + str(iteration) +
-                  ", solution index: " + str(solution.solution_index))
-            scans = self.scan_technique.scan(board)
-            naked_pairs = self.naked_pair_technique.get_naked_pairs(board)
-            pointings = self.pointing_technique.get_pointing(board)
-            claimings = self.claiming_technique.get_claiming(board)
-            hidden_pairs = self.hidden_pair_technique.get_hidden_pairs(board)
-            simple_colorings = self.simpleColoring.get_simple_colorings(board)
-            elimination_groups = \
-                scans + \
-                naked_pairs + \
-                pointings + \
-                claimings + \
-                hidden_pairs + \
-                simple_colorings
+            print("Iteration: " + str(iteration))
+            next_solution = None
+            for solver in self.techniques:
+                next_solution = solver.get_next_solution(board)
+                if (next_solution is not None):
+                    break
 
-            if (len(elimination_groups) > 0):
-                first_group = elimination_groups[0]
-                board = self.apply_elimination(board, first_group)
-                solution.add_elimination(first_group)
+            if (next_solution is None):
+                print("No new solution found. Unable to solve sudoku")
+                break
+
+            board = next_solution.apply(board)
+            if (next_solution.is_elimination()):
+                solution.add_elimination(next_solution)
             else:
-                single_candidates = self.single_candidate_technique.get_single_candidates(
-                    board)
-                board = self.apply_single_candidates(board, single_candidates)
-
-                solution.add_single_candidates(single_candidates)
+                solution.add_single_candidate(next_solution)
 
             error_squares = self.is_solved(board)
-            if (len(elimination_groups) == 0 and len(single_candidates) == 0):
-                print(
-                    "No eliminations or single candidates found. Unable to solve sudoku")
-                break
             if (len(error_squares) == 0):
                 solution.is_solved = True
                 print("Sudoku solved")

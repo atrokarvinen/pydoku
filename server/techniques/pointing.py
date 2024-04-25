@@ -1,15 +1,12 @@
 from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
-from models.square import Square
+from models.solutionStep import SolutionStep
+from techniques.eliminatorBase import EliminatorBase
 
 
-class Pointing:
-    def __init__(self) -> None:
-        pass
-
-    def get_pointing(self, board: Board) -> list[Elimination]:
-        groups = []
+class Pointing(EliminatorBase):
+    def get_next_solution(self, board: Board) -> SolutionStep:
         for i in range(board.size):
             squares_in_box = board.get_squares_in_box_number(i)
             notes = [*range(1, board.size+1)]
@@ -44,7 +41,7 @@ class Pointing:
                             s.row, s.column, note) for s in squares_with_note],
                         eliminated_notes=eliminated_notes
                     )
-                    groups.append(elimination)
+                    return elimination
 
                 # Column
                 is_every_square_in_same_column = all(
@@ -68,6 +65,6 @@ class Pointing:
                             s.row, s.column, note) for s in squares_with_note],
                         eliminated_notes=eliminated_notes
                     )
-                    groups.append(elimination)
+                    return elimination
 
-        return groups
+        return None

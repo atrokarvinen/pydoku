@@ -2,14 +2,12 @@ from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.numberedSquare import NumberedSquare
+from models.solutionStep import SolutionStep
+from techniques.eliminatorBase import EliminatorBase
 
 
-class Scan:
-    def __init__(self):
-        pass
-
-    def scan(self, board: Board) -> list[Elimination]:
-        elimination_groups = []
+class Scan(EliminatorBase):
+    def get_next_solution(self, board: Board) -> SolutionStep:
         flat_squares = board.flatten()
         for square in flat_squares:
             if (square.is_empty()):
@@ -25,7 +23,7 @@ class Scan:
             other_squares = squares_in_row + squares_in_column + squares_in_box
 
             eliminated_notes = []
-            elimination_group = Elimination(
+            elimination = Elimination(
                 technique="scan",
                 causing_square=NumberedSquare(row, column, number),
                 causing_notes=[],
@@ -41,6 +39,6 @@ class Scan:
                         number)
                     eliminated_notes.append(eliminated_note)
             if (len(eliminated_notes) > 0):
-                elimination_groups.append(elimination_group)
+                return elimination
 
-        return elimination_groups
+        return None

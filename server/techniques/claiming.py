@@ -1,14 +1,12 @@
 from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
+from models.solutionStep import SolutionStep
+from techniques.eliminatorBase import EliminatorBase
 
 
-class Claiming:
-    def __init__(self) -> None:
-        pass
-
-    def get_claiming(self, board: Board) -> list[Elimination]:
-        elimination_groups = []
+class Claiming(EliminatorBase):
+    def get_next_solution(self, board: Board) -> SolutionStep:
         columns = [board.get_empty_squares_in_column(
             i) for i in range(board.size)]
         rows = [board.get_empty_squares_in_row(i) for i in range(board.size)]
@@ -36,7 +34,7 @@ class Claiming:
                 ]
                 if len(claimed_squares) == 0:
                     continue
-                elimination_group = Elimination(
+                elimination = Elimination(
                     technique="claiming",
                     causing_square=None,
                     causing_notes=[NumberedNote(
@@ -44,6 +42,6 @@ class Claiming:
                     eliminated_notes=[NumberedNote(
                         s.row, s.column, note) for s in claimed_squares]
                 )
-                elimination_groups.append(elimination_group)
+                return elimination
 
-        return elimination_groups
+        return None
