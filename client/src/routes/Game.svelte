@@ -62,6 +62,24 @@
 		resetSelections();
 	};
 
+	const next = async () => {
+		if (currentSolutionStep >= getSolutionStepsCount(solution)) {
+			return;
+		}
+		const newSudoku = moveToSolutionStep(
+			sudoku,
+			currentSolutionStep,
+			solution,
+			currentSolutionStep + 1
+		);
+		resetSelections();
+		selectedElimination = solution.eliminations.find(
+			(e) => e.solutionIndex === currentSolutionStep + 1
+		);
+		sudoku = newSudoku;
+		currentSolutionStep++;
+	};
+
 	const playSolution = async () => {
 		resetSelections();
 		const stepCount = getSolutionStepsCount(solution);
@@ -98,6 +116,7 @@
 	<GameActionButtons {boardSize} {numberClicked} />
 	<div class="flex flex-row gap-5">
 		<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
+		<button class="btn variant-filled-primary" on:click={next}>N</button>
 		<button class="btn variant-filled-primary" on:click={playSolution}>Play</button>
 		<button class="btn variant-filled-primary" on:click={reverseSolution}>Reverse</button>
 	</div>

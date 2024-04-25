@@ -1,11 +1,8 @@
 import copy
 import math
 from models.square import Square
-from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
-from models.elimination import Elimination
-from techniques.eliminatorBase import EliminatorBase
 from techniques.solverBase import SolverBase
 from techniques.simpleColoring import SimpleColoring
 from techniques.hiddenPair import HiddenPair
@@ -14,7 +11,7 @@ from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import expert_sudoku1
+from testing.sudokus import expert_sudoku2
 
 
 class Sudoku:
@@ -36,7 +33,7 @@ class Sudoku:
     def parse(self) -> Board:
         size = 9
         box_size = math.sqrt(size)
-        testSudoku = expert_sudoku1
+        testSudoku = expert_sudoku2
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")

@@ -12,11 +12,12 @@ class Scan(EliminatorBase):
         for square in flat_squares:
             row = square.row
             column = square.column
+            box = square.box
             number = square.number
 
             squares_in_row = board.get_empty_squares_in_row(row)
             squares_in_column = board.get_empty_squares_in_column(column)
-            squares_in_box = board.get_empty_squares_in_box(square)
+            squares_in_box = board.get_empty_squares_in_box(box)
 
             other_squares = squares_in_row + squares_in_column + squares_in_box
 
