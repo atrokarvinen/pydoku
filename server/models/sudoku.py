@@ -5,13 +5,14 @@ from models.singleCandidate import SingleCandidate
 from models.solution import Solution
 from models.board import Board
 from models.elimination import Elimination
+from techniques.simpleColoring import SimpleColoring
 from techniques.hiddenPair import HiddenPair
 from techniques.claiming import Claiming
 from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import expert_sudoku3
+from testing.sudokus import expert_sudoku1
 
 
 class Sudoku:
@@ -24,6 +25,7 @@ class Sudoku:
         self.pointing_technique = Pointing()
         self.claiming_technique = Claiming()
         self.hidden_pair_technique = HiddenPair()
+        self.simpleColoring = SimpleColoring()
 
     def set_board(self, board: Board):
         self.board = board
@@ -31,7 +33,7 @@ class Sudoku:
     def parse(self) -> Board:
         size = 9
         box_size = math.sqrt(size)
-        testSudoku = expert_sudoku3
+        testSudoku = expert_sudoku1
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
@@ -88,7 +90,9 @@ class Sudoku:
 
     def solve(self, empty_board: Board) -> Solution:
         board = copy.deepcopy(empty_board)
-        self.add_initial_possibilities(board)
+        is_empty = all([len(s.possible_numbers) == 0 for s in board.flatten()])
+        if (is_empty):
+            self.add_initial_possibilities(board)
         iteration = 0
         solution = Solution(board)
         max_iterations = 100
@@ -100,12 +104,14 @@ class Sudoku:
             pointings = self.pointing_technique.get_pointing(board)
             claimings = self.claiming_technique.get_claiming(board)
             hidden_pairs = self.hidden_pair_technique.get_hidden_pairs(board)
+            simple_colorings = self.simpleColoring.get_simple_colorings(board)
             elimination_groups = \
                 scans + \
                 naked_pairs + \
                 pointings + \
                 claimings + \
-                hidden_pairs
+                hidden_pairs + \
+                simple_colorings
 
             if (len(elimination_groups) > 0):
                 first_group = elimination_groups[0]

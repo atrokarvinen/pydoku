@@ -9,6 +9,9 @@ class Square:
     def is_empty(self) -> bool:
         return self.number == 0
 
+    def is_same_location(self, square) -> bool:
+        return self.row == square.row and self.column == square.column
+
     def set_number(self, number: int):
         self.number = number
         self.possible_numbers = []

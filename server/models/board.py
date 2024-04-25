@@ -7,6 +7,12 @@ class Board:
         self.size = size
         self.box_size = int(size ** 0.5)
 
+    def get_range(self) -> int:
+        return [*range(1, self.size + 1)]
+
+    def get_range_zero_indexed(self) -> int:
+        return [*range(self.size)]
+
     def get_square(self, row: int, column: int):
         return self.rows[row][column]
 

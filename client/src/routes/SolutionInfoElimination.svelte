@@ -25,6 +25,16 @@
 				return 'Pointing';
 			case 'claiming':
 				return 'Claiming';
+			case 'x-wing':
+				return 'X-Wing';
+			case 'swordfish':
+				return 'Swordfish';
+			case 'jellyfish':
+				return 'Jellyfish';
+			case 'xy-wing':
+				return 'XY-Wing';
+			case 'simple-coloring':
+				return 'Simple Coloring';
 			default:
 				return 'Unknown strategy';
 		}

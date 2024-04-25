@@ -73,6 +73,7 @@ const applyElimination = (sudoku: Sudoku, elimination: Elimination) => {
 const applySingleCandidate = (sudoku: Sudoku, singleCandidate: SingleCandidate) => {
 	const { row, column, number } = singleCandidate;
 	sudoku[row][column].number = number;
+	sudoku[row][column].possibleNumbers = [];
 };
 
 const undoElimination = (sudoku: Sudoku, elimination: Elimination) => {
@@ -84,6 +85,7 @@ const undoElimination = (sudoku: Sudoku, elimination: Elimination) => {
 };
 
 const undoSingleCandidate = (sudoku: Sudoku, singleCandidate: SingleCandidate) => {
-	const { row, column } = singleCandidate;
+	const { row, column, number } = singleCandidate;
 	sudoku[row][column].number = 0;
+	sudoku[row][column].possibleNumbers = [number];
 };
