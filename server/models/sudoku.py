@@ -97,7 +97,8 @@ class Sudoku:
         if (is_empty):
             self.add_initial_possibilities(board)
         iteration = 0
-        solution = Solution(board)
+        initial_board = copy.deepcopy(board)
+        solution = Solution(initial_board)
         empty_square_count = len([s for s in board.flatten() if s.is_empty()])
         max_iterations = (board.size + 1) * empty_square_count
         while (True):
@@ -118,14 +119,15 @@ class Sudoku:
             else:
                 solution.add_single_candidate(next_solution)
 
-            error_squares = self.is_solved(board)
-            if (len(error_squares) == 0):
-                solution.is_solved = True
-                print("Sudoku solved")
-                break
-            if (iteration == max_iterations):
-                print("Max iterations reached, unable to solve sudoku")
-                break
+            if (self.is_board_full(board)):
+                error_squares = self.is_solved(board)
+                if (len(error_squares) == 0):
+                    solution.is_solved = True
+                    print("Sudoku solved")
+                    break
+                if (iteration == max_iterations):
+                    print("Max iterations reached, unable to solve sudoku")
+                    break
 
             iteration += 1
 
@@ -134,26 +136,5 @@ class Sudoku:
               str(len(solution.single_candidates)))
         return solution
 
-    def apply_elimination(self, board: Board, elimination: Elimination) -> Board:
-        board_copy = copy.deepcopy(board)
-        for elimination in elimination.eliminated_notes:
-            row = elimination.row
-            column = elimination.column
-            number = elimination.number
-
-            square = board_copy.get_square(row, column)
-            square.remove_possible_number(number)
-
-        return board_copy
-
-    def apply_single_candidates(self, board: Board, candidates: list[SingleCandidate]) -> Board:
-        board_copy = copy.deepcopy(board)
-        for candidate in candidates:
-            row = candidate.row
-            column = candidate.column
-            number = candidate.number
-
-            square = board_copy.get_square(row, column)
-            square.set_number(number)
-
-        return board_copy
+    def is_board_full(self, board: Board) -> bool:
+        return all([not s.is_empty() for s in board.flatten()])

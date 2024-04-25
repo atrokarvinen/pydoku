@@ -1,4 +1,3 @@
-import copy
 from models.numberedNote import NumberedNote
 from models.numberedSquare import NumberedSquare
 from models.board import Board
@@ -19,16 +18,15 @@ class Elimination(SolutionStep):
         self.solution_index = 0
 
     def apply(self, board: Board) -> Board:
-        board_copy = copy.deepcopy(board)
         for eliminated_note in self.eliminated_notes:
             row = eliminated_note.row
             column = eliminated_note.column
             number = eliminated_note.number
 
-            square = board_copy.get_square(row, column)
+            square = board.get_square(row, column)
             square.remove_possible_number(number)
 
-        return board_copy
+        return board
 
     def is_elimination(self) -> bool:
         return True

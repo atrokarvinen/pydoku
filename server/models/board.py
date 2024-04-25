@@ -65,5 +65,11 @@ class Board:
     def flatten(self):
         return [square for row in self.rows for square in row]
 
+    def flatten_empty(self):
+        return [square for row in self.rows for square in row if square.is_empty()]
+
+    def flatten_not_empty(self):
+        return [square for row in self.rows for square in row if not square.is_empty()]
+
     def serialize(self):
         return [[square.serialize() for square in row] for row in self.rows]

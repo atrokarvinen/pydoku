@@ -1,4 +1,3 @@
-import copy
 from models.board import Board
 from models.solutionStep import SolutionStep
 
@@ -14,16 +13,14 @@ class SingleCandidate(SolutionStep):
         self.solutionIndex = 0
 
     def apply(self, board: Board) -> Board:
-        board_copy = copy.deepcopy(board)
-
         row = self.row
         column = self.column
         number = self.number
 
-        square = board_copy.get_square(row, column)
+        square = board.get_square(row, column)
         square.set_number(number)
 
-        return board_copy
+        return board
 
     def is_elimination(self) -> bool:
         return False
