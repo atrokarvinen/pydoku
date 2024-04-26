@@ -3,6 +3,7 @@ import math
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
+from techniques.xWing import XWing
 from techniques.solverBase import SolverBase
 from techniques.simpleColoring import SimpleColoring
 from techniques.hiddenPair import HiddenPair
@@ -11,7 +12,7 @@ from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import expert_sudoku2
+from testing.sudokus import x_wing_example
 
 
 class Sudoku:
@@ -24,6 +25,7 @@ class Sudoku:
             Pointing(),
             Claiming(),
             HiddenPair(),
+            XWing(),
             SimpleColoring()
         ]
 
@@ -33,7 +35,7 @@ class Sudoku:
     def parse(self) -> Board:
         size = 9
         box_size = math.sqrt(size)
-        testSudoku = expert_sudoku2
+        testSudoku = x_wing_example
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
@@ -125,6 +127,10 @@ class Sudoku:
                 if (iteration == max_iterations):
                     print("Max iterations reached, unable to solve sudoku")
                     break
+
+            if (iteration == max_iterations):
+                print("Max iterations reached, unable to solve sudoku")
+                break
 
             iteration += 1
 
