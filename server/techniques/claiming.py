@@ -27,7 +27,7 @@ class Claiming(EliminatorBase):
                 if not squares_in_same_box:
                     continue
 
-                squares_in_box = board.get_squares_in_box_number(
+                squares_in_box = board.get_squares_in_box(
                     squares_with_note[0].box)
                 claimed_squares = [
                     s for s in squares_in_box if s not in squares_with_note and note in s.possible_numbers

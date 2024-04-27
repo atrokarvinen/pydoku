@@ -3,6 +3,7 @@ import math
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
+from techniques.yWing import YWing
 from techniques.xWing import XWing
 from techniques.solverBase import SolverBase
 from techniques.simpleColoring import SimpleColoring
@@ -26,6 +27,7 @@ class Sudoku:
             Claiming(),
             HiddenPair(),
             XWing(),
+            YWing(),
             SimpleColoring()
         ]
 
@@ -74,7 +76,7 @@ class Sudoku:
 
             squares_in_row = board.get_squares_in_row(row)
             squares_in_column = board.get_squares_in_column(column)
-            squares_in_box = board.get_squares_in_box(square)
+            squares_in_box = board.get_squares_in_box_by_square(square)
 
             other_Squares = squares_in_row + squares_in_column + squares_in_box
             for other_square in other_Squares:

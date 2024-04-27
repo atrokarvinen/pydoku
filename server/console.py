@@ -2,7 +2,6 @@ from models.sudoku import Sudoku
 
 
 def run():
-    print("Starting server...")
     sudoku = Sudoku()
     board = sudoku.parse()
     print("Parsed board:" + str(board))

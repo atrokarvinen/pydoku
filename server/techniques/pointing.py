@@ -8,7 +8,7 @@ from techniques.eliminatorBase import EliminatorBase
 class Pointing(EliminatorBase):
     def get_next_solution(self, board: Board) -> SolutionStep:
         for i in range(board.size):
-            squares_in_box = board.get_squares_in_box_number(i)
+            squares_in_box = board.get_squares_in_box(i)
             notes = [*range(1, board.size+1)]
             for note in notes:
                 squares_with_note = [

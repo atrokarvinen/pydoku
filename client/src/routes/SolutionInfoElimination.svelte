@@ -27,6 +27,8 @@
 				return 'Claiming';
 			case 'x-wing':
 				return 'X-Wing';
+			case 'y-wing':
+				return 'Y-Wing';
 			case 'swordfish':
 				return 'Swordfish';
 			case 'jellyfish':

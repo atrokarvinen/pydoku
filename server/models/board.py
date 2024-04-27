@@ -37,17 +37,17 @@ class Board:
     def get_box_of_square(self, square: Square):
         return (square.row // self.box_size) * self.box_size + square.column // self.box_size
 
-    def get_squares_in_box(self, square: Square) -> list[Square]:
-        box = self.get_box_of_square(square)
-        return self.get_squares_in_box_number(box)
-
-    def get_squares_in_box_number(self, box: int) -> list[Square]:
+    def get_squares_in_box(self, box: int) -> list[Square]:
         flat_squares = self.flatten()
         squares = [s for s in flat_squares if self.get_box_of_square(s) == box]
         return squares
 
+    def get_squares_in_box_by_square(self, square: Square) -> list[Square]:
+        box = self.get_box_of_square(square)
+        return self.get_squares_in_box(box)
+
     def get_empty_squares_in_box(self, box: int) -> list[Square]:
-        return [square for square in self.get_squares_in_box_number(box) if square.is_empty()]
+        return [square for square in self.get_squares_in_box(box) if square.is_empty()]
 
     def get_empty_squares_in_box_by_square(self, square: Square) -> list[Square]:
         return self.get_empty_squares_in_box(self.get_box_of_square(square))
