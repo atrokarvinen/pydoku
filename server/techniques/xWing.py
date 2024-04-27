@@ -77,9 +77,9 @@ class XWing(EliminatorBase):
                        region_type: str) -> Elimination:
 
         row1 = board.get_empty_squares_in_row(squares[0].row)
-        row2 = board.get_empty_squares_in_row(squares[2].row)
+        row2 = board.get_empty_squares_in_row(squares[1].row)
         col1 = board.get_empty_squares_in_column(squares[0].column)
-        col2 = board.get_empty_squares_in_column(squares[2].column)
+        col2 = board.get_empty_squares_in_column(squares[1].column)
 
         other_region1_squares = col1 if region_type == "row" else row1
         other_region2_squares = col2 if region_type == "row" else row2
