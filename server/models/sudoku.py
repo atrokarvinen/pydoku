@@ -3,6 +3,7 @@ import math
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
+from techniques.emptyRectangle import EmptyRectangle
 from techniques.yWing import YWing
 from techniques.xWing import XWing
 from techniques.solverBase import SolverBase
@@ -13,7 +14,7 @@ from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import x_wing_example
+from testing.sudokus import expert_sudoku3
 
 
 class Sudoku:
@@ -28,7 +29,8 @@ class Sudoku:
             HiddenPair(),
             XWing(),
             YWing(),
-            SimpleColoring()
+            SimpleColoring(),
+            EmptyRectangle()
         ]
 
     def set_board(self, board: Board):
@@ -37,7 +39,7 @@ class Sudoku:
     def parse(self) -> Board:
         size = 9
         box_size = math.sqrt(size)
-        testSudoku = x_wing_example
+        testSudoku = expert_sudoku3
         sudoku_length = len(testSudoku)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")

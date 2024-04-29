@@ -120,9 +120,6 @@ class SimpleColoring(EliminatorBase):
         if not self.is_connected(square1, square2):
             return False
 
-        if (square1.row == 1 and square1.column == 3):
-            pass
-
         is_connected_by_row = square1.row == square2.row
         if is_connected_by_row:
             other_squares_in_same_row = [

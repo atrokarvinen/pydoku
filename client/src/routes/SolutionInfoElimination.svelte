@@ -33,6 +33,8 @@
 				return 'Swordfish';
 			case 'jellyfish':
 				return 'Jellyfish';
+			case 'empty-rectangle':
+				return 'Empty Rectangle';
 			case 'xy-wing':
 				return 'XY-Wing';
 			case 'simple-coloring':
