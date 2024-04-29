@@ -43,8 +43,6 @@ class YWing(EliminatorBase):
                     if (not pivot_numbers_in_pincers or not pincers_have_same_numbers):
                         continue
 
-                    print("Found Y-Wing")
-
                     shared_number = pincer_numbers_not_in_pivot[0]
 
                     eliminated_notes = []
@@ -59,6 +57,8 @@ class YWing(EliminatorBase):
 
                     if (len(eliminated_notes) == 0):
                         continue
+
+                    print("Found Y-Wing")
 
                     elimination = Elimination(
                         technique="y-wing",

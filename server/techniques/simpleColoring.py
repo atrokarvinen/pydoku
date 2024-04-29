@@ -35,14 +35,26 @@ class SimpleColoring(EliminatorBase):
                                    start_color,
                                    number)
 
+                if (len(chain) < 2):
+                    continue
+
                 unique_chain = self.uniquefy_chain(chain)
 
                 conflicting_color = self.detect_conflicting_color(unique_chain)
                 if conflicting_color is not None:
                     self.print_chain(unique_chain, number)
                     print("Conflicting color: " + str(conflicting_color))
-                    elimination = self.to_elimination(
+                    elimination = self.conflict_to_elimination(
                         unique_chain, conflicting_color)
+                    return elimination
+
+                seen_by_both = self.detect_squares_seen_by_both(
+                    unique_chain, squares_with_note)
+                if len(seen_by_both) > 0:
+                    self.print_chain(unique_chain, number)
+                    print("Squares seen by both colors.")
+                    elimination = self.seen_by_both_to_elimination(
+                        unique_chain, seen_by_both)
                     return elimination
 
                 chains.append(unique_chain)
@@ -184,7 +196,23 @@ class SimpleColoring(EliminatorBase):
                     return square1.color
         return None
 
-    def to_elimination(self, chain: list[ColoredNote], conflicting_color: int) -> Elimination:
+    def detect_squares_seen_by_both(self, chain: list[ColoredNote], squares: list[Square]) -> list[Square]:
+        squares_seen_by_both = []
+        for square in squares:
+            square_in_chain = False
+            for chain_square in chain:
+                if (chain_square.is_same_location(square)):
+                    square_in_chain = True
+            if (square_in_chain):
+                continue
+            seen_chain_squares = [s for s in chain if s.is_connected(square)]
+            seen_colors = [s.color for s in seen_chain_squares]
+            if (1 in seen_colors and 2 in seen_colors):
+                squares_seen_by_both.append(square)
+
+        return squares_seen_by_both
+
+    def conflict_to_elimination(self, chain: list[ColoredNote], conflicting_color: int) -> Elimination:
         causing_color = [s for s in chain if s.color != conflicting_color]
         eliminated_color = [s for s in chain if s.color == conflicting_color]
 
@@ -192,6 +220,18 @@ class SimpleColoring(EliminatorBase):
                          for x in causing_color]
         eliminated_notes = [NumberedNote(x.row, x.column, x.number)
                             for x in eliminated_color]
+        return Elimination(
+            technique="simple-coloring",
+            causing_square=None,
+            causing_notes=causing_notes,
+            eliminated_notes=eliminated_notes)
+
+    def seen_by_both_to_elimination(self, chain: list[ColoredNote], seen_by_both: list[Square]) -> Elimination:
+        number = chain[0].number
+        causing_notes = [NumberedNote(
+            x.row, x.column, number) for x in chain]
+        eliminated_notes = [NumberedNote(x.row, x.column, number)
+                            for x in seen_by_both]
         return Elimination(
             technique="simple-coloring",
             causing_square=None,
