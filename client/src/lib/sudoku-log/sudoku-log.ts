@@ -86,6 +86,7 @@ const undoElimination = (sudoku: Sudoku, elimination: Elimination) => {
 
 const undoSingleCandidate = (sudoku: Sudoku, singleCandidate: SingleCandidate) => {
 	const { row, column, number } = singleCandidate;
-	sudoku[row][column].number = 0;
-	sudoku[row][column].possibleNumbers = [number];
+	const square = sudoku[row][column];
+	square.number = 0;
+	square.possibleNumbers.push(number);
 };
