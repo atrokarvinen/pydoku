@@ -77,3 +77,12 @@ class SquareLogic:
         if number in notes_in_others:
             return False
         return True
+
+    def count_notes_in_region(region: list[Square]) -> dict[int, int]:
+        notes_by_count = {}
+        for square in region:
+            for note in square.possible_numbers:
+                if note not in notes_by_count:
+                    notes_by_count[note] = 0
+                notes_by_count[note] += 1
+        return notes_by_count

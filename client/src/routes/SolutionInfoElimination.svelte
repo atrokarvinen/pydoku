@@ -39,6 +39,8 @@
 				return 'XY-Wing';
 			case 'simple-coloring':
 				return 'Simple Coloring';
+			case 'bug':
+				return 'Bi-Value Universal Grave (BUG)';
 			default:
 				return 'Unknown strategy';
 		}

@@ -3,6 +3,7 @@ import math
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
+from techniques.biValueUniversalGrave import BiValueUniversalGrave
 from techniques.emptyRectangle import EmptyRectangle
 from techniques.yWing import YWing
 from techniques.xWing import XWing
@@ -30,7 +31,8 @@ class Sudoku:
             XWing(),
             YWing(),
             SimpleColoring(),
-            EmptyRectangle()
+            EmptyRectangle(),
+            BiValueUniversalGrave()
         ]
 
     def set_board(self, board: Board):
