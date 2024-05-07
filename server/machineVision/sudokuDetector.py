@@ -6,6 +6,8 @@ import cv2 as cv
 import matplotlib.pyplot as plt
 import pytesseract
 
+from models.recognizedSquare import RecognizedSquare
+
 pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
 
 
@@ -32,7 +34,7 @@ class SudokuDetector:
         plt.subplot(1, 3, 3)
         plt.imshow(roi, cmap="gray")
 
-        plt.show()
+        # plt.show()
 
         squares = self.get_squares(roi)
         numbers = self.recognize_numbers(squares)
@@ -81,21 +83,58 @@ class SudokuDetector:
                 squares.append(square)
         return squares
 
-    def recognize_numbers(self, squares: Sequence[cv.Mat]) -> Sequence[int]:
-        numbers = []
-        i = 0
-        ss = squares
-        # ss = [squares[0], squares[1], squares[4], squares[78]]
-        # ss = [squares[78]]
+    def recognize_numbers(self, squares: Sequence[cv.Mat]) -> Sequence[str]:
+        processed_squares = self.form_squares(squares)
+        non_empty_squares = [
+            square for square in processed_squares if not square.is_empty]
+        non_empty_images = [square.image for square in non_empty_squares]
+        all_squares_image = cv.hconcat(non_empty_images)
+        border_size = 2
+        bordered = cv.copyMakeBorder(
+            all_squares_image, border_size, border_size, border_size, border_size, cv.BORDER_CONSTANT, value=0)
         plt.close()
+        plt.imshow(bordered, cmap="gray")
+        # plt.show()
+        config = '--oem 3 --psm 7 -c tessedit_char_whitelist=123456789'
+        numberStr = pytesseract.image_to_string(bordered, config=config)
+        numberStr = numberStr.strip()
+        print("detected string: " + numberStr)
+
+        if len(numberStr) != len(non_empty_squares):
+            print(f"Detected string length ({
+                  len(numberStr)}) does not match number of squares ({len(non_empty_squares)})")
+            return []
+
+        for i in range(len(numberStr)):
+            digit = numberStr[i]
+            non_empty_squares[i].set_number(digit)
+
+        sudoku_numbers = [square.number_str for square in processed_squares]
+        return sudoku_numbers
+
+        i = 0
+        numbers = []
+        ss = squares
         for square in ss:
-            config = '--oem 3 --psm 10 -c tessedit_char_whitelist=123456789'
-            # config = '--oem 3 --psm 10 outputbase digits'
+            # 0    Orientation and script detection (OSD) only.
+            # 1    Automatic page segmentation with OSD.
+            # 2    Automatic page segmentation, but no OSD, or OCR. (not implemented)
+            # 3    Fully automatic page segmentation, but no OSD. (Default)
+            # 4    Assume a single column of text of variable sizes.
+            # 5    Assume a single uniform block of vertically aligned text.
+            # 6    Assume a single uniform block of text.
+            # 7    Treat the image as a single text line.
+            # 8    Treat the image as a single word.
+            # 9    Treat the image as a single word in a circle.
+            # 10    Treat the image as a single character.
+            # 11    Sparse text. Find as much text as possible in no particular order.
+            # 12    Sparse text with OSD.
+            # 13    Raw line. Treat the image as a single text line,
+            # bypassing hacks that are Tesseract-specific.
+            # config = '--oem 3 --psm 10 -c tessedit_char_whitelist=123456789'
             preprocessed = self.preprocess_square(square)
             img_pixels = preprocessed.shape[0] * preprocessed.shape[1]
             binary_area = cv.countNonZero(preprocessed)
-            sub = img_pixels - binary_area
-            # print("sub: " + str(sub) + ", " + str(0.01 * img_pixels))
             is_empty = img_pixels - binary_area < 0.01 * img_pixels
             if is_empty:
                 # print("empty square")
@@ -134,6 +173,23 @@ class SudokuDetector:
             i = i + 1
         return numbers
 
+    def form_squares(self, squares: Sequence[cv.Mat]) -> list[RecognizedSquare]:
+        recog = []
+        for i in range(len(squares)):
+            square = squares[i]
+            preprocessed = self.preprocess_square(square)
+            is_empty = self.is_empty_square(preprocessed)
+
+            recog.append(RecognizedSquare(preprocessed, is_empty, i))
+
+        return recog
+
+    def is_empty_square(self, square: cv.Mat) -> bool:
+        img_pixels = square.shape[0] * square.shape[1]
+        binary_area = cv.countNonZero(square)
+        is_empty = img_pixels - binary_area < 0.01 * img_pixels
+        return is_empty
+
     def preprocess_square(self, square: cv.Mat) -> cv.Mat:
         cropped = self.crop_square(square)
         squared = cv.resize(cropped, (50, 50))
@@ -142,7 +198,7 @@ class SudokuDetector:
 
     def crop_square(self, square: cv.Mat) -> cv.Mat:
         (x, y, w, h) = cv.boundingRect(square)
-        cutoff_factor = 0.1
+        cutoff_factor = 0.15
         x2 = math.floor(w * cutoff_factor * 0.5)
         y2 = math.floor(h * cutoff_factor * 0.5)
         w2 = w - 2 * x2
