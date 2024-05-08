@@ -1,9 +1,14 @@
+import os
 from flask import Flask, request
 from flask_cors import CORS
 
 from models.sudoku import Sudoku
 from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
+from machineVision.sudokuDetector import SudokuDetector
+from pathlib import Path
+from testing.sudokus import expert_sudoku3
+
 
 app = Flask(__name__)
 CORS(app)
@@ -27,14 +32,31 @@ def tester():
 @app.route("/sudoku")
 def get_sudoku():
     sudoku = Sudoku()
-    board = sudoku.parse()
+    board = sudoku.parse(expert_sudoku3)
     return board.serialize()
+
+
+@app.route("/sudoku/import", methods=["POST"])
+def import_sudoku():
+    file = request.files["file"]
+    print("importing image file: " + str(file))
+    current_path = Path(__file__).parent
+    filename = os.path.join(
+        current_path, "machineVision/testImages", file.filename)
+    print("saving to path: " + filename)
+    file.save(filename)
+    mv = SudokuDetector()
+    img = mv.load_image(filename)
+    sudoku_string = mv.detect(img)
+    solver = Sudoku()
+    sudoku = solver.parse(sudoku_string)
+    return sudoku.serialize()
 
 
 @app.route("/sudoku/notes")
 def get_sudoku_notes():
     sudoku = Sudoku()
-    board = sudoku.parse()
+    board = sudoku.parse(expert_sudoku3)
     sudoku.add_initial_possibilities(board)
     return board.serialize()
 

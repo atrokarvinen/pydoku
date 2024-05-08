@@ -8,6 +8,7 @@
 	import GameActionButtons from './GameActionButtons.svelte';
 	import SolutionInfo from './SolutionInfo.svelte';
 	import SudokuBoard from './SudokuBoard.svelte';
+	import SudokuImport from './import/SudokuImport.svelte';
 	export let sudoku: Sudoku;
 	let selectedNumber: number | undefined;
 	let selectedElimination: Elimination | undefined;
@@ -15,11 +16,6 @@
 	let solution: Solution = defaultSolution;
 	let currentSolutionStep = 0;
 	$: boardSize = sudoku.length;
-
-	const fillNotes = async () => {
-		const response = await axios.get<Sudoku>('/sudoku/notes');
-		sudoku = response.data;
-	};
 
 	const resetSelections = () => {
 		selectedNumber = undefined;
@@ -76,6 +72,11 @@
 		selectedElimination = solution.eliminations.find(
 			(e) => e.solutionIndex === currentSolutionStep + 1
 		);
+		if (!selectedElimination) {
+			selectedCandidate = solution.singleCandidates.find(
+				(c) => c.solutionIndex === currentSolutionStep + 1
+			);
+		}
 		sudoku = newSudoku;
 		currentSolutionStep++;
 	};
@@ -109,9 +110,18 @@
 		resetSelections();
 		selectedNumber = n;
 	};
+
+	const onSudokuImported = (importedSudoku: Sudoku) => {
+		console.log('sudoku imported: ', importedSudoku);
+		resetSelections();
+		currentSolutionStep = 0;
+		solution = defaultSolution;
+		sudoku = importedSudoku;
+	};
 </script>
 
 <div class="flex flex-col gap-5">
+	<SudokuImport {onSudokuImported} />
 	<SudokuBoard {sudoku} {selectedElimination} {selectedCandidate} {selectedNumber} />
 	<GameActionButtons {boardSize} {numberClicked} />
 	<div class="flex flex-row gap-5">

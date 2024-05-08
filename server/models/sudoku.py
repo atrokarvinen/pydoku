@@ -15,7 +15,6 @@ from techniques.pointing import Pointing
 from techniques.nakedPair import NakedPair
 from techniques.scan import Scan
 from techniques.singleCandidate import SingleCandidate as SingleCandidateTechnique
-from testing.sudokus import expert_sudoku3
 
 
 class Sudoku:
@@ -38,16 +37,15 @@ class Sudoku:
     def set_board(self, board: Board):
         self.board = board
 
-    def parse(self) -> Board:
+    def parse(self, sudoku_string) -> Board:
         size = 9
         box_size = math.sqrt(size)
-        testSudoku = expert_sudoku3
-        sudoku_length = len(testSudoku)
+        sudoku_length = len(sudoku_string)
         if (sudoku_length != size*size):
             print("Invalid sudoku length")
             return
 
-        char_array = list(testSudoku)
+        char_array = list(sudoku_string)
         board = Board(size)
         for i in range(size):
             row = []

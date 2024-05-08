@@ -6,7 +6,8 @@ detector = SudokuDetector()
 def test_detect_sudoku(file_path: str, expected_sudoku: str):
     base_path = "C:/Users/atro.karvinen/source/repos/2-omat-projektit/pydoku/server/machineVision/testImages/"
     full_path = base_path + file_path
-    sudoku = detector.detect(full_path)
+    img = detector.load_image(full_path)
+    sudoku = detector.detect(img)
     print("detected sudoku: " + sudoku)
     print("expected sudoku: " + expected_sudoku)
 

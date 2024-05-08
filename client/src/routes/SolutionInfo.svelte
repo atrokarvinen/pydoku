@@ -16,7 +16,7 @@
 <div class="flex flex-col gap-5 h-48 overflow-auto">
 	{#if solution.isSolved}
 		<span>Solved after ({solutionSteps.length}) steps.</span>
-	{:else}
+	{:else if solution.isSolved === false}
 		<span>Unable to solve sudoku</span>
 	{/if}
 	{#each solutionSteps as action, step}

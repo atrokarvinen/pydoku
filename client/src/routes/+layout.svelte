@@ -1,7 +1,16 @@
 <script lang="ts">
-	import { AppBar, AppShell } from '@skeletonlabs/skeleton';
+	import { AppBar, AppShell, Modal, initializeStores } from '@skeletonlabs/skeleton';
 	import '../app.postcss';
+	import ImportModal from './import/ImportModal.svelte';
+
+	initializeStores();
+
+	const modalRegistry = {
+		ImportModal: { ref: ImportModal }
+	};
 </script>
+
+<Modal components={modalRegistry} />
 
 <AppShell>
 	<svelte:fragment slot="header">

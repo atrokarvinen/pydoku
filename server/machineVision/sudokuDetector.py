@@ -1,40 +1,23 @@
 import math
 import os
-import string
-from typing import Sequence
 import cv2 as cv
-import matplotlib.pyplot as plt
 import pytesseract
 
-from models.recognizedSquare import RecognizedSquare
-
-pytesseract.pytesseract.tesseract_cmd = 'C:/Program Files/Tesseract-OCR/tesseract.exe'
+from typing import Sequence
+from machineVision.models.recognizedSquare import RecognizedSquare
 
 
 class SudokuDetector:
     def __init__(self) -> None:
         pass
 
-    def detect(self, file) -> str:
-        img = self.load_image(file)
-
-        plt.subplot(1, 3, 1)
-        plt.imshow(img, cmap="gray")
-
+    def detect(self, img: cv.Mat) -> str:
         preprocessed = self.preprocess(img)
         edges = self.detect_edges(preprocessed)
-
-        plt.subplot(1, 3, 2)
-        plt.imshow(edges, cmap="gray")
 
         contours = self.get_sudoku_contours(edges)
         largest_contour = self.take_largest_contour(contours)
         roi = self.get_region_of_interest(preprocessed, largest_contour)
-
-        plt.subplot(1, 3, 3)
-        plt.imshow(roi, cmap="gray")
-
-        # plt.show()
 
         squares = self.get_squares(roi)
         numbers = self.recognize_numbers(squares)
@@ -92,9 +75,6 @@ class SudokuDetector:
         border_size = 2
         bordered = cv.copyMakeBorder(
             all_squares_image, border_size, border_size, border_size, border_size, cv.BORDER_CONSTANT, value=0)
-        plt.close()
-        plt.imshow(bordered, cmap="gray")
-        # plt.show()
         config = '--oem 3 --psm 7 -c tessedit_char_whitelist=123456789'
         numberStr = pytesseract.image_to_string(bordered, config=config)
         numberStr = numberStr.strip()
@@ -111,67 +91,6 @@ class SudokuDetector:
 
         sudoku_numbers = [square.number_str for square in processed_squares]
         return sudoku_numbers
-
-        i = 0
-        numbers = []
-        ss = squares
-        for square in ss:
-            # 0    Orientation and script detection (OSD) only.
-            # 1    Automatic page segmentation with OSD.
-            # 2    Automatic page segmentation, but no OSD, or OCR. (not implemented)
-            # 3    Fully automatic page segmentation, but no OSD. (Default)
-            # 4    Assume a single column of text of variable sizes.
-            # 5    Assume a single uniform block of vertically aligned text.
-            # 6    Assume a single uniform block of text.
-            # 7    Treat the image as a single text line.
-            # 8    Treat the image as a single word.
-            # 9    Treat the image as a single word in a circle.
-            # 10    Treat the image as a single character.
-            # 11    Sparse text. Find as much text as possible in no particular order.
-            # 12    Sparse text with OSD.
-            # 13    Raw line. Treat the image as a single text line,
-            # bypassing hacks that are Tesseract-specific.
-            # config = '--oem 3 --psm 10 -c tessedit_char_whitelist=123456789'
-            preprocessed = self.preprocess_square(square)
-            img_pixels = preprocessed.shape[0] * preprocessed.shape[1]
-            binary_area = cv.countNonZero(preprocessed)
-            is_empty = img_pixels - binary_area < 0.01 * img_pixels
-            if is_empty:
-                # print("empty square")
-                numbers.append(".")
-                i = i + 1
-                continue
-
-            rbg = cv.cvtColor(preprocessed, cv.COLOR_GRAY2RGB)
-
-            numberStr = pytesseract.image_to_string(
-                rbg, config=config)
-
-            # data = pytesseract.image_to_data(
-            #     preprocessed, output_type=pytesseract.Output.DICT, config=config)
-            # print(data)
-
-            print("detected string: " + numberStr)
-
-            trimmed = numberStr.strip()
-            try:
-                parsed = int(trimmed)
-                postprocessed = parsed if parsed < 10 else parsed % 10
-                if postprocessed <= 0:
-                    postprocessed = "."
-                number = str(postprocessed)
-            except:
-                number = "."
-
-            print("detected number: " + number +
-                  " in square (row, col): " + str(i // 9) + ", " + str(i % 9))
-
-            # plt.imshow(preprocessed, cmap="gray")
-            # plt.waitforbuttonpress()
-
-            numbers.append(number)
-            i = i + 1
-        return numbers
 
     def form_squares(self, squares: Sequence[cv.Mat]) -> list[RecognizedSquare]:
         recog = []
@@ -226,7 +145,7 @@ class SudokuDetector:
         return thresh
 
     def load_image(self, file) -> cv.Mat:
-        print("Loading image...")
+        print(f"Loading image {file}...")
 
         file_exists = os.path.isfile(file)
         if (not file_exists):
