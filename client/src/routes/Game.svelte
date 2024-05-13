@@ -8,7 +8,9 @@
 	import GameActionButtons from './GameActionButtons.svelte';
 	import SolutionInfo from './SolutionInfo.svelte';
 	import SudokuBoard from './SudokuBoard.svelte';
+	import SudokuExport from './export/SudokuExport.svelte';
 	import SudokuImport from './import/SudokuImport.svelte';
+
 	export let sudoku: Sudoku;
 	let selectedNumber: number | undefined;
 	let selectedElimination: Elimination | undefined;
@@ -124,7 +126,10 @@
 </script>
 
 <div class="flex flex-col gap-5">
-	<SudokuImport {onSudokuImported} />
+	<div class="flex flex-row gap-5">
+		<SudokuImport {onSudokuImported} />
+		<SudokuExport {sudoku} />
+	</div>
 	<SudokuBoard {sudoku} {selectedElimination} {selectedCandidate} {selectedNumber} />
 	<GameActionButtons {boardSize} {numberClicked} />
 	<div class="flex flex-row gap-5">

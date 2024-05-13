@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { AppBar, AppShell, Modal, initializeStores } from '@skeletonlabs/skeleton';
 	import '../app.postcss';
+	import ExportModal from './export/ExportModal.svelte';
 	import ImportModal from './import/ImportModal.svelte';
 
 	initializeStores();
 
 	const modalRegistry = {
-		ImportModal: { ref: ImportModal }
+		ImportModal: { ref: ImportModal },
+		ExportModal: { ref: ExportModal }
 	};
 </script>
 

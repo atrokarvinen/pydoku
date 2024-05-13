@@ -24,11 +24,6 @@ def after_request(response):
     return response
 
 
-@app.route("/")
-def tester():
-    return "Hello"
-
-
 @app.route("/sudoku")
 def get_sudoku():
     sudoku = Sudoku()
@@ -36,8 +31,8 @@ def get_sudoku():
     return board.serialize()
 
 
-@app.route("/sudoku/import", methods=["POST"])
-def import_sudoku():
+@app.route("/sudoku/import/image", methods=["POST"])
+def import_sudoku_from_image():
     file = request.files["file"]
     print("importing image file: " + str(file))
     current_path = Path(__file__).parent
@@ -48,6 +43,14 @@ def import_sudoku():
     mv = SudokuDetector()
     img = mv.load_image(filename)
     sudoku_string = mv.detect(img)
+    solver = Sudoku()
+    sudoku = solver.parse(sudoku_string)
+    return sudoku.serialize()
+
+
+@app.route("/sudoku/import/string", methods=["POST"])
+def import_sudoku_from_string():
+    sudoku_string = request.get_json()["sudoku"]
     solver = Sudoku()
     sudoku = solver.parse(sudoku_string)
     return sudoku.serialize()

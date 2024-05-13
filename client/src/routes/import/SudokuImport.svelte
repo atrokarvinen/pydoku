@@ -5,7 +5,7 @@
 	export let onSudokuImported: (sudoku: Sudoku) => void;
 
 	const modalStore = getModalStore();
-	const importSudoku = async () => {
+	const importSudoku = () => {
 		modalStore.trigger({
 			type: 'component',
 			component: 'ImportModal',
