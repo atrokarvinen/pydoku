@@ -55,8 +55,10 @@ class SingleCandidate(SolverBase):
                     continue
                 row = square.row
                 column = square.column
+                other_numbers = [
+                    n for n in square.possible_numbers if n != note]
                 single_candidate = SingleCandidateModel(
-                    row, column, note, alignment)
+                    row, column, note, other_numbers, alignment)
                 return single_candidate
 
         return None

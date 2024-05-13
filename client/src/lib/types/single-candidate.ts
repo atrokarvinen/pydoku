@@ -3,6 +3,7 @@ export type SingleCandidate = {
 	row: number;
 	column: number;
 	number: number;
+	otherNumbers: number[];
 	alignment: Alignment;
 	solutionIndex: number;
 };

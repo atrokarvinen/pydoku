@@ -3,11 +3,12 @@ from models.solutionStep import SolutionStep
 
 
 class SingleCandidate(SolutionStep):
-    def __init__(self, row: int, column: int, number: int, alignment: str) -> None:
+    def __init__(self, row: int, column: int, number: int, other_numbers: list[int], alignment: str) -> None:
         self.type = "single-candidate"
         self.column = column
-        self.number = number
         self.row = row
+        self.number = number
+        self.other_numbers = other_numbers
         self.alignment = alignment
 
         self.solutionIndex = 0
@@ -31,6 +32,7 @@ class SingleCandidate(SolutionStep):
             "row": self.row,
             "column": self.column,
             "number": self.number,
+            "otherNumbers": self.other_numbers,
             "alignment": self.alignment,
             "solutionIndex": self.solutionIndex
         }

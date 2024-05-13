@@ -112,6 +112,9 @@
 	};
 
 	const onSudokuImported = (importedSudoku: Sudoku) => {
+		if (!importedSudoku) {
+			return;
+		}
 		console.log('sudoku imported: ', importedSudoku);
 		resetSelections();
 		currentSolutionStep = 0;

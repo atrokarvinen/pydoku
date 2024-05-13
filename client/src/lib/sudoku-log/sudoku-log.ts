@@ -89,4 +89,5 @@ const undoSingleCandidate = (sudoku: Sudoku, singleCandidate: SingleCandidate) =
 	const square = sudoku[row][column];
 	square.number = 0;
 	square.possibleNumbers.push(number);
+	square.possibleNumbers.push(...singleCandidate.otherNumbers);
 };
