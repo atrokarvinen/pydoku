@@ -4,7 +4,7 @@
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
-	import type { Sudoku } from '$lib/types/sudoku';
+	import type { Square, Sudoku } from '$lib/types/sudoku';
 	import GameActionButtons from './GameActionButtons.svelte';
 	import SolutionInfo from './SolutionInfo.svelte';
 	import SudokuBoard from './SudokuBoard.svelte';
@@ -123,6 +123,10 @@
 		solution = defaultSolution;
 		sudoku = importedSudoku;
 	};
+
+	const squarePressed = (square: Square) => {
+		numberClicked(square.number);
+	};
 </script>
 
 <div class="flex flex-col gap-5">
@@ -130,7 +134,13 @@
 		<SudokuImport {onSudokuImported} />
 		<SudokuExport {sudoku} />
 	</div>
-	<SudokuBoard {sudoku} {selectedElimination} {selectedCandidate} {selectedNumber} />
+	<SudokuBoard
+		{sudoku}
+		{selectedElimination}
+		{selectedCandidate}
+		{selectedNumber}
+		{squarePressed}
+	/>
 	<GameActionButtons {boardSize} {numberClicked} />
 	<div class="flex flex-row gap-5">
 		<button class="btn variant-filled-primary" on:click={solve}>Solve</button>

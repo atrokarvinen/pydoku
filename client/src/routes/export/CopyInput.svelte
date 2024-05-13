@@ -14,7 +14,7 @@
 
 <div>
 	<div class="flex flex-row gap-x-2">
-		<input class="input rounded-none" bind:value={text} readonly />
+		<input class="input" bind:value={text} readonly />
 		<button class="btn-icon variant-filled" on:click={() => copy(text)}
 			><i class="fas fa-copy" /></button
 		>

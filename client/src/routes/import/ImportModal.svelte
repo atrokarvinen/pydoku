@@ -49,7 +49,15 @@
 		<header class="text-2xl font-bold">Import sudoku</header>
 		<div class="flex flex-col gap-y-5">
 			<input
-				class="input rounded-none"
+				bind:this={fileInput}
+				class="input"
+				type="file"
+				on:change={handleFileChange}
+				bind:files
+			/>
+			<span> Or </span>
+			<input
+				class="input"
 				type="text"
 				placeholder="Paste sudoku here"
 				bind:this={stringInput}
@@ -59,14 +67,6 @@
 					files = undefined;
 					fileInput.value = '';
 				}}
-			/>
-			<span> Or </span>
-			<input
-				bind:this={fileInput}
-				class="input"
-				type="file"
-				on:change={handleFileChange}
-				bind:files
 			/>
 		</div>
 		<footer class="modal-footer flex flex-row space-x-2 justify-end">

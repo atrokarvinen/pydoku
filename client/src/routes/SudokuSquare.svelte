@@ -9,6 +9,7 @@
 	export let selectedElimination: Elimination | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
 	export let selectedNumber: number | undefined;
+	export let squarePressed: (square: Square) => void;
 
 	$: rowNumber = square.row;
 	$: colNumber = square.column;
@@ -120,8 +121,11 @@
 			</div>
 		</button>
 	{:else}
-		<span class={`text-3xl text-center h-full w-full ${isSelected ? 'bg-green-700' : ''}`}>
+		<button
+			class={`text-3xl text-center h-full w-full ${isSelected ? 'bg-green-700' : ''}`}
+			on:click={() => squarePressed(square)}
+		>
 			{square.number}
-		</span>
+		</button>
 	{/if}
 </div>
