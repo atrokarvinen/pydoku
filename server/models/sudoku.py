@@ -56,7 +56,7 @@ class Sudoku:
                 else:
                     char_as_number = int(char)
                 box = math.floor(i/box_size)*box_size + math.floor(j/box_size)
-                square = Square(i, j, char_as_number, box)
+                square = Square(i, j, box, char_as_number)
                 row.append(square)
             board.append(row)
 

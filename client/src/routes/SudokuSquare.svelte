@@ -29,6 +29,7 @@
 		square.row === candidateSquare.row &&
 		square.column === candidateSquare.column;
 	$: isSelected = selectedNumber && square.number === selectedNumber;
+	$: isInitial = square.isInitial;
 
 	const getBorderClass = (
 		row: number,
@@ -59,6 +60,10 @@
 			borderStyle += ' border-green-500';
 		}
 		return borderStyle;
+	};
+
+	const getFontClass = (isInitial: boolean) => {
+		return isInitial ? 'font-bold' : '';
 	};
 
 	const getContentClassName = (size: number) => {
@@ -122,7 +127,7 @@
 		</button>
 	{:else}
 		<button
-			class={`text-3xl text-center h-full w-full ${isSelected ? 'bg-green-700' : ''}`}
+			class={`text-3xl text-center h-full w-full ${isSelected ? 'bg-green-700' : ''} ${getFontClass(isInitial)}`}
 			on:click={() => squarePressed(square)}
 		>
 			{square.number}

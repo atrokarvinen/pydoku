@@ -14,8 +14,9 @@ class SudokuMapper:
                 mappedSquare = Square(
                     square["row"],
                     square["column"],
-                    square["number"],
-                    square["box"])
+                    square["box"],
+                    square["number"]
+                )
                 possibleNumbers = [
                     number for number in square["possibleNumbers"]]
                 mappedSquare.set_possible_numbers(possibleNumbers)
