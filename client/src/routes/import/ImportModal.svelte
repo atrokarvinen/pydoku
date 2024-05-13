@@ -3,7 +3,7 @@
 	import type { Sudoku } from '$lib/types/sudoku';
 	import { ProgressRadial, getModalStore } from '@skeletonlabs/skeleton';
 
-	export let parent: any;
+	export const parent: any = {};
 
 	const modalStore = getModalStore();
 	let file: File;
