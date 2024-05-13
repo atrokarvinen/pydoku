@@ -7,6 +7,7 @@ from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
 from pathlib import Path
+from machineVision.imageSaver import ImageSaver
 from testing.sudokus import expert_sudoku3
 
 
@@ -33,19 +34,20 @@ def get_sudoku():
 
 @app.route("/sudoku/import/image", methods=["POST"])
 def import_sudoku_from_image():
-    file = request.files["file"]
-    print("importing image file: " + str(file))
-    current_path = Path(__file__).parent
-    filename = os.path.join(
-        current_path, "machineVision/testImages", file.filename)
-    print("saving to path: " + filename)
-    file.save(filename)
     mv = SudokuDetector()
-    img = mv.load_image(filename)
-    sudoku_string = mv.detect(img)
-    solver = Sudoku()
-    sudoku = solver.parse(sudoku_string)
-    return sudoku.serialize()
+    file = request.files["file"]
+    file_saver = ImageSaver()
+    filename = file_saver.save(file)
+    try:
+        img = mv.load_image(filename)
+        sudoku_string = mv.detect(img)
+        solver = Sudoku()
+        sudoku = solver.parse(sudoku_string)
+        return sudoku.serialize()
+    except:
+        return "Error"
+    finally:
+        file_saver.try_delete_image(filename)
 
 
 @app.route("/sudoku/import/string", methods=["POST"])
