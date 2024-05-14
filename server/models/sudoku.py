@@ -5,6 +5,7 @@ from models.solution import Solution
 from models.board import Board
 from techniques.biValueUniversalGrave import BiValueUniversalGrave
 from techniques.emptyRectangle import EmptyRectangle
+from techniques.xCycle import XCycle
 from techniques.yWing import YWing
 from techniques.xWing import XWing
 from techniques.solverBase import SolverBase
@@ -31,7 +32,8 @@ class Sudoku:
             YWing(),
             SimpleColoring(),
             EmptyRectangle(),
-            BiValueUniversalGrave()
+            BiValueUniversalGrave(),
+            XCycle()
         ]
 
     def set_board(self, board: Board):
