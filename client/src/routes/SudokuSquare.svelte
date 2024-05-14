@@ -53,11 +53,18 @@
 		if (col === size - 1) {
 			borderStyle += ' border-r-2';
 		}
+		return borderStyle;
+	};
+
+	const getInnerBorderClass = (isCausedBy: boolean, isCandidate: boolean) => {
+		let borderStyle = 'border-solid border-2 ';
 		if (isCausedBy) {
 			borderStyle += ' border-red-500';
-		}
-		if (isCandidate) {
+		} else if (isCandidate) {
 			borderStyle += ' border-green-500';
+		} else {
+			borderStyle += ' border-transparent';
+			// return ""
 		}
 		return borderStyle;
 	};
@@ -106,31 +113,33 @@
 </script>
 
 <div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
-	{#if square.number === 0}
-		<button class="w-full h-full">
-			<div class={getContentClassName(size)}>
-				{#each possibleNotes as note}
-					<div class="flex items-center justify-center">
-						{#if square.possibleNumbers.includes(note)}
-							<SudokuNote
-								{note}
-								isEliminated={isNoteEliminated(note, square.row, square.column)}
-								isCausing={isNoteCausing(note, square.row, square.column)}
-								{selectedNumber}
-							/>
-						{:else}
-							<div />
-						{/if}
-					</div>
-				{/each}
-			</div>
-		</button>
-	{:else}
-		<button
-			class={`text-3xl text-center h-full w-full ${isSelected ? 'bg-green-700' : ''} ${getFontClass(isInitial)}`}
-			on:click={() => squarePressed(square)}
-		>
-			{square.number}
-		</button>
-	{/if}
+	<div class={`w-full h-full ${getInnerBorderClass(isCausedBy, isCandidate)} flex`}>
+		{#if square.number === 0}
+			<button class={`w-full h-full`}>
+				<div class={getContentClassName(size)}>
+					{#each possibleNotes as note}
+						<div class="flex items-center justify-center">
+							{#if square.possibleNumbers.includes(note)}
+								<SudokuNote
+									{note}
+									isEliminated={isNoteEliminated(note, square.row, square.column)}
+									isCausing={isNoteCausing(note, square.row, square.column)}
+									{selectedNumber}
+								/>
+							{:else}
+								<div />
+							{/if}
+						</div>
+					{/each}
+				</div>
+			</button>
+		{:else}
+			<button
+				class={`text-3xl flex items-center justify-center h-full w-full ${isSelected ? 'bg-green-700' : ''} ${getFontClass(isInitial)}`}
+				on:click={() => squarePressed(square)}
+			>
+				{square.number}
+			</button>
+		{/if}
+	</div>
 </div>
