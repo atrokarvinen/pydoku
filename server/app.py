@@ -10,10 +10,14 @@ from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
 from machineVision.imageSaver import ImageSaver
 from testing.sudokus import expert_sudoku3
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 db = SQLAlchemy(model_class=Base)
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./sudoku.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("CONNECTION_STRING")
 db.init_app(app)
 CORS(app)
 
