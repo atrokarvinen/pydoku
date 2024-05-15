@@ -15,4 +15,5 @@ server/**/__pycache__
 server/**/todo.txt
 server/**/example_image.png
 server/**/testImages
+server/**/instance
 fly.toml

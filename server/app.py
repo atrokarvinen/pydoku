@@ -1,28 +1,41 @@
-import os
 from flask import Flask, request
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
+from database.baseModel import Base
+from database.userRepository import UserRepository
 from models.sudoku import Sudoku
 from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
-from pathlib import Path
 from machineVision.imageSaver import ImageSaver
 from testing.sudokus import expert_sudoku3
 
-
+db = SQLAlchemy(model_class=Base)
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./sudoku.db"
+db.init_app(app)
 CORS(app)
+
+with app.app_context():
+    db.create_all()
 
 
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers',
-                         'Content-Type,Authorization')
+                         'Content-Type,Authorization,UserId')
     response.headers.add('Access-Control-Allow-Methods',
                          'GET,PUT,POST,DELETE,OPTIONS')
     return response
+
+
+@app.route("/auth/create")
+def create_user():
+    with db.session() as session:
+        user = UserRepository().create_user(session)
+        return user.serialize()
 
 
 @app.route("/sudoku")
@@ -82,3 +95,8 @@ def serialize_eliminations(eliminations):
 
 def serialize_solution(solution: Solution):
     return solution.serialize()
+
+
+def get_user_id():
+    headers = request.headers
+    return headers["UserId"]
