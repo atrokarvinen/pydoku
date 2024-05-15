@@ -3,6 +3,13 @@
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import type { Square } from '$lib/types/sudoku';
 	import SudokuNote from './SudokuNote.svelte';
+	import {
+		BASE_BORDER_COLOR,
+		CANDIDATE_COLOR,
+		CAUSING_SQUARE_COLOR,
+		INITIAL_NUMBER_STYLE,
+		SELECTED_STYLE
+	} from './theme';
 
 	export let square: Square;
 	export let size: number;
@@ -28,30 +35,24 @@
 		!!candidateSquare &&
 		square.row === candidateSquare.row &&
 		square.column === candidateSquare.column;
-	$: isSelected = selectedNumber && square.number === selectedNumber;
+	$: isSelected = !!selectedNumber && square.number === selectedNumber;
 	$: isInitial = square.isInitial;
 
-	const getBorderClass = (
-		row: number,
-		col: number,
-		size: number,
-		isCausedBy: boolean,
-		isCandidate: boolean
-	) => {
-		const baseStyle = 'flex items-center justify-center h-10 w-10 border-solid border border-black';
-		let borderStyle = baseStyle;
+	const getBorderClass = (row: number, col: number, size: number) => {
+		let borderStyle = 'flex items-center justify-center h-10 w-10 border-solid border ';
+		borderStyle += BASE_BORDER_COLOR + ' ';
 		const boxSize = Math.sqrt(size);
 		if (row % boxSize === 0) {
-			borderStyle += ' border-t-2';
+			borderStyle += 'border-t-2 ';
 		}
 		if (row === size - 1) {
-			borderStyle += ' border-b-2';
+			borderStyle += 'border-b-2 ';
 		}
 		if (col % boxSize === 0) {
-			borderStyle += ' border-l-2';
+			borderStyle += 'border-l-2 ';
 		}
 		if (col === size - 1) {
-			borderStyle += ' border-r-2';
+			borderStyle += 'border-r-2 ';
 		}
 		return borderStyle;
 	};
@@ -59,22 +60,25 @@
 	const getInnerBorderClass = (isCausedBy: boolean, isCandidate: boolean) => {
 		let borderStyle = 'border-solid border-2 ';
 		if (isCausedBy) {
-			borderStyle += ' border-red-500';
+			borderStyle += CAUSING_SQUARE_COLOR;
 		} else if (isCandidate) {
-			borderStyle += ' border-green-500';
+			borderStyle += CANDIDATE_COLOR;
 		} else {
-			borderStyle += ' border-transparent';
-			// return ""
+			borderStyle += 'border-transparent';
 		}
 		return borderStyle;
 	};
 
 	const getFontClass = (isInitial: boolean) => {
-		return isInitial ? 'font-bold' : '';
+		return isInitial ? INITIAL_NUMBER_STYLE : '';
+	};
+
+	const getSelectedClass = (isSelected: boolean) => {
+		return isSelected ? SELECTED_STYLE : '';
 	};
 
 	const getContentClassName = (size: number) => {
-		let className = 'w-full h-full grid';
+		let className = 'w-full h-full grid gap-px';
 		if (size === 4) {
 			className += ' grid-cols-2 grid-rows-2';
 		} else if (size === 9) {
@@ -112,7 +116,7 @@
 	$: possibleNotes = Array.from({ length: size }, (_, i) => i + 1);
 </script>
 
-<div class={getBorderClass(rowNumber, colNumber, size, isCausedBy, isCandidate)}>
+<div class={getBorderClass(rowNumber, colNumber, size)}>
 	<div class={`w-full h-full ${getInnerBorderClass(isCausedBy, isCandidate)} flex`}>
 		{#if square.number === 0}
 			<button class={`w-full h-full`}>
@@ -135,7 +139,7 @@
 			</button>
 		{:else}
 			<button
-				class={`text-3xl flex items-center justify-center h-full w-full ${isSelected ? 'bg-green-700' : ''} ${getFontClass(isInitial)}`}
+				class={`text-3xl flex items-center justify-center h-full w-full ${getSelectedClass(isSelected)} ${getFontClass(isInitial)}`}
 				on:click={() => squarePressed(square)}
 			>
 				{square.number}

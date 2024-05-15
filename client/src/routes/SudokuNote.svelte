@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { CAUSING_NOTE_STYLE, ELIMINATED_STYLE, SELECTED_STYLE } from './theme';
+
 	export let note: number;
 	export let isEliminated: boolean;
 	export let isCausing: boolean;
@@ -10,13 +12,13 @@
 	$: {
 		let noteStyle = 'flex items-center justify-center w-full h-full';
 		if (isEliminated) {
-			noteStyle += ' border border-red-500';
+			noteStyle += ' ' + ELIMINATED_STYLE;
 		}
 		if (isCausing) {
-			noteStyle += ' border border-green-500';
+			noteStyle += ' ' + CAUSING_NOTE_STYLE;
 		}
 		if (isSelected) {
-			noteStyle += ' bg-green-700';
+			noteStyle += ' ' + SELECTED_STYLE;
 		}
 		className = noteStyle;
 	}
