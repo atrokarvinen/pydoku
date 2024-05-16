@@ -15,6 +15,7 @@
 	let selectedNumber: number | undefined;
 	let selectedElimination: Elimination | undefined;
 	let selectedCandidate: SingleCandidate | undefined;
+	let selectedSquare: Square | undefined;
 	let solution: Solution = defaultSolution;
 	let currentSolutionStep = 0;
 	$: boardSize = sudoku.length;
@@ -23,6 +24,7 @@
 		selectedNumber = undefined;
 		selectedElimination = undefined;
 		selectedCandidate = undefined;
+		selectedSquare = undefined;
 	};
 
 	const eliminationClicked = (elimination: Elimination) => {
@@ -126,6 +128,7 @@
 
 	const squarePressed = (square: Square) => {
 		numberClicked(square.number);
+		selectedSquare = square;
 	};
 </script>
 
@@ -139,6 +142,7 @@
 		{selectedElimination}
 		{selectedCandidate}
 		{selectedNumber}
+		{selectedSquare}
 		{squarePressed}
 	/>
 	<GameActionButtons {boardSize} {numberClicked} />

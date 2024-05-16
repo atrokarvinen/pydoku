@@ -8,6 +8,7 @@
 		CANDIDATE_COLOR,
 		CAUSING_SQUARE_COLOR,
 		INITIAL_NUMBER_STYLE,
+		SELECTED_NUMBER_STYLE,
 		SELECTED_STYLE
 	} from './theme';
 
@@ -16,6 +17,8 @@
 	export let selectedElimination: Elimination | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
 	export let selectedNumber: number | undefined;
+	export let selectedSquare: Square | undefined;
+	export let highlightedSquares: Square[];
 	export let squarePressed: (square: Square) => void;
 
 	$: rowNumber = square.row;
@@ -35,7 +38,15 @@
 		!!candidateSquare &&
 		square.row === candidateSquare.row &&
 		square.column === candidateSquare.column;
-	$: isSelected = !!selectedNumber && square.number === selectedNumber;
+	$: isSelected =
+		!!selectedSquare &&
+		square.row === selectedSquare.row &&
+		square.column === selectedSquare.column;
+	$: isNumberSelected = !!selectedNumber && square.number === selectedNumber;
+	$: isHighlighted = highlightedSquares.some(
+		(highlightedSquare) =>
+			highlightedSquare.row === square.row && highlightedSquare.column === square.column
+	);
 	$: isInitial = square.isInitial;
 
 	const getBorderClass = (row: number, col: number, size: number) => {
@@ -73,8 +84,19 @@
 		return isInitial ? INITIAL_NUMBER_STYLE : '';
 	};
 
-	const getSelectedClass = (isSelected: boolean) => {
-		return isSelected ? SELECTED_STYLE : '';
+	const getSelectedClass = (
+		isNumberSelected: boolean,
+		isSelected: boolean,
+		isHighlighted: boolean
+	) => {
+		if (isSelected) {
+			return SELECTED_STYLE;
+		} else if (isHighlighted) {
+			return 'bg-gray-200';
+		} else if (isNumberSelected) {
+			return SELECTED_NUMBER_STYLE;
+		}
+		return '';
 	};
 
 	const getContentClassName = (size: number) => {
@@ -139,7 +161,7 @@
 			</button>
 		{:else}
 			<button
-				class={`text-3xl flex items-center justify-center h-full w-full ${getSelectedClass(isSelected)} ${getFontClass(isInitial)}`}
+				class={`text-3xl flex items-center justify-center h-full w-full ${getSelectedClass(isNumberSelected, isSelected, isHighlighted)} ${getFontClass(isInitial)}`}
 				on:click={() => squarePressed(square)}
 			>
 				{square.number}

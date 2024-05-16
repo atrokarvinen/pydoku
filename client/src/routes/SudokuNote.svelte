@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CAUSING_NOTE_STYLE, ELIMINATED_STYLE, SELECTED_STYLE } from './theme';
+	import { CAUSING_NOTE_STYLE, ELIMINATED_STYLE, SELECTED_NUMBER_STYLE } from './theme';
 
 	export let note: number;
 	export let isEliminated: boolean;
@@ -18,7 +18,7 @@
 			noteStyle += ' ' + CAUSING_NOTE_STYLE;
 		}
 		if (isSelected) {
-			noteStyle += ' ' + SELECTED_STYLE;
+			noteStyle += ' ' + SELECTED_NUMBER_STYLE;
 		}
 		className = noteStyle;
 	}
