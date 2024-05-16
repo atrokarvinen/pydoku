@@ -3,13 +3,12 @@ from models.board import Board
 from models.elimination import Elimination
 from models.square import Square
 from models.numberedNote import NumberedNote
-from models.solutionStep import SolutionStep
 from techniques.models.coloredNote import ColoredNote
 from techniques.eliminatorBase import EliminatorBase
 
 
 class SimpleColoring(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         squares = board.flatten()
         empty_squares = [s for s in squares if s.is_empty()]
         boardRange = board.get_range()

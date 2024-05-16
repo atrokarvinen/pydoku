@@ -1,12 +1,11 @@
 from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
-from models.solutionStep import SolutionStep
 from techniques.eliminatorBase import EliminatorBase
 
 
 class Claiming(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         columns = [board.get_empty_squares_in_column(
             i) for i in range(board.size)]
         rows = [board.get_empty_squares_in_row(i) for i in range(board.size)]

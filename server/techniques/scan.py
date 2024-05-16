@@ -3,13 +3,12 @@ from models.elimination import Elimination
 from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.numberedSquare import NumberedSquare
-from models.solutionStep import SolutionStep
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
 
 
 class Scan(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         flat_squares = board.flatten_not_empty()
         for square in flat_squares:
             row = square.row
@@ -23,11 +22,13 @@ class Scan(EliminatorBase):
 
             other_squares = squares_in_row + squares_in_column + squares_in_box
 
-            eliminated_notes = []
+            eliminated_notes: list[NumberedNote] = []
             for other_square in other_squares:
                 if (other_square.row == row and other_square.column == column):
                     continue
-                if (number in other_square.possible_numbers):
+                already_eliminated = any(
+                    note.row == other_square.row and note.column == other_square.column and note.number == number for note in eliminated_notes)
+                if (number in other_square.possible_numbers and not already_eliminated):
                     eliminated_note = NumberedNote(
                         other_square.row,
                         other_square.column,

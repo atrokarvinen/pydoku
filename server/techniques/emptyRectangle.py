@@ -1,5 +1,4 @@
 from models.board import Board
-from models.solutionStep import SolutionStep
 from models.numberedNote import NumberedNote
 from models.elimination import Elimination
 from techniques.models.emptyRectangleConnection import EmptyRectangleConnection
@@ -9,7 +8,7 @@ from techniques.eliminatorBase import EliminatorBase
 
 
 class EmptyRectangle(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         empty_rectangles = self.detect_empty_rectangles(board)
         if (len(empty_rectangles) == 0):
             return None

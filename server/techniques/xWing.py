@@ -1,5 +1,4 @@
 from models.board import Board
-from models.solutionStep import SolutionStep
 from models.numberedNote import NumberedNote
 from models.elimination import Elimination
 from models.square import Square
@@ -7,7 +6,7 @@ from techniques.eliminatorBase import EliminatorBase
 
 
 class XWing(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         note_range = board.get_range()
         board_range = board.get_range_zero_indexed()
         rows = [board.get_empty_squares_in_row(i) for i in board_range]

@@ -2,12 +2,11 @@ from models.board import Board
 from models.highlightedRegion import HighlightedRegion
 from models.singleCandidate import SingleCandidate as SingleCandidateModel
 from models.square import Square
-from models.solutionStep import SolutionStep
 from techniques.solverBase import SolverBase
 
 
 class SingleCandidate(SolverBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> SingleCandidateModel:
         boardRange = range(board.size)
         rows = [board.get_empty_squares_in_row(i) for i in boardRange]
         columns = [board.get_empty_squares_in_column(i) for i in boardRange]

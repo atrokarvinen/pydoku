@@ -1,12 +1,11 @@
 from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
-from models.solutionStep import SolutionStep
 from techniques.eliminatorBase import EliminatorBase
 
 
 class Pointing(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         for i in range(board.size):
             squares_in_box = board.get_squares_in_box(i)
             notes = [*range(1, board.size+1)]

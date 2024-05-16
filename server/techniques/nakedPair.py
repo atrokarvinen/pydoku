@@ -3,12 +3,11 @@ from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.square import Square
-from models.solutionStep import SolutionStep
 from techniques.eliminatorBase import EliminatorBase
 
 
 class NakedPair(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         max_pair_count = math.floor(board.size/2)
         for pair_count in range(2, max_pair_count+1):
             pair = self.find_naked_pair_of_n(board, pair_count)

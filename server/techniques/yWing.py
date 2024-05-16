@@ -1,14 +1,13 @@
 from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
-from models.solutionStep import SolutionStep
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
 from techniques.squareLogic import SquareLogic
 
 
 class YWing(EliminatorBase):
-    def get_next_solution(self, board: Board) -> SolutionStep:
+    def get_next_solution(self, board: Board) -> Elimination:
         empty_squares = board.flatten_empty()
         pivot_squares = [
             s for s in empty_squares if len(s.possible_numbers) == 2]

@@ -52,6 +52,21 @@ class Board:
     def get_empty_squares_in_box_by_square(self, square: Square) -> list[Square]:
         return self.get_empty_squares_in_box(self.get_box_of_square(square))
 
+    def set_square(self, row: int, column: int, number: int):
+        self.rows[row][column].set_number(number)
+
+    def set_notes(self, row: int, column: int, notes: list[int]):
+        self.rows[row][column].set_possible_numbers(notes)
+
+    def initialize_empty(self):
+        for i in range(self.size):
+            row = []
+            for j in range(self.size):
+                square = Square(i, j, self.get_box_of_square(
+                    Square(i, j, 0, 0)), 0)
+                row.append(square)
+            self.rows.append(row)
+
     def append(self, row: list[Square]):
         self.rows.append(row)
 

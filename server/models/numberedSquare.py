@@ -10,3 +10,8 @@ class NumberedSquare:
             "column": self.column,
             "number": self.number
         }
+
+    def __eq__(self, other):
+        return self.row == other.row \
+            and self.column == other.column \
+            and self.number == other.number
