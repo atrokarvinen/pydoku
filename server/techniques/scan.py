@@ -1,8 +1,10 @@
 from models.board import Board
 from models.elimination import Elimination
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.numberedSquare import NumberedSquare
 from models.solutionStep import SolutionStep
+from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
 
 
@@ -35,12 +37,26 @@ class Scan(EliminatorBase):
             if (len(eliminated_notes) == 0):
                 continue
 
+            highlighted_regions = self.get_highlighted_regions(square)
+
             elimination = Elimination(
                 technique="scan",
                 causing_square=NumberedSquare(row, column, number),
                 causing_notes=[],
                 eliminated_notes=eliminated_notes,
+                highlighted_regions=highlighted_regions
             )
             return elimination
 
         return None
+
+    def get_highlighted_regions(self, square: Square) -> list[HighlightedRegion]:
+        row = square.row
+        column = square.column
+        box = square.box
+
+        return [
+            HighlightedRegion("row", row),
+            HighlightedRegion("column", column),
+            HighlightedRegion("box", box)
+        ]

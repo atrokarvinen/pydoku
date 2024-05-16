@@ -1,3 +1,4 @@
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.numberedSquare import NumberedSquare
 from models.board import Board
@@ -9,12 +10,14 @@ class Elimination(SolutionStep):
                  technique: str,
                  causing_square: NumberedSquare,
                  causing_notes: list[NumberedNote],
-                 eliminated_notes: list[NumberedNote]):
+                 eliminated_notes: list[NumberedNote],
+                 highlighted_regions: list[HighlightedRegion] = []) -> None:
         self.type = "elimination"
         self.causing_square = causing_square
         self.causing_notes = causing_notes
         self.technique = technique
         self.eliminated_notes = eliminated_notes
+        self.highlighted_regions = highlighted_regions
         self.solution_index = 0
 
     def apply(self, board: Board) -> Board:
@@ -38,5 +41,6 @@ class Elimination(SolutionStep):
             "causingNotes": [note.serialize() for note in self.causing_notes],
             "technique": self.technique,
             "eliminatedNotes": [note.serialize() for note in self.eliminated_notes],
+            "highlightedRegions": [region.serialize() for region in self.highlighted_regions],
             "solutionIndex": self.solution_index
         }
