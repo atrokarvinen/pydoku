@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Elimination } from '$lib/types/elimination';
+	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import type { Square } from '$lib/types/sudoku';
 	import SudokuNote from './SudokuNote.svelte';
 
@@ -7,6 +8,7 @@
 	export let square: Square;
 	export let selectedNumber: number | undefined;
 	export let selectedElimination: Elimination | undefined;
+	export let selectedCandidate: SingleCandidate | undefined;
 
 	$: possibleNotes = Array.from({ length: size }, (_, i) => i + 1);
 
@@ -45,6 +47,17 @@
 				eliminationNote.number === note
 		);
 	};
+
+	const isNoteSingleCandidate = (note: number, row: number, col: number) => {
+		if (!selectedCandidate) {
+			return false;
+		}
+		return (
+			selectedCandidate.row === row &&
+			selectedCandidate.column === col &&
+			selectedCandidate.number === note
+		);
+	};
 </script>
 
 <div class={getContentClassName(size)}>
@@ -55,6 +68,7 @@
 					{note}
 					isEliminated={isNoteEliminated(note, square.row, square.column)}
 					isCausing={isNoteCausing(note, square.row, square.column)}
+					isSingleCandidate={isNoteSingleCandidate(note, square.row, square.column)}
 					{selectedNumber}
 				/>
 			{:else}

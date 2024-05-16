@@ -1,9 +1,15 @@
 <script lang="ts">
-	import { CAUSING_NOTE_STYLE, ELIMINATED_STYLE, SELECTED_NUMBER_STYLE } from './theme';
+	import {
+		CANDIDATE_COLOR,
+		CAUSING_NOTE_STYLE,
+		ELIMINATED_STYLE,
+		SELECTED_NUMBER_STYLE
+	} from './theme';
 
 	export let note: number;
 	export let isEliminated: boolean;
 	export let isCausing: boolean;
+	export let isSingleCandidate: boolean;
 	export let selectedNumber: number | undefined;
 
 	$: isSelected = selectedNumber === note;
@@ -16,6 +22,9 @@
 		}
 		if (isCausing) {
 			noteStyle += ' ' + CAUSING_NOTE_STYLE;
+		}
+		if (isSingleCandidate) {
+			noteStyle += ' ' + CANDIDATE_COLOR;
 		}
 		if (isSelected) {
 			noteStyle += ' ' + SELECTED_NUMBER_STYLE;

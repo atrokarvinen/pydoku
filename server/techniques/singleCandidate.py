@@ -1,4 +1,5 @@
 from models.board import Board
+from models.highlightedRegion import HighlightedRegion
 from models.singleCandidate import SingleCandidate as SingleCandidateModel
 from models.square import Square
 from models.solutionStep import SolutionStep
@@ -57,8 +58,24 @@ class SingleCandidate(SolverBase):
                 column = square.column
                 other_numbers = [
                     n for n in square.possible_numbers if n != note]
+                highlighted_regions = self.get_highlighted_regions(
+                    square, alignment)
                 single_candidate = SingleCandidateModel(
-                    row, column, note, other_numbers, alignment)
+                    row,
+                    column,
+                    note,
+                    other_numbers,
+                    highlighted_regions,
+                    alignment)
                 return single_candidate
 
         return None
+
+    def get_highlighted_regions(self, square: Square, alignment: str) -> list[HighlightedRegion]:
+        if (alignment == "row"):
+            return [HighlightedRegion(alignment, square.row)]
+        if (alignment == "column"):
+            return [HighlightedRegion(alignment, square.column)]
+        if (alignment == "box"):
+            return [HighlightedRegion(alignment, square.box)]
+        return []

@@ -1,14 +1,22 @@
 from models.board import Board
+from models.highlightedRegion import HighlightedRegion
 from models.solutionStep import SolutionStep
 
 
 class SingleCandidate(SolutionStep):
-    def __init__(self, row: int, column: int, number: int, other_numbers: list[int], alignment: str) -> None:
+    def __init__(self,
+                 row: int,
+                 column: int,
+                 number: int,
+                 other_numbers: list[int],
+                 highlighted_regions: list[HighlightedRegion],
+                 alignment: str) -> None:
         self.type = "single-candidate"
         self.column = column
         self.row = row
         self.number = number
         self.other_numbers = other_numbers
+        self.highlightedRegions = highlighted_regions
         self.alignment = alignment
 
         self.solutionIndex = 0
@@ -33,6 +41,7 @@ class SingleCandidate(SolutionStep):
             "column": self.column,
             "number": self.number,
             "otherNumbers": self.other_numbers,
+            "highlightedRegions": [region.serialize() for region in self.highlightedRegions],
             "alignment": self.alignment,
             "solutionIndex": self.solutionIndex
         }

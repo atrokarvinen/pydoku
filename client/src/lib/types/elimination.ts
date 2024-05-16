@@ -1,3 +1,5 @@
+import type { HighlightedRectangle } from './highlighted-rectangle';
+import type { HighlightedRegion } from './highlighted-region';
 import type { NumberedNote } from './numbered-note';
 import type { NumberedSquare } from './numbered-square';
 
@@ -7,5 +9,7 @@ export type Elimination = {
 	causingSquare?: NumberedSquare;
 	causingNotes: NumberedNote[];
 	eliminatedNotes: NumberedNote[];
+	highlightedRegions: HighlightedRegion[];
+	highlightedRectangle: HighlightedRectangle;
 	solutionIndex: number;
 };

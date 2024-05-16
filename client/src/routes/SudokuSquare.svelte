@@ -5,7 +5,6 @@
 	import SudokuNotes from './SudokuNotes.svelte';
 	import {
 		BASE_BORDER_COLOR,
-		CANDIDATE_COLOR,
 		CAUSING_SQUARE_COLOR,
 		HIGHLIGHTED_STYLE,
 		INITIAL_NUMBER_STYLE,
@@ -24,21 +23,11 @@
 
 	$: rowNumber = square.row;
 	$: colNumber = square.column;
-	$: candidateSquare = selectedCandidate
-		? {
-				row: selectedCandidate.row,
-				column: selectedCandidate.column
-			}
-		: undefined;
 	$: isCausedBy =
 		!!selectedElimination &&
 		!!selectedElimination.causingSquare &&
 		square.row === selectedElimination.causingSquare.row &&
 		square.column === selectedElimination.causingSquare.column;
-	$: isCandidate =
-		!!candidateSquare &&
-		square.row === candidateSquare.row &&
-		square.column === candidateSquare.column;
 	$: isSelected =
 		!!selectedSquare &&
 		square.row === selectedSquare.row &&
@@ -69,12 +58,10 @@
 		return borderStyle;
 	};
 
-	const getInnerBorderClass = (isCausedBy: boolean, isCandidate: boolean) => {
+	const getInnerBorderClass = (isCausedBy: boolean) => {
 		let borderStyle = 'border-solid border-2 ';
 		if (isCausedBy) {
 			borderStyle += CAUSING_SQUARE_COLOR;
-		} else if (isCandidate) {
-			borderStyle += CANDIDATE_COLOR;
 		} else {
 			borderStyle += 'border-transparent';
 		}
@@ -103,14 +90,14 @@
 
 <div class={getOuterBorderClass(rowNumber, colNumber, size)}>
 	<div
-		class={`w-full h-full flex ${getInnerBorderClass(isCausedBy, isCandidate)} ${getBackgroundClass(isNumberSelected, isSelected, isHighlighted)}`}
+		class={`w-full h-full flex ${getInnerBorderClass(isCausedBy)} ${getBackgroundClass(isNumberSelected, isSelected, isHighlighted)}`}
 	>
 		<button
 			class={`text-3xl flex items-center justify-center h-full w-full  ${getFontClass(isInitial)}`}
 			on:click={() => squarePressed(square)}
 		>
 			{#if square.number === 0}
-				<SudokuNotes {size} {square} {selectedElimination} {selectedNumber} />
+				<SudokuNotes {size} {square} {selectedElimination} {selectedCandidate} {selectedNumber} />
 			{:else}
 				{square.number}
 			{/if}
