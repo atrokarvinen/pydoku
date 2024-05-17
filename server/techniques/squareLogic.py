@@ -86,3 +86,10 @@ class SquareLogic:
                     notes_by_count[note] = 0
                 notes_by_count[note] += 1
         return notes_by_count
+
+    def get_unique_notes(squares: list[Square]) -> set[int]:
+        unique_notes = set()
+        for square in squares:
+            for note in square.possible_numbers:
+                unique_notes.add(note)
+        return unique_notes

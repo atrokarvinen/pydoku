@@ -4,6 +4,7 @@ from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
+from techniques.squareLogic import SquareLogic
 
 
 class NakedPair(EliminatorBase):
@@ -15,10 +16,7 @@ class NakedPair(EliminatorBase):
                 return pair
         return None
 
-    def get_eliminations(self, board: Board) -> list[Elimination]:
-        return self.get_naked_pairs(board)
-
-    def get_sets_of_n(self, sets, remaining_elements, pair, n):
+    def get_sets_of_n(self, sets, remaining_elements, pair, n) -> list[list[Square]]:
         if (len(pair) == n):
             sets.append(pair)
         for i in range(len(remaining_elements)):
@@ -27,13 +25,19 @@ class NakedPair(EliminatorBase):
                 sets, remaining_elements[i+1:], pair + [picked], n)
         return sets
 
-    def are_all_notes_same(self, squares: list[Square]) -> bool:
-        first_square = squares[0]
-        notes = first_square.possible_numbers
-        for square in squares:
-            if (square.possible_numbers != notes):
-                return False
+    def validate_pair(self, pair: list[Square]) -> bool:
+        pair_count = len(pair)
+        any_too_few_notes = any(
+            len(square.possible_numbers) <= 1 for square in pair)
+        any_too_many_notes = any(
+            len(square.possible_numbers) > pair_count for square in pair)
+        if (any_too_few_notes or any_too_many_notes):
+            return False
         return True
+
+    def do_notes_form_pair(self, squares: list[Square]) -> bool:
+        unique_notes = SquareLogic.get_unique_notes(squares)
+        return len(unique_notes) == len(squares)
 
     def pair_to_elimination(self, pair: list[Square], eliminated_notes: list[NumberedNote]) -> Elimination:
         causing_notes = []
@@ -64,12 +68,12 @@ class NakedPair(EliminatorBase):
 
     def get_eliminated_notes(self, pair: list[Square], square_set: list[Square]) -> list[NumberedNote]:
         eliminates_notes = []
-        pair_to_look = pair[0].possible_numbers
+        notes_in_pair = SquareLogic.get_unique_notes(pair)
         squares_outside_pair = self.squares_outside_pair(
             square_set, pair)
         for square_outside_pair in squares_outside_pair:
             for note in square_outside_pair.possible_numbers:
-                if (note in pair_to_look):
+                if (note in notes_in_pair):
                     eliminates_notes.append(NumberedNote(
                         square_outside_pair.row,
                         square_outside_pair.column,
@@ -106,14 +110,14 @@ class NakedPair(EliminatorBase):
         for line in lines:
             sets = self.get_sets_of_n([], line, [], pair_count)
             for pair in sets:
-                all_notes_same = self.are_all_notes_same(pair)
+                is_pair_valid = self.validate_pair(pair)
+                if (not is_pair_valid):
+                    continue
+                all_notes_same = self.do_notes_form_pair(pair)
                 if (not all_notes_same):
                     continue
-                correct_count = len(pair[0].possible_numbers) == pair_count
-                if (not correct_count):
-                    continue
-                squares_in_line = region_getter_by_square(pair[0])
-                squares = [s for s in squares_in_line if s not in pair]
+                squares_in_region = region_getter_by_square(pair[0])
+                squares = [s for s in squares_in_region if s not in pair]
                 eliminated_notes = self.get_eliminated_notes(pair, squares)
                 if (len(eliminated_notes) == 0):
                     continue
