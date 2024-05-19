@@ -3,7 +3,7 @@ from models.numberedNote import NumberedNote
 from models.elimination import Elimination
 from techniques.models.emptyRectangleConnection import EmptyRectangleConnection
 from techniques.models.emptyRectangleModel import EmptyRectangleModel
-from techniques.squareLogic import SquareLogic
+from techniques.utils.squareLogic import SquareLogic
 from techniques.eliminatorBase import EliminatorBase
 
 

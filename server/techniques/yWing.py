@@ -3,7 +3,7 @@ from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
-from techniques.squareLogic import SquareLogic
+from techniques.utils.squareLogic import SquareLogic
 
 
 class YWing(EliminatorBase):

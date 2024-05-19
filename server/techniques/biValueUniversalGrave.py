@@ -2,7 +2,7 @@ from models.board import Board
 from models.elimination import Elimination
 from models.numberedNote import NumberedNote
 from models.square import Square
-from techniques.squareLogic import SquareLogic
+from techniques.utils.squareLogic import SquareLogic
 from techniques.eliminatorBase import EliminatorBase
 
 
