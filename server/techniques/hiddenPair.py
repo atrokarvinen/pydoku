@@ -4,6 +4,7 @@ from models.numberedNote import NumberedNote
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
 from techniques.pairBase import PairBase
+from techniques.squareLogic import SquareLogic
 from techniques.utils.combinatorics import Combinatorics
 
 
@@ -25,17 +26,20 @@ class HiddenPair(EliminatorBase, PairBase):
                 notes_by_count[note] = notes_by_count.get(note, 0) + 1
 
         notes_with_pair_count = [
-            note for note, count in notes_by_count.items() if count == pair_count]
+            note for note, count in notes_by_count.items() if count <= pair_count and count > 1]
 
         possible_note_pairs = Combinatorics.get_sets_of_n(
             [], notes_with_pair_count, [], pair_count)
         for note_pair in possible_note_pairs:
-            is_valid_pair = self.validate_pair(squares, note_pair)
+            is_valid_pair = self.validate_pair(
+                squares, note_pair, other_squares)
             if (not is_valid_pair):
                 continue
 
             eliminated_notes = self.get_eliminated_notes(
                 squares, note_pair)
+            if (len(eliminated_notes) == 0):
+                continue
             elimination = self.pair_to_elimination(
                 squares, eliminated_notes, note_pair)
 
@@ -43,15 +47,19 @@ class HiddenPair(EliminatorBase, PairBase):
 
         return None
 
-    def validate_pair(self, pair: list[Square], note_pair: list[int]) -> bool:
-        squares_contain_note_pair = True
-        for note in note_pair:
-            all_squares_have_note = all(
-                [note in square.possible_numbers for square in pair])
-            if (not all_squares_have_note):
-                squares_contain_note_pair = False
-                continue
-        return squares_contain_note_pair
+    def validate_pair(self, pair: list[Square], note_pair: list[int], other_squares: list[Square]) -> bool:
+        squares_valid = all([len(s.possible_numbers) > 1 for s in pair])
+        if (not squares_valid):
+            return False
+        other_squares_have_note = any(
+            [note in s.possible_numbers for s in other_squares for note in note_pair])
+        if (other_squares_have_note):
+            return False
+        unique_notes = SquareLogic.get_unique_notes(pair)
+        note_pair_is_contained = all(
+            [note in unique_notes for note in note_pair]
+        )
+        return note_pair_is_contained
 
     def get_eliminated_notes(self, pair: list[Square], note_pair: list[int]) -> list[NumberedNote]:
         eliminated_notes = []
@@ -70,10 +78,12 @@ class HiddenPair(EliminatorBase, PairBase):
                             note_pair: list[int]) -> Elimination:
         causing_notes = []
         for square in pair:
-            causing_notes += [NumberedNote(
-                square.row,
-                square.column,
-                note) for note in note_pair]
+            for note in note_pair:
+                has_note = note in square.possible_numbers
+                if (not has_note):
+                    continue
+                causing_notes.append(NumberedNote(
+                    square.row, square.column, note))
 
         if (len(pair) == 2):
             technique = "hidden-pair"
