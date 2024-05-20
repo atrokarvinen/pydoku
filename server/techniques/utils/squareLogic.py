@@ -93,3 +93,11 @@ class SquareLogic:
             for note in square.possible_numbers:
                 unique_notes.add(note)
         return unique_notes
+
+    def squares_have_same_row(squares: list[Square]) -> bool:
+        rows = set([s.row for s in squares])
+        return len(rows) == 1
+
+    def squares_have_same_column(squares: list[Square]) -> bool:
+        columns = set([s.column for s in squares])
+        return len(columns) == 1

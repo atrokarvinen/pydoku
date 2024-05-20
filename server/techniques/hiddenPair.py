@@ -1,5 +1,6 @@
 from models.board import Board
 from models.elimination import Elimination
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
@@ -41,7 +42,7 @@ class HiddenPair(EliminatorBase, PairBase):
             if (len(eliminated_notes) == 0):
                 continue
             elimination = self.pair_to_elimination(
-                squares, eliminated_notes, note_pair)
+                squares, other_squares, eliminated_notes, note_pair)
 
             return elimination
 
@@ -74,6 +75,7 @@ class HiddenPair(EliminatorBase, PairBase):
 
     def pair_to_elimination(self,
                             pair: list[Square],
+                            other_squares: list[Square],
                             eliminated_notes: list[NumberedNote],
                             note_pair: list[int]) -> Elimination:
         causing_notes = []
@@ -94,8 +96,12 @@ class HiddenPair(EliminatorBase, PairBase):
         else:
             technique = "hidden-" + str(len(pair))
 
+        print("Found hidden pair")
+
+        highlighted_regions = self.get_highlighted_regions(pair, other_squares)
         return Elimination(
             technique=technique,
             causing_square=None,
             causing_notes=causing_notes,
-            eliminated_notes=eliminated_notes)
+            eliminated_notes=eliminated_notes,
+            highlighted_regions=highlighted_regions)

@@ -25,7 +25,8 @@ class NakedPair(EliminatorBase, PairBase):
         eliminated_notes = self.get_eliminated_notes(pair, squares)
         if (len(eliminated_notes) == 0):
             return None
-        elimination = self.pair_to_elimination(pair, eliminated_notes)
+        elimination = self.pair_to_elimination(
+            pair, other_squares, eliminated_notes)
         return elimination
 
     def validate_pair(self, pair: list[Square]) -> bool:
@@ -42,7 +43,10 @@ class NakedPair(EliminatorBase, PairBase):
         unique_notes = SquareLogic.get_unique_notes(squares)
         return len(unique_notes) == len(squares)
 
-    def pair_to_elimination(self, pair: list[Square], eliminated_notes: list[NumberedNote]) -> Elimination:
+    def pair_to_elimination(self,
+                            pair: list[Square],
+                            other_squares: list[Square],
+                            eliminated_notes: list[NumberedNote]) -> Elimination:
         causing_notes = []
         for square in pair:
             notes = square.possible_numbers
@@ -59,11 +63,13 @@ class NakedPair(EliminatorBase, PairBase):
         else:
             technique = "naked-" + str(len(pair))
 
+        highlighted_regions = self.get_highlighted_regions(pair, other_squares)
         return Elimination(
             technique=technique,
             causing_square=None,
             causing_notes=causing_notes,
-            eliminated_notes=eliminated_notes
+            eliminated_notes=eliminated_notes,
+            highlighted_regions=highlighted_regions
         )
 
     def squares_outside_pair(self, squares: list[Square], pair: list[Square]) -> list[Square]:

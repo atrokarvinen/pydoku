@@ -1,5 +1,6 @@
 from models.board import Board
 from models.elimination import Elimination
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
@@ -38,14 +39,17 @@ class Claiming(EliminatorBase):
         if len(claimed_squares) == 0:
             return None
 
+        highlighted_regions = self.get_highlighted_regions(squares)
         elimination = Elimination(
             technique="claiming",
             causing_square=None,
             causing_notes=[NumberedNote(s.row, s.column, note)
                            for s in squares_with_note],
             eliminated_notes=[NumberedNote(
-                s.row, s.column, note) for s in claimed_squares]
+                s.row, s.column, note) for s in claimed_squares],
+            highlighted_regions=highlighted_regions
         )
+        print("Claiming found")
         return elimination
 
     def validate_squares(self, squares: list[Square], box_size: int) -> bool:
@@ -62,3 +66,16 @@ class Claiming(EliminatorBase):
             return False
 
         return True
+
+    def get_highlighted_regions(self, squares: list[Square]) -> list[HighlightedRegion]:
+        first_square = squares[0]
+        box = first_square.box
+        row = first_square.row
+        column = first_square.column
+        is_row_set = len(set([s.row for s in squares])) == 1
+        highlighted_regions = [
+            HighlightedRegion("box", box),
+            HighlightedRegion("row", row) if is_row_set else
+            HighlightedRegion("column", column),
+        ]
+        return highlighted_regions

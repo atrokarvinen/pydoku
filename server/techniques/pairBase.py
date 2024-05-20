@@ -1,6 +1,7 @@
 import math
 from models.board import Board
 from models.elimination import Elimination
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
@@ -55,3 +56,14 @@ class PairBase():
                               other_squares: list[Square]) -> Elimination:
         # Implemented by child classes
         pass
+
+    def get_highlighted_regions(self, pair: list[Square], other_squares: list[Square]) -> list[HighlightedRegion]:
+        first_square = pair[0]
+        all_squares = pair + other_squares
+        is_row_pair = SquareLogic.squares_have_same_row(all_squares)
+        if (is_row_pair):
+            return [HighlightedRegion("row", first_square.row)]
+        is_column_pair = SquareLogic.squares_have_same_column(all_squares)
+        if (is_column_pair):
+            return [HighlightedRegion("column", first_square.column)]
+        return [HighlightedRegion("box", first_square.box)]
