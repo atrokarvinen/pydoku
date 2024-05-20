@@ -1,10 +1,13 @@
 import copy
 from models.board import Board
 from models.elimination import Elimination
+from models.point import Point
+from models.pointer import Pointer
 from models.square import Square
 from models.numberedNote import NumberedNote
 from techniques.models.coloredNote import ColoredNote
 from techniques.eliminatorBase import EliminatorBase
+from techniques.models.loopPart import LoopPart
 
 
 class SimpleColoring(EliminatorBase):
@@ -75,7 +78,12 @@ class SimpleColoring(EliminatorBase):
             if not is_strongly_connected:
                 continue
             chain.append(ColoredNote(
-                square.row, square.column, square.box, number, color))
+                square.row,
+                square.column,
+                square.box,
+                number,
+                color,
+                LoopPart(current_square, square, "strong")))
             if (square in possible_chain_squares):
                 possible_chain_squares.remove(square)
             next_color = 1 if color == 2 else 2
@@ -216,11 +224,13 @@ class SimpleColoring(EliminatorBase):
                          for x in causing_color]
         eliminated_notes = [NumberedNote(x.row, x.column, x.number)
                             for x in eliminated_color]
+        pointers = self.chain_to_pointers(chain)
         return Elimination(
             technique="simple-coloring",
             causing_square=None,
             causing_notes=causing_notes,
-            eliminated_notes=eliminated_notes)
+            eliminated_notes=eliminated_notes,
+            pointers=pointers)
 
     def seen_by_both_to_elimination(self, chain: list[ColoredNote], seen_by_both: list[Square]) -> Elimination:
         number = chain[0].number
@@ -228,11 +238,22 @@ class SimpleColoring(EliminatorBase):
             x.row, x.column, number) for x in chain]
         eliminated_notes = [NumberedNote(x.row, x.column, number)
                             for x in seen_by_both]
+        pointers = self.chain_to_pointers(chain)
         return Elimination(
             technique="simple-coloring",
             causing_square=None,
             causing_notes=causing_notes,
-            eliminated_notes=eliminated_notes)
+            eliminated_notes=eliminated_notes,
+            pointers=pointers)
+
+    def chain_to_pointers(self, chain: list[ColoredNote]) -> list[Pointer]:
+        pointers = []
+        for chain_part in chain:
+            pointers.append(Pointer(
+                chain_part.link.start.to_point(),
+                chain_part.link.end.to_point()
+            ))
+        return pointers
 
     def print_chain(self, chain: list[ColoredNote], number: int):
         print("Simple coloring chain. Chain length: " + str(len(chain)))

@@ -1,10 +1,20 @@
+from techniques.models.loopPart import LoopPart
+
+
 class ColoredNote:
-    def __init__(self, row: int, column: int, box: int, number: int, color: int) -> None:
+    def __init__(self,
+                 row: int,
+                 column: int,
+                 box: int,
+                 number: int,
+                 color: int,
+                 link: LoopPart) -> None:
         self.row = row
         self.column = column
         self.box = box
         self.number = number
         self.color = color
+        self.link = link
 
     def is_same_location(self, square) -> bool:
         return self.row == square.row and self.column == square.column

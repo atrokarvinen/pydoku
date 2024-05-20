@@ -1,3 +1,6 @@
+from models.point import Point
+
+
 class Square:
     def __init__(self, row: int, column: int, box: int, number: int):
         self.row = row
@@ -23,6 +26,9 @@ class Square:
     def remove_possible_number(self, number: int):
         if (number in self.possible_numbers):
             self.possible_numbers.remove(number)
+
+    def to_point(self):
+        return Point(self.row, self.column)
 
     def serialize(self):
         return {
