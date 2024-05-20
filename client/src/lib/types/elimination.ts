@@ -2,6 +2,7 @@ import type { HighlightedRectangle } from './highlighted-rectangle';
 import type { HighlightedRegion } from './highlighted-region';
 import type { NumberedNote } from './numbered-note';
 import type { NumberedSquare } from './numbered-square';
+import type { Pointer } from './pointer';
 
 export type Elimination = {
 	type: 'elimination';
@@ -11,5 +12,6 @@ export type Elimination = {
 	eliminatedNotes: NumberedNote[];
 	highlightedRegions: HighlightedRegion[];
 	highlightedRectangle: HighlightedRectangle;
+	pointers: Pointer[];
 	solutionIndex: number;
 };

@@ -46,6 +46,7 @@
   "dependencies": {
     "@types/lodash": "^4.17.0",
     "axios": "^1.6.8",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "perfect-arrows": "^0.3.7"
   }
 }
