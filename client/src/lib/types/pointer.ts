@@ -5,4 +5,5 @@ export type Pointer = {
 	end: Point;
 	dash?: boolean;
 	color?: string;
+	bidirectional?: boolean;
 };

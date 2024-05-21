@@ -1,8 +1,12 @@
 from models.board import Board
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.elimination import Elimination
+from models.point import Point
+from models.pointer import Pointer
 from models.square import Square
 from techniques.eliminatorBase import EliminatorBase
+from techniques.utils.squareLogic import SquareLogic
 
 
 class XWing(EliminatorBase):
@@ -55,19 +59,9 @@ class XWing(EliminatorBase):
         return None
 
     def squares_form_rectangle(self, squares: list[Square]) -> bool:
-        rows_by_count = {}
-        cols_by_count = {}
-        for s in squares:
-            if (s.row not in rows_by_count):
-                rows_by_count[s.row] = 0
-            rows_by_count[s.row] += 1
-
-            if (s.column not in cols_by_count):
-                cols_by_count[s.column] = 0
-            cols_by_count[s.column] += 1
-
-        return all([count == 2 for count in rows_by_count.values()]) \
-            and all([count == 2 for count in cols_by_count.values()])
+        unique_rows = set([s.row for s in squares])
+        unique_cols = set([s.column for s in squares])
+        return len(unique_rows) == 2 and len(unique_cols) == 2
 
     def to_elimination(self,
                        board: Board,
@@ -97,9 +91,40 @@ class XWing(EliminatorBase):
 
         print("Found x-wing")
 
+        highlighted_regions = self.get_highlighted_regions(causing_squares)
+        pointers = self.get_pointers(causing_squares)
         return Elimination(
+            technique="x-wing",
+            causing_square=None,
             causing_notes=[NumberedNote(
                 s.row, s.column, number) for s in causing_squares],
             eliminated_notes=eliminated_notes,
-            causing_square=None,
-            technique="x-wing")
+            highlighted_regions=highlighted_regions,
+            pointers=pointers)
+
+    def get_highlighted_regions(self, causing_squares: list[Square]) -> list[HighlightedRegion]:
+        unique_rows = set([s.row for s in causing_squares])
+        unique_cols = set([s.column for s in causing_squares])
+        highlighted_regions = []
+        for row in unique_rows:
+            highlighted_regions.append(HighlightedRegion("row", row))
+        for col in unique_cols:
+            highlighted_regions.append(HighlightedRegion("column", col))
+        return highlighted_regions
+
+    def get_pointers(self, causing_squares: list[Square]) -> list[Pointer]:
+        visited = []
+        pointers = []
+        for s1 in causing_squares:
+            for s2 in causing_squares:
+                if (s1 == s2 or s1 in visited or s2 in visited):
+                    continue
+                same_row = SquareLogic.squares_have_same_row([s1, s2])
+                same_column = SquareLogic.squares_have_same_column([s1, s2])
+                if (same_row or same_column):
+                    continue
+                pointers.append(
+                    Pointer(s1.to_point(), s2.to_point(), bidirectional=True))
+                visited.append(s1)
+                visited.append(s2)
+        return pointers

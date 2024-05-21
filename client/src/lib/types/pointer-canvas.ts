@@ -7,6 +7,7 @@ export type PointerCanvas = {
 	y1: number;
 	dash?: boolean;
 	color?: string;
+	bidirectional?: boolean;
 };
 
 export const pointerToPointerCanvas = (pointer: Pointer, squareSizePx: number): PointerCanvas => {
@@ -16,7 +17,8 @@ export const pointerToPointerCanvas = (pointer: Pointer, squareSizePx: number): 
 		x1: resize(pointer.end.column, squareSizePx),
 		y1: resize(pointer.end.row, squareSizePx),
 		dash: pointer.dash,
-		color: pointer.color
+		color: pointer.color,
+		bidirectional: pointer.bidirectional
 	};
 };
 

@@ -13,10 +13,17 @@
 	$: x1 = pointer.x1;
 	$: y1 = pointer.y1;
 	$: [sx, sy, cx, cy, ex, ey, ae, as, sc] = getArrow(x0, y0, x1, y1, options);
+	$: isBidirectional = pointer.bidirectional;
 
 	const arrowSize = 2;
 </script>
 
+{#if isBidirectional}
+	<polygon
+		points="0,-{arrowSize} {2 * arrowSize},0, 0,{arrowSize}"
+		transform="translate({sx},{sy}) rotate({as * (180 / Math.PI)})"
+	/>
+{/if}
 <path d="M{sx},{sy} Q{cx},{cy} {ex},{ey}" fill="none" />
 <polygon
 	points="0,-{arrowSize} {2 * arrowSize},0, 0,{arrowSize}"
