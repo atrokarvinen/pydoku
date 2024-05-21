@@ -1,3 +1,4 @@
+from models.numberedNote import NumberedNote
 from techniques.models.loopPart import LoopPart
 
 
@@ -29,3 +30,7 @@ class ColoredNote:
             and self.column == other.column \
             and self.number == other.number \
             and self.color == other.color
+
+    def to_numbered_note(self):
+        color = "simple-coloring-1" if self.color == 1 else "simple-coloring-2"
+        return NumberedNote(self.row, self.column, self.number, color)

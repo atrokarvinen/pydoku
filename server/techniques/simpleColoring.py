@@ -220,8 +220,7 @@ class SimpleColoring(EliminatorBase):
         causing_color = [s for s in chain if s.color != conflicting_color]
         eliminated_color = [s for s in chain if s.color == conflicting_color]
 
-        causing_notes = [NumberedNote(x.row, x.column, x.number)
-                         for x in causing_color]
+        causing_notes = [x.to_numbered_note() for x in causing_color]
         eliminated_notes = [NumberedNote(x.row, x.column, x.number)
                             for x in eliminated_color]
         pointers = self.chain_to_pointers(chain)
@@ -234,8 +233,7 @@ class SimpleColoring(EliminatorBase):
 
     def seen_by_both_to_elimination(self, chain: list[ColoredNote], seen_by_both: list[Square]) -> Elimination:
         number = chain[0].number
-        causing_notes = [NumberedNote(
-            x.row, x.column, number) for x in chain]
+        causing_notes = [x.to_numbered_note() for x in chain]
         eliminated_notes = [NumberedNote(x.row, x.column, number)
                             for x in seen_by_both]
         pointers = self.chain_to_pointers(chain)
@@ -249,6 +247,8 @@ class SimpleColoring(EliminatorBase):
     def chain_to_pointers(self, chain: list[ColoredNote]) -> list[Pointer]:
         pointers = []
         for chain_part in chain:
+            if (chain_part == chain[1]):
+                continue
             pointers.append(Pointer(
                 chain_part.link.start.to_point(),
                 chain_part.link.end.to_point()

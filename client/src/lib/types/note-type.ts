@@ -1,0 +1,10 @@
+export enum NoteType {
+	NORMAL,
+
+	ELIMINATED,
+	CAUSING,
+	CANDIDATE,
+
+	COLORING_1,
+	COLORING_2
+}

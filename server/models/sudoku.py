@@ -29,8 +29,8 @@ class Sudoku:
             Claiming(),
             HiddenPair(),
             XWing(),
-            YWing(),
             SimpleColoring(),
+            YWing(),
             EmptyRectangle(),
             BiValueUniversalGrave(),
             XCycle()

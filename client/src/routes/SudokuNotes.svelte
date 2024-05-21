@@ -3,6 +3,7 @@
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import type { Square } from '$lib/types/sudoku';
 	import SudokuNote from './SudokuNote.svelte';
+	import { getNoteType } from './note-style';
 
 	export let size: number;
 	export let square: Square;
@@ -23,41 +24,6 @@
 		}
 		return className;
 	};
-
-	const isNoteEliminated = (note: number, row: number, col: number) => {
-		if (!selectedElimination || !selectedElimination.eliminatedNotes) {
-			return false;
-		}
-		return selectedElimination.eliminatedNotes.some(
-			(eliminationNote) =>
-				eliminationNote.row === row &&
-				eliminationNote.column === col &&
-				eliminationNote.number === note
-		);
-	};
-
-	const isNoteCausing = (note: number, row: number, col: number) => {
-		if (!selectedElimination || !selectedElimination.causingNotes) {
-			return false;
-		}
-		return selectedElimination.causingNotes.some(
-			(eliminationNote) =>
-				eliminationNote.row === row &&
-				eliminationNote.column === col &&
-				eliminationNote.number === note
-		);
-	};
-
-	const isNoteSingleCandidate = (note: number, row: number, col: number) => {
-		if (!selectedCandidate) {
-			return false;
-		}
-		return (
-			selectedCandidate.row === row &&
-			selectedCandidate.column === col &&
-			selectedCandidate.number === note
-		);
-	};
 </script>
 
 <div class={getContentClassName(size)}>
@@ -66,10 +32,8 @@
 			{#if square.possibleNumbers.includes(note)}
 				<SudokuNote
 					{note}
-					isEliminated={isNoteEliminated(note, square.row, square.column)}
-					isCausing={isNoteCausing(note, square.row, square.column)}
-					isSingleCandidate={isNoteSingleCandidate(note, square.row, square.column)}
 					{selectedNumber}
+					noteType={getNoteType(square, note, selectedElimination, selectedCandidate)}
 				/>
 			{:else}
 				<div />

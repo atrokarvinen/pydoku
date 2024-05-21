@@ -25,16 +25,16 @@ class Claiming(EliminatorBase):
 
         return None
 
-    def find_elimination(self, board: Board, squares: list[Square], note: int) -> Elimination:
-        squares_with_note = [s for s in squares if note in s.possible_numbers]
-        is_valid = self.validate_squares(squares_with_note, board.box_size)
+    def find_elimination(self, board: Board, all_squares: list[Square], note: int) -> Elimination:
+        squares = [s for s in all_squares if note in s.possible_numbers]
+        is_valid = self.validate_squares(squares, board.box_size)
         if not is_valid:
             return None
 
-        box = squares_with_note[0].box
+        box = squares[0].box
         squares_in_box = board.get_squares_in_box(box)
         claimed_squares = [
-            s for s in squares_in_box if s not in squares_with_note and note in s.possible_numbers
+            s for s in squares_in_box if s not in squares and note in s.possible_numbers
         ]
         if len(claimed_squares) == 0:
             return None
@@ -44,7 +44,7 @@ class Claiming(EliminatorBase):
             technique="claiming",
             causing_square=None,
             causing_notes=[NumberedNote(s.row, s.column, note)
-                           for s in squares_with_note],
+                           for s in squares],
             eliminated_notes=[NumberedNote(
                 s.row, s.column, note) for s in claimed_squares],
             highlighted_regions=highlighted_regions

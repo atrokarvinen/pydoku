@@ -18,7 +18,7 @@
 		style="width: {canvas_size}px; height: {canvas_size}px;"
 		stroke="#000"
 		fill="#000"
-		stroke-width={3}
+		stroke-width={1}
 	>
 		{#each canvasPointers as pointer}
 			<Arrow {pointer} />
