@@ -9,7 +9,7 @@ from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
 from machineVision.imageSaver import ImageSaver
-from testing.sudokus import expert_sudoku1
+from testing.sudokus import y_wing_example
 import os
 from dotenv import load_dotenv
 
@@ -45,7 +45,7 @@ def create_user():
 @app.route("/sudoku")
 def get_sudoku():
     sudoku = Sudoku()
-    board = sudoku.parse(expert_sudoku1)
+    board = sudoku.parse(y_wing_example)
     return board.serialize()
 
 
@@ -73,14 +73,6 @@ def import_sudoku_from_string():
     solver = Sudoku()
     sudoku = solver.parse(sudoku_string)
     return sudoku.serialize()
-
-
-@app.route("/sudoku/notes")
-def get_sudoku_notes():
-    sudoku = Sudoku()
-    board = sudoku.parse(expert_sudoku3)
-    sudoku.add_initial_possibilities(board)
-    return board.serialize()
 
 
 @app.route("/sudoku/solve", methods=["POST"])

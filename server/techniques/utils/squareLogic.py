@@ -1,3 +1,4 @@
+from models.highlightedRegion import HighlightedRegion
 from models.square import Square
 
 
@@ -101,3 +102,19 @@ class SquareLogic:
     def squares_have_same_column(squares: list[Square]) -> bool:
         columns = set([s.column for s in squares])
         return len(columns) == 1
+
+    def squares_have_same_box(squares: list[Square]) -> bool:
+        boxes = set([s.box for s in squares])
+        return len(boxes) == 1
+
+    def get_connected_region(squares: list[Square]) -> HighlightedRegion:
+        if SquareLogic.squares_have_same_row(squares):
+            return HighlightedRegion("row", squares[0].row)
+        if SquareLogic.squares_have_same_column(squares):
+            return HighlightedRegion("column", squares[0].column)
+        if SquareLogic.squares_have_same_box(squares):
+            return HighlightedRegion("box", squares[0].box)
+        return None
+
+    def subtract_squares(squares1: list[Square], squares2: list[Square]) -> list[Square]:
+        return [s for s in squares1 if s not in squares2]
