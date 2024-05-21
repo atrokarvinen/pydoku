@@ -8,3 +8,10 @@ class EmptyRectangleModel:
         self.box = box
         self.number = number
         self.squares = squares
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, EmptyRectangleModel):
+            return False
+        return self.row == other.row \
+            and self.column == other.column \
+            and self.number == other.number

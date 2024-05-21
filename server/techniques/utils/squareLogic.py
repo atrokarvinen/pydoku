@@ -1,5 +1,6 @@
 from models.highlightedRegion import HighlightedRegion
 from models.square import Square
+from techniques.models.emptyRectangleModel import EmptyRectangleModel
 
 
 class SquareLogic:
@@ -118,3 +119,13 @@ class SquareLogic:
 
     def subtract_squares(squares1: list[Square], squares2: list[Square]) -> list[Square]:
         return [s for s in squares1 if s not in squares2]
+
+    def get_closest_square(squares: list[Square], square: Square) -> Square:
+        closest_square = None
+        closest_distance = 1000
+        for s in squares:
+            distance = abs(s.row - square.row) + abs(s.column - square.column)
+            if distance < closest_distance:
+                closest_square = s
+                closest_distance = distance
+        return closest_square

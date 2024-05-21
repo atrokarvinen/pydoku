@@ -1,6 +1,9 @@
 from models.board import Board
+from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.elimination import Elimination
+from models.pointer import Pointer
+from models.square import Square
 from techniques.models.emptyRectangleConnection import EmptyRectangleConnection
 from techniques.models.emptyRectangleModel import EmptyRectangleModel
 from techniques.utils.squareLogic import SquareLogic
@@ -13,14 +16,12 @@ class EmptyRectangle(EliminatorBase):
         if (len(empty_rectangles) == 0):
             return None
 
-        for empty_rectangle in empty_rectangles:
-            connection = self.find_strong_connection(
-                empty_rectangle, board)
+        for rect in empty_rectangles:
+            connection = self.find_strong_connection(rect, board)
             if (connection is None):
                 continue
 
-            elimination = self.check_eliminations(
-                empty_rectangle, connection, board)
+            elimination = self.check_eliminations(rect, connection, board)
             if (elimination is not None):
                 return elimination
 
@@ -32,49 +33,34 @@ class EmptyRectangle(EliminatorBase):
         empty_rectangles = []
         for box in board_range:
             squares_in_box = board.get_empty_squares_in_box(box)
-            if (len(squares_in_box) < 3):
+            if (len(squares_in_box) < 2):
                 continue
 
             for note in notes:
-                if (box == 8 and note == 4):
-                    pass
-
-                squares_with_note = [
+                squares = [
                     s for s in squares_in_box if note in s.possible_numbers]
-                if (len(squares_with_note) < 3 or len(squares_with_note) > 5):
-                    continue
-
-                notes_by_row = {}
-                for square in squares_with_note:
-                    if (square.row not in notes_by_row):
-                        notes_by_row[square.row] = []
-                    notes_by_row[square.row].append(square)
-
-                rows_with_multiple_notes = [
-                    r for r in notes_by_row if len(notes_by_row[r]) > 1]
-
-                notes_by_column = {}
-                for square in squares_with_note:
-                    if (square.column not in notes_by_column):
-                        notes_by_column[square.column] = []
-                    notes_by_column[square.column].append(square)
-
-                columns_with_multiple_notes = [
-                    c for c in notes_by_column if len(notes_by_column[c]) > 1]
-
-                if (len(rows_with_multiple_notes) != 1 or len(columns_with_multiple_notes) != 1):
-                    continue
-
-                empty_rectangle = EmptyRectangleModel(
-                    rows_with_multiple_notes[0],
-                    columns_with_multiple_notes[0],
-                    box,
-                    note,
-                    squares_with_note)
-
-                empty_rectangles.append(empty_rectangle)
+                empty_rectangles += self.get_empty_rectangles(squares, note)
 
         return empty_rectangles
+
+    def get_empty_rectangles(self, squares: list[Square], number: int) -> list[EmptyRectangleModel]:
+        if (len(squares) <= 1 or len(squares) > 5):
+            return []
+        unique_rows = set([s.row for s in squares])
+        unique_columns = set([s.column for s in squares])
+        if (len(unique_rows) == 1 or len(unique_columns) == 1):
+            return []
+        rectangles = []
+        for row in unique_rows:
+            for column in unique_columns:
+                squares_in_row_or_column = [
+                    s for s in squares if s.row == row or s.column == column]
+                if (len(squares_in_row_or_column) == len(squares)):
+                    box = squares[0].box
+                    rect = EmptyRectangleModel(
+                        row, column, box, number, squares)
+                    rectangles.append(rect)
+        return rectangles
 
     def find_strong_connection(self, empty_rectangle: EmptyRectangleModel, board: Board) -> EmptyRectangleConnection:
         row = empty_rectangle.row
@@ -137,8 +123,9 @@ class EmptyRectangle(EliminatorBase):
                 continue
             sees_connection = SquareLogic.is_connected(
                 square, square_other)
-            sees_rectangle = any([SquareLogic.is_connected(
-                square, s) for s in rectangle_squares])
+            sees_rectangle = \
+                square.row == empty_rectangle.row \
+                or square.column == empty_rectangle.column
             sees_both = sees_connection and sees_rectangle
             if (not sees_both):
                 continue
@@ -152,9 +139,35 @@ class EmptyRectangle(EliminatorBase):
             eliminated_notes = [NumberedNote(
                 square.row, square.column, number)]
 
+            highlighted_regions = self.get_highlighted_regions(empty_rectangle)
+            pointers = self.get_pointers(rectangle_squares, connection, square)
+
             return Elimination(
                 technique="empty-rectangle",
                 causing_notes=causing_notes,
                 causing_square=None,
-                eliminated_notes=eliminated_notes
+                eliminated_notes=eliminated_notes,
+                highlighted_regions=highlighted_regions,
+                pointers=pointers
             )
+
+    def get_highlighted_regions(self, rect: EmptyRectangleModel) -> list[HighlightedRegion]:
+        return [
+            HighlightedRegion("row", rect.row),
+            HighlightedRegion("column", rect.column),
+        ]
+
+    def get_pointers(
+            self,
+            squares: list[Square],
+            connection: EmptyRectangleConnection,
+            eliminated_square: Square) -> list[Pointer]:
+        closest_square: Square = SquareLogic.get_closest_square(
+            squares, eliminated_square)
+        return [
+            Pointer(connection.square_main.to_point(),
+                    connection.square_other.to_point()),
+            Pointer(connection.square_other.to_point(),
+                    eliminated_square.to_point()),
+            Pointer(closest_square.to_point(), eliminated_square.to_point()),
+        ]

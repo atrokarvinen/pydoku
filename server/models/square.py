@@ -11,7 +11,7 @@ class Square:
         self.possible_numbers = []
 
     def is_empty(self) -> bool:
-        return self.number == 0
+        return self.number == 0 and len(self.possible_numbers) > 0
 
     def is_same_location(self, square) -> bool:
         return self.row == square.row and self.column == square.column
