@@ -2,13 +2,19 @@ from models.point import Point
 
 
 class Square:
-    def __init__(self, row: int, column: int, box: int, number: int):
+    def __init__(
+            self,
+            row: int,
+            column: int,
+            box: int,
+            number: int,
+            possible_numbers: list[int] = []) -> None:
         self.row = row
         self.column = column
         self.box = box
         self.number = number
         self.is_initial = number != 0
-        self.possible_numbers = []
+        self.possible_numbers = possible_numbers
 
     def is_empty(self) -> bool:
         return self.number == 0 and len(self.possible_numbers) > 0
@@ -39,3 +45,9 @@ class Square:
             "isInitial": self.is_initial,
             "possibleNumbers": self.possible_numbers
         }
+
+    def __repr__(self) -> str:
+        return f"Square({self.row}, {self.column})"
+
+    def __eq__(self, value: object) -> bool:
+        return isinstance(value, Square) and self.row == value.row and self.column == value.column

@@ -16,11 +16,10 @@ class NumberedNote:
     def __eq__(self, other):
         return self.row == other.row \
             and self.column == other.column \
-            and self.number == other.number \
-            and self.color == other.color
+            and self.number == other.number
 
     def __repr__(self):
-        return f"NumberedNote({self.row}, {self.column}, {self.number}, {self.color})"
+        return f"NumberedNote({self.row}, {self.column}, {self.number})"
 
     def __lt__(self, other):
         return self.__repr__() < other.__repr__()

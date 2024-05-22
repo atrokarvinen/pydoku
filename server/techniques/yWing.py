@@ -109,13 +109,13 @@ class YWing(EliminatorBase):
             eliminated_notes: list[Square]) -> list[HighlightedRegion]:
         elimination_highlights = []
         for note in eliminated_notes:
-            region1 = SquareLogic.get_connected_region([pincer1, note])
+            region1 = SquareLogic.get_highlighted_region([pincer1, note])
             elimination_highlights.append(region1)
-            region2 = SquareLogic.get_connected_region([pincer2, note])
+            region2 = SquareLogic.get_highlighted_region([pincer2, note])
             elimination_highlights.append(region2)
         pincer_highlights = [
-            SquareLogic.get_connected_region([pivot, pincer1]),
-            SquareLogic.get_connected_region([pivot, pincer2]),
+            SquareLogic.get_highlighted_region([pivot, pincer1]),
+            SquareLogic.get_highlighted_region([pivot, pincer2]),
         ]
         return elimination_highlights
 

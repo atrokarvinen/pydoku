@@ -1,13 +1,13 @@
 import copy
 from models.board import Board
 from models.elimination import Elimination
-from models.point import Point
 from models.pointer import Pointer
 from models.square import Square
 from models.numberedNote import NumberedNote
 from techniques.models.coloredNote import ColoredNote
 from techniques.eliminatorBase import EliminatorBase
 from techniques.models.loopPart import LoopPart
+from techniques.utils.squareLogic import SquareLogic
 
 
 class SimpleColoring(EliminatorBase):
@@ -73,7 +73,7 @@ class SimpleColoring(EliminatorBase):
             number: int):
         squares_not_in_chain = self.exclude_chain(all_squares, chain)
         for square in squares_not_in_chain:
-            is_strongly_connected = self.is_strongly_connected(
+            is_strongly_connected = SquareLogic.is_strongly_connected(
                 all_squares, current_square, square, number)
             if not is_strongly_connected:
                 continue
@@ -112,60 +112,9 @@ class SimpleColoring(EliminatorBase):
             current_square: Square,
             number: int):
         for square in possible_chain_squares:
-            if self.is_strongly_connected(all_squares, current_square, square, number):
+            if SquareLogic.is_strongly_connected(all_squares, current_square, square, number):
                 return square
         return None
-
-    def is_strongly_connected(
-            self,
-            all_squares: list[Square],
-            square1: Square,
-            square2: Square,
-            number: int):
-        if square1 == square2:
-            return False
-        if not self.is_connected(square1, square2):
-            return False
-
-        is_connected_by_row = square1.row == square2.row
-        if is_connected_by_row:
-            other_squares_in_same_row = [
-                s for s in all_squares if s.row == square1.row
-                and not s.is_same_location(square1)
-                and not s.is_same_location(square2)]
-            note_in_others = all(
-                [number in s.possible_numbers for s in other_squares_in_same_row])
-            if len(other_squares_in_same_row) == 0 or not note_in_others:
-                return True
-
-        is_connected_by_column = square1.column == square2.column
-        if is_connected_by_column:
-            other_squares_in_same_column = [
-                s for s in all_squares if s.column == square1.column
-                and not s.is_same_location(square1)
-                and not s.is_same_location(square2)]
-            note_in_others = all(
-                [number in s.possible_numbers for s in other_squares_in_same_column])
-            if len(other_squares_in_same_column) == 0 or not note_in_others:
-                return True
-
-        is_connected_by_box = square1.box == square2.box
-        if is_connected_by_box:
-            other_squares_in_same_box = [
-                s for s in all_squares if s.box == square1.box
-                and not s.is_same_location(square1)
-                and not s.is_same_location(square2)]
-            note_in_others = all(
-                [number in s.possible_numbers for s in other_squares_in_same_box])
-            if len(other_squares_in_same_box) == 0 or not note_in_others:
-                return True
-
-        return False
-
-    def is_connected(self, square1: Square, square2: Square):
-        return square1.row == square2.row \
-            or square1.column == square2.column \
-            or square1.box == square2.box
 
     def square_in_chains(self, chains: list[list[ColoredNote]], square: Square) -> bool:
         for chain in chains:

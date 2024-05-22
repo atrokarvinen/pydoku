@@ -9,7 +9,7 @@ from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
 from machineVision.imageSaver import ImageSaver
-from testing.sudokus import y_wing_example
+from testing.sudokus import x_cycle_example
 import os
 from dotenv import load_dotenv
 
@@ -45,7 +45,7 @@ def create_user():
 @app.route("/sudoku")
 def get_sudoku():
     sudoku = Sudoku()
-    board = sudoku.parse(y_wing_example)
+    board = sudoku.parse(x_cycle_example)
     return board.serialize()
 
 
