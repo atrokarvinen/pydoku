@@ -18,7 +18,7 @@ class CycleFinder:
     def find_cycles(self, number: int) -> list[Cycle]:
         self.iterations = 0
         cycles = []
-        squares = self.square_lookup.lookups_by_number[number]["squares"]
+        squares = self.square_lookup.get_squares_by_number(number)
         for square in squares:
             visited = []
             cycle = Cycle()

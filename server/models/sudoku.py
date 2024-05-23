@@ -29,11 +29,11 @@ class Sudoku:
             Claiming(),
             HiddenPair(),
             XWing(),
-            XCycle(),
             SimpleColoring(),
             YWing(),
             EmptyRectangle(),
             BiValueUniversalGrave(),
+            XCycle(),
         ]
 
     def set_board(self, board: Board):
