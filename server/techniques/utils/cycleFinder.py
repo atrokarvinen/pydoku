@@ -76,12 +76,12 @@ class CycleFinder:
                 continue
             if s == previous_square:
                 continue
-            connection = SquareLogic.get_square_connection(
+            square_links = SquareLogic.get_square_connections(
                 squares, square, s, number)
-            is_connected = connection.type != ConnectionType.NONE
-            is_different_region = connection.region != previous_connection_region
-            if is_connected and is_different_region:
-                connections.append(CyclePart(square, s, connection))
+            for connection in square_links:
+                is_different_region = connection.region != previous_connection_region
+                if is_different_region:
+                    connections.append(CyclePart(square, s, connection))
         return connections
 
     def validate_start(self, cycle: Cycle, start_square: Square, square: Square, connections: list[CyclePart]) -> bool:

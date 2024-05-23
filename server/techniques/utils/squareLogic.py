@@ -18,44 +18,51 @@ class SquareLogic:
             square1: Square,
             square2: Square,
             number: int):
-        connection: Connection = SquareLogic.get_square_connection(
+        connections = SquareLogic.get_square_connections(
             all_squares, square1, square2, number)
-        return connection.type == ConnectionType.STRONG
+        any_strong = any(
+            [c.type == ConnectionType.STRONG for c in connections])
+        return any_strong
 
     @staticmethod
-    def get_square_connection(
+    def get_square_connections(
             all_squares: list[Square],
-            square1: Square,
-            square2: Square,
-            number: int) -> Connection:
-        if square1 == square2:
-            return Connection.none()
-        (connecting_region, region_value) = SquareLogic.get_connected_region(
-            [square1, square2])
-        if connecting_region == RegionType.NONE:
-            return Connection.none()
+            s1: Square,
+            s2: Square,
+            number: int) -> list[Connection]:
+        if s1 == s2:
+            return []
+        connecting_regions = SquareLogic.get_connected_regions(
+            [s1, s2])
+        if len(connecting_regions) == 0:
+            return []
 
-        squares_in_row = [s for s in all_squares if s.row == square1.row]
-        is_strong_by_row = SquareLogic.is_strongly_connected_by_row(
-            squares_in_row, square1, square2, number)
-        if is_strong_by_row:
-            return Connection(ConnectionType.STRONG, RegionType.ROW, square1.row)
+        connections = []
+        if (RegionType.ROW in connecting_regions):
+            squares_in_row = [s for s in all_squares if s.row == s1.row]
+            is_strong = SquareLogic.is_strongly_connected_by_row(
+                squares_in_row, s1, s2, number)
+            connection_type = ConnectionType.STRONG if is_strong else ConnectionType.WEAK
+            connections.append(Connection(
+                connection_type, RegionType.ROW, s1.row))
+        elif (RegionType.COLUMN in connecting_regions):
+            squares_in_column = [
+                s for s in all_squares if s.column == s1.column]
+            is_strong = SquareLogic.is_strongly_connected_by_column(
+                squares_in_column, s1, s2, number)
+            connection_type = ConnectionType.STRONG if is_strong else ConnectionType.WEAK
+            connections.append(Connection(
+                connection_type, RegionType.COLUMN, s1.column))
+        if (RegionType.BOX in connecting_regions):
+            squares_in_box = [
+                s for s in all_squares if s.box == s1.box]
+            is_strong = SquareLogic.is_strongly_connected_by_box(
+                squares_in_box, s1, s2, number)
+            connection_type = ConnectionType.STRONG if is_strong else ConnectionType.WEAK
+            connections.append(Connection(
+                connection_type, RegionType.BOX, s1.box))
 
-        squares_in_column = [
-            s for s in all_squares if s.column == square1.column]
-        is_strong_by_column = SquareLogic.is_strongly_connected_by_column(
-            squares_in_column, square1, square2, number)
-        if is_strong_by_column:
-            return Connection(ConnectionType.STRONG, RegionType.COLUMN, square1.column)
-
-        squares_in_box = [
-            s for s in all_squares if s.box == square1.box]
-        is_strong_by_box = SquareLogic.is_strongly_connected_by_box(
-            squares_in_box, square1, square2, number)
-        if is_strong_by_box:
-            return Connection(ConnectionType.STRONG, RegionType.BOX, square1.box)
-
-        return Connection(ConnectionType.WEAK, connecting_region, region_value)
+        return connections
 
     @staticmethod
     def is_strongly_connected_by_row(squares: list[Square], s1: Square, s2: Square, number: int):
@@ -144,23 +151,24 @@ class SquareLogic:
         return len(boxes) == 1
 
     @staticmethod
-    def get_connected_region(squares: list[Square]):
+    def get_connected_regions(squares: list[Square]):
+        connections = []
         if SquareLogic.squares_have_same_row(squares):
-            return (RegionType.ROW, squares[0].row)
-        if SquareLogic.squares_have_same_column(squares):
-            return (RegionType.COLUMN, squares[0].column)
+            connections.append(RegionType.ROW)
+        elif SquareLogic.squares_have_same_column(squares):
+            connections.append(RegionType.COLUMN)
         if SquareLogic.squares_have_same_box(squares):
-            return (RegionType.BOX, squares[0].box)
-        return (RegionType.NONE, 0)
+            connections.append(RegionType.BOX)
+        return connections
 
     @staticmethod
     def get_highlighted_region(squares: list[Square]) -> HighlightedRegion:
-        region_type = SquareLogic.get_connected_region(squares)
-        if region_type == RegionType.ROW:
+        connected_regions = SquareLogic.get_connected_regions(squares)
+        if RegionType.ROW in connected_regions:
             return HighlightedRegion("row", squares[0].row)
-        elif region_type == RegionType.COLUMN:
+        elif RegionType.COLUMN in connected_regions:
             return HighlightedRegion("column", squares[0].column)
-        elif region_type == RegionType.BOX:
+        elif RegionType.BOX in connected_regions:
             return HighlightedRegion("box", squares[0].box)
         return None
 

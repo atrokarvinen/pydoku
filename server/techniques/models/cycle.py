@@ -21,7 +21,7 @@ class Cycle:
 
         self.check_weak_link(part)
         self.check_strong_link(part)
-        # self.check_duplicate_connections(part)
+        self.check_duplicate_connections(part)
 
         self.last = part
 
@@ -76,6 +76,8 @@ class Cycle:
 
     def copy(self) -> "Cycle":
         cycle = Cycle()
+        cycle.has_discontinuous_strong_link = self.has_discontinuous_strong_link
+        cycle.has_discontinuous_weak_link = self.has_discontinuous_weak_link
         for part in self.parts:
             cycle.append(part)
         return cycle

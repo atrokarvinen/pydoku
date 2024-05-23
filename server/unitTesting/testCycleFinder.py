@@ -135,7 +135,7 @@ class TestCycleFinder(unittest.TestCase, CustomAsserts):
                            len(c.parts) == 6
                            and c.start.start.row == 1
                            and c.start.start.column == 4]
-
+        [print(c) for c in filtered_cycles]
         pass
 
     def test_does_not_find_cycle(self):
