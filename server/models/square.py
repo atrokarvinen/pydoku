@@ -6,12 +6,12 @@ class Square:
             self,
             row: int,
             column: int,
-            box: int,
-            number: int,
+            box: int = None,
+            number: int = 0,
             possible_numbers: list[int] = []) -> None:
         self.row = row
         self.column = column
-        self.box = box
+        self.box = box if box is not None else (row // 3) * 3 + column // 3
         self.number = number
         self.is_initial = number != 0
         self.possible_numbers = possible_numbers
@@ -51,3 +51,6 @@ class Square:
 
     def __eq__(self, value: object) -> bool:
         return isinstance(value, Square) and self.row == value.row and self.column == value.column
+
+    def __lt__(self, value: object) -> bool:
+        return self.row < value.row or (self.row == value.row and self.column < value.column)

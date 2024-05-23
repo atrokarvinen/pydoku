@@ -18,3 +18,6 @@ class Connection:
 
     def __repr__(self) -> str:
         return f"({self.type}, {self.region})"
+
+    def __hash__(self) -> int:
+        return hash((self.type, self.region, self.value))

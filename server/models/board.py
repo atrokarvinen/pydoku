@@ -62,8 +62,8 @@ class Board:
         for i in range(self.size):
             row = []
             for j in range(self.size):
-                square = Square(i, j, self.get_box_of_square(
-                    Square(i, j, 0, 0)), 0)
+                box = self.get_box_of_square(Square(i, j, 0))
+                square = Square(i, j, box)
                 row.append(square)
             self.rows.append(row)
 
