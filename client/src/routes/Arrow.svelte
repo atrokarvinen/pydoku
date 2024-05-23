@@ -14,7 +14,7 @@
 	$: y1 = pointer.y1;
 	$: [sx, sy, cx, cy, ex, ey, ae, as, ac] = getArrow(x0, y0, x1, y1, options);
 	$: isBidirectional = pointer.bidirectional;
-	$: isDashed = pointer.dash;
+	$: isDashed = pointer.dashed;
 
 	const arrowSize = 2;
 </script>
@@ -28,7 +28,7 @@
 <path
 	d="M{sx},{sy} Q{cx},{cy} {ex},{ey}"
 	fill="none"
-	stroke-dasharray={isDashed ? '4 1' : undefined}
+	stroke-dasharray={isDashed ? '8 4' : undefined}
 />
 <polygon
 	points="0,-{arrowSize} {2 * arrowSize},0, 0,{arrowSize}"

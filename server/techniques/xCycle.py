@@ -1,43 +1,62 @@
 import copy
 from models.board import Board
 from models.elimination import Elimination
+from models.numberedNote import NumberedNote
 from techniques.eliminatorBase import EliminatorBase
+from techniques.models.cycle import Cycle
+from techniques.utils.cycleFinder import CycleFinder
+from techniques.utils.squareConnectionLookup import SquareConnectionLookup
+from techniques.utils.squareLogic import SquareLogic
+from techniques.utils.squareLookup import SquareLookup
 
 
 class XCycle(EliminatorBase):
     def get_next_solution(self, board: Board) -> Elimination:
+        lookup = SquareLookup(board)
+        connection_lookup = SquareConnectionLookup(lookup)
+        cycle_finder = CycleFinder(lookup, connection_lookup)
+        notes = board.get_range()
+        for note in notes:
+            cycles = cycle_finder.find_cycles(note)
+            elimination = self.detect_elimination(
+                lookup, connection_lookup, cycles, note)
+            if elimination:
+                return elimination
         return None
 
-    def get_loops(self, board: Board):
-        empty_squares = board.flatten_empty()
-        boardRange = board.get_range()
-        for number in boardRange:
-            squares_with_note = [
-                s for s in empty_squares if number in s.possible_numbers]
-            if len(squares_with_note) < 4:
+    def detect_elimination(
+            self,
+            lookup: SquareLookup,
+            connection_lookup: SquareConnectionLookup,
+            cycles: list[Cycle],
+            number: int) -> Elimination:
+        squares = lookup.get_squares_by_number(number)
+        for cycle in cycles:
+            if not cycle.is_nice():
                 continue
-            loops = []
-            for start_square in squares_with_note:
-                is_explored = self.square_in_loops(loops, start_square)
-                if is_explored:
-                    continue
+            cycle_squares = cycle.to_square_list()
+            other_squares = SquareLogic.subtract_squares(
+                squares, cycle_squares)
+            eliminated_notes = []
+            for square in other_squares:
+                endpoints = connection_lookup.get_connections_endpoints(
+                    square, number)
+                intersection = [
+                    value for value in endpoints if value in cycle_squares]
+                if len(intersection) >= 2:
+                    eliminated_notes.append(NumberedNote(
+                        square.row, square.column, number))
+            if len(eliminated_notes) == 0:
+                continue
+            elimination = Elimination(
+                technique="x-cycle",
+                causing_square=None,
+                causing_notes=[NumberedNote(s.row, s.column, number)
+                               for s in cycle_squares],
+                eliminated_notes=eliminated_notes,
+                highlighted_regions=[],
+                pointers=cycle.to_pointers()
+            )
+            return elimination
 
-                loop = []
-                all_squares = copy.deepcopy(squares_with_note)
-                possible_squares = squares_with_note
-                if (len(loop) < 2):
-                    continue
-
-                loops.append(loop)
-
-        return None
-
-    def square_in_loops(self, loops, square):
-        for loop in loops:
-            if square in loop:
-                return True
-        return False
-
-    def detect_eliminations(self, board: Board, loops):
-        # If seen by two weak links, eliminate number
         return None

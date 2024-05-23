@@ -1,6 +1,7 @@
 import unittest
 
 from models.board import Board
+from models.numberedNote import NumberedNote
 from techniques.xCycle import XCycle
 from unitTesting.customAsserts import CustomAsserts
 
@@ -20,6 +21,9 @@ class TestXCycle(unittest.TestCase, CustomAsserts):
         self.board.set_notes(1, 7, [1])
 
         self.board.set_notes(2, 1, [1])
+        self.board.set_notes(2, 3, [1])
+        self.board.set_notes(2, 5, [1])
+        self.board.set_notes(2, 6, [1])
         self.board.set_notes(2, 7, [1])
 
         self.board.set_notes(3, 3, [1])
@@ -27,6 +31,7 @@ class TestXCycle(unittest.TestCase, CustomAsserts):
         self.board.set_notes(3, 5, [1])
 
         self.board.set_notes(6, 3, [1])
+        self.board.set_notes(6, 5, [1])
         self.board.set_notes(6, 7, [1])
 
         self.board.set_notes(7, 1, [1])
@@ -37,18 +42,19 @@ class TestXCycle(unittest.TestCase, CustomAsserts):
 
         solution = self.solver.get_next_solution(self.board)
 
-        # self.assertNotEqual(solution, None)
-        # self.assertListEqualNoOrder(solution.causing_notes, [
-        #     (1, 4, 1),
-        #     (1, 7, 1),
-        #     (7, 1, 1),
-        #     (7, 4, 1),
-        #     (8, 1, 1),
-        #     (8, 7, 1),
-        # ])
-        # self.assertListEqualNoOrder(solution.eliminated_notes, [
-        #     (0, 4, 1),
-        #     (2, 7, 1),
-        #     (3, 4, 1),
-        #     (6, 7, 1),
-        # ])
+        self.assertNotEqual(solution, None)
+        self.assertListEqualNoOrder(solution.causing_notes, [
+            NumberedNote(1, 4, 1),
+            NumberedNote(1, 7, 1),
+            NumberedNote(7, 1, 1),
+            NumberedNote(7, 4, 1),
+            NumberedNote(8, 1, 1),
+            NumberedNote(8, 7, 1),
+        ])
+        self.assertListEqualNoOrder(solution.eliminated_notes, [
+            NumberedNote(2, 1, 1),
+            NumberedNote(0, 4, 1),
+            NumberedNote(2, 7, 1),
+            NumberedNote(3, 4, 1),
+            NumberedNote(6, 7, 1),
+        ])

@@ -27,12 +27,13 @@ class SimpleColoring(EliminatorBase):
                     continue
 
                 chain = []
-                all_squares = copy.deepcopy(squares_with_note)
+                visited_squares = []
+                all_squares = squares_with_note
                 possible_squares = squares_with_note
                 start_color = 1
                 self.recurse_chain(chain,
                                    all_squares,
-                                   possible_squares,
+                                   visited_squares,
                                    start_square,
                                    start_color,
                                    number)
@@ -67,7 +68,7 @@ class SimpleColoring(EliminatorBase):
             self,
             chain: list[ColoredNote],
             all_squares: list[Square],
-            possible_chain_squares: list[Square],
+            visited_squares: list[Square],
             current_square: Square,
             color: int,
             number: int):
@@ -77,6 +78,9 @@ class SimpleColoring(EliminatorBase):
                 all_squares, current_square, square, number)
             if not is_strongly_connected:
                 continue
+            if square in visited_squares:
+                continue
+            visited_squares.append(square)
             chain.append(ColoredNote(
                 square.row,
                 square.column,
@@ -84,12 +88,10 @@ class SimpleColoring(EliminatorBase):
                 number,
                 color,
                 LoopPart(current_square, square, "strong")))
-            if (square in possible_chain_squares):
-                possible_chain_squares.remove(square)
             next_color = 1 if color == 2 else 2
             self.recurse_chain(chain,
                                all_squares,
-                               possible_chain_squares,
+                               visited_squares,
                                square,
                                next_color,
                                number)
@@ -104,17 +106,6 @@ class SimpleColoring(EliminatorBase):
             if (not square_in_chain):
                 squares_not_in_chain.append(square)
         return squares_not_in_chain
-
-    def get_next_square(
-            self,
-            all_squares: list[Square],
-            possible_chain_squares: list[Square],
-            current_square: Square,
-            number: int):
-        for square in possible_chain_squares:
-            if SquareLogic.is_strongly_connected(all_squares, current_square, square, number):
-                return square
-        return None
 
     def square_in_chains(self, chains: list[list[ColoredNote]], square: Square) -> bool:
         for chain in chains:

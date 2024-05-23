@@ -1,18 +1,24 @@
 from models.square import Square
-from techniques.models.connection import Connection
 from techniques.models.connectionType import ConnectionType
 from techniques.models.cycle import Cycle
 from techniques.models.cyclePart import CyclePart
 from techniques.models.regionType import RegionType
-from techniques.utils.squareLogic import SquareLogic
+from techniques.utils.squareConnectionLookup import SquareConnectionLookup
+from techniques.utils.squareLookup import SquareLookup
 
 
 class CycleFinder:
-    def __init__(self) -> None:
+    def __init__(self,
+                 square_lookup: SquareLookup,
+                 connection_lookup: SquareConnectionLookup) -> None:
         self.iterations = 0
+        self.square_lookup = square_lookup
+        self.connection_lookup = connection_lookup
 
-    def find_cycles(self, squares: list[Square], number: int) -> list[Cycle]:
+    def find_cycles(self, number: int) -> list[Cycle]:
+        self.iterations = 0
         cycles = []
+        squares = self.square_lookup.lookups_by_number[number]["squares"]
         for square in squares:
             visited = []
             cycle = Cycle()
@@ -21,6 +27,8 @@ class CycleFinder:
 
         print("found cycles: ", len(cycles))
         print("iterations: ", self.iterations)
+        nice_cycles = [c for c in cycles if c.is_nice()]
+        print("nice cycles: ", len(nice_cycles))
         return cycles
 
     def find_cycle(
@@ -69,19 +77,17 @@ class CycleFinder:
             visited: list[Square],
             number: int) -> list[CyclePart]:
         connections = []
-        previous_square = previous_part.start if previous_part else None
         previous_connection_region = previous_part.connection.region if previous_part else RegionType.NONE
-        for s in squares:
-            if (s in visited and s != start_square):
+        square_links = self.connection_lookup.get_connections(square, number)
+        for connection in square_links:
+            is_visited = connection.end in visited and connection.end != start_square
+            if is_visited:
                 continue
-            if s == previous_square:
-                continue
-            square_links = SquareLogic.get_square_connections(
-                squares, square, s, number)
-            for connection in square_links:
-                is_different_region = connection.region != previous_connection_region
-                if is_different_region:
-                    connections.append(CyclePart(square, s, connection))
+            is_different_region = connection.connection.region != previous_connection_region
+            if is_different_region:
+                connections.append(
+                    CyclePart(square, connection.end, connection.connection))
+
         return connections
 
     def validate_start(self, cycle: Cycle, start_square: Square, square: Square, connections: list[CyclePart]) -> bool:

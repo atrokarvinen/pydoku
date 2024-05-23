@@ -110,8 +110,6 @@ class SquareLogic:
             return ConnectionType.NONE
 
         others = SquareLogic.subtract_squares(squares, [s1, s2])
-        if (len(others) == 0):
-            return ConnectionType.STRONG
         notes_in_others = [note for s in others for note in s.possible_numbers]
         if number in notes_in_others:
             return ConnectionType.WEAK
@@ -134,6 +132,14 @@ class SquareLogic:
             for note in square.possible_numbers:
                 unique_notes.add(note)
         return unique_notes
+
+    @staticmethod
+    def get_unique_squares(squares: list[Square]) -> list[Square]:
+        unique_squares = []
+        for square in squares:
+            if square not in unique_squares:
+                unique_squares.append(square)
+        return unique_squares
 
     @staticmethod
     def squares_have_same_row(squares: list[Square]) -> bool:

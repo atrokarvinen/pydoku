@@ -91,3 +91,42 @@ class TestSimpleColoring(unittest.TestCase, CustomAsserts):
         self.assertListEqualNoOrder(solution.eliminated_notes, [
             NumberedNote(8, 6, 1),
         ])
+
+    def test_returns_none_when_no_cycle_found(self):
+        self.board.set_notes(0, 0, [1])
+        self.board.set_notes(0, 4, [1])
+        self.board.set_notes(0, 5, [1])
+
+        self.board.set_notes(1, 4, [1])
+        self.board.set_notes(1, 7, [1])
+
+        self.board.set_notes(2, 1, [1])
+        self.board.set_notes(2, 3, [1])
+        self.board.set_notes(2, 5, [1])
+        self.board.set_notes(2, 6, [1])
+        self.board.set_notes(2, 7, [1])
+
+        self.board.set_notes(3, 3, [1])
+        self.board.set_notes(3, 4, [1])
+        self.board.set_notes(3, 5, [1])
+
+        self.board.set_notes(4, 6, [1])
+        self.board.set_notes(4, 8, [1])
+
+        self.board.set_notes(6, 1, [1])
+        self.board.set_notes(6, 3, [1])
+        self.board.set_notes(6, 5, [1])
+        self.board.set_notes(6, 6, [1])
+        self.board.set_notes(6, 7, [1])
+
+        self.board.set_notes(7, 0, [1])
+        self.board.set_notes(7, 1, [1])
+        self.board.set_notes(7, 4, [1])
+
+        self.board.set_notes(8, 1, [1])
+        self.board.set_notes(8, 7, [1])
+        self.board.set_notes(8, 8, [1])
+
+        solution = self.solver.get_next_solution(self.board)
+
+        self.assertEqual(solution, None)

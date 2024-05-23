@@ -1,3 +1,4 @@
+from models.pointer import Pointer
 from models.square import Square
 from techniques.models.connectionType import ConnectionType
 from techniques.models.cyclePart import CyclePart
@@ -58,6 +59,23 @@ class Cycle:
             squares.append(part.start)
         return squares
 
+    def to_pointers(self) -> list[Pointer]:
+        pointers = []
+        for part in self.parts:
+            dashed = part.connection.type == ConnectionType.WEAK
+            pointers.append(Pointer(part.start, part.end, dashed=dashed))
+        return pointers
+
+    def get_weak_squares(self) -> list[Square]:
+        squares = []
+        for part in self.parts:
+            if part.connection.type == ConnectionType.WEAK:
+                if part.start not in squares:
+                    squares.append(part.start)
+                if part.end not in squares:
+                    squares.append(part.end)
+        return squares
+
     def to_list_string(self) -> str:
         square_list = self.to_square_list()
         sorted_list = sorted(square_list)
@@ -73,6 +91,15 @@ class Cycle:
             and self.last is not None \
             and self.start.start == self.last.end \
             and len(self.parts) > 1
+
+    def is_nice(self) -> bool:
+        is_even_length = len(self.parts) % 2 == 0
+        return \
+            self.is_complete() \
+            and not self.has_discontinuous_weak_link \
+            and not self.has_discontinuous_strong_link \
+            and is_even_length \
+            and self.is_valid
 
     def copy(self) -> "Cycle":
         cycle = Cycle()

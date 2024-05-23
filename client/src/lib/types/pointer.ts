@@ -3,7 +3,7 @@ import type { Point } from './point';
 export type Pointer = {
 	start: Point;
 	end: Point;
-	dash?: boolean;
+	dashed?: boolean;
 	color?: string;
 	bidirectional?: boolean;
 };

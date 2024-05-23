@@ -1,23 +1,31 @@
 import unittest
 
+from models.board import Board
 from models.square import Square
 from techniques.utils.cycleFinder import CycleFinder
+from techniques.utils.squareConnectionLookup import SquareConnectionLookup
+from techniques.utils.squareLookup import SquareLookup
 from unitTesting.customAsserts import CustomAsserts
 
 
 class TestCycleFinder(unittest.TestCase, CustomAsserts):
     def setUp(self) -> None:
-        self.finder = CycleFinder()
+        self.board = Board(9)
+        self.board.initialize_empty()
+        lookup = SquareLookup(self.board)
+        conn_lookup = SquareConnectionLookup(lookup)
+        self.finder = CycleFinder(lookup, conn_lookup)
 
     def test_finds_cycle(self):
-        squares = [
-            Square(0, 0, possible_numbers=[1]),
-            Square(8, 0, possible_numbers=[1]),
-            Square(8, 8, possible_numbers=[1]),
-            Square(0, 8, possible_numbers=[1]),
-        ]
+        self.board.set_notes(0, 0, [1])
+        self.board.set_notes(8, 0, [1])
+        self.board.set_notes(8, 8, [1])
+        self.board.set_notes(0, 8, [1])
+        lookup = SquareLookup(self.board)
+        conn_lookup = SquareConnectionLookup(lookup)
+        self.finder = CycleFinder(lookup, conn_lookup)
 
-        cycles = self.finder.find_cycles(squares, 1)
+        cycles = self.finder.find_cycles(1)
 
     def test_finds_cycle_with_multiple_numbers_1(self):
         squares = [
@@ -100,36 +108,38 @@ class TestCycleFinder(unittest.TestCase, CustomAsserts):
         pass
 
     def test_finds_cycle_with_multiple_numbers_3(self):
-        squares = [
-            Square(0, 0, possible_numbers=[1]),
-            Square(0, 4, possible_numbers=[1]),
-            Square(0, 5, possible_numbers=[1]),
+        self.board.set_notes(0, 0, [1])
+        self.board.set_notes(0, 4, [1])
+        self.board.set_notes(0, 5, [1])
 
-            Square(1, 4, possible_numbers=[1]),
-            Square(1, 7, possible_numbers=[1]),
+        self.board.set_notes(1, 4, [1])
+        self.board.set_notes(1, 7, [1])
 
-            Square(2, 1, possible_numbers=[1]),
-            Square(2, 3, possible_numbers=[1]),
-            Square(2, 5, possible_numbers=[1]),
-            Square(2, 6, possible_numbers=[1]),
-            Square(2, 7, possible_numbers=[1]),
+        self.board.set_notes(2, 1, [1])
+        self.board.set_notes(2, 3, [1])
+        self.board.set_notes(2, 5, [1])
+        self.board.set_notes(2, 6, [1])
+        self.board.set_notes(2, 7, [1])
 
-            Square(3, 3, possible_numbers=[1]),
-            Square(3, 4, possible_numbers=[1]),
-            Square(3, 5, possible_numbers=[1]),
+        self.board.set_notes(3, 3, [1])
+        self.board.set_notes(3, 4, [1])
+        self.board.set_notes(3, 5, [1])
 
-            Square(6, 3, possible_numbers=[1]),
-            Square(6, 5, possible_numbers=[1]),
-            Square(6, 7, possible_numbers=[1]),
+        self.board.set_notes(6, 3, [1])
+        self.board.set_notes(6, 5, [1])
+        self.board.set_notes(6, 7, [1])
 
-            Square(7, 1, possible_numbers=[1]),
-            Square(7, 4, possible_numbers=[1]),
+        self.board.set_notes(7, 1, [1])
+        self.board.set_notes(7, 4, [1])
 
-            Square(8, 1, possible_numbers=[1]),
-            Square(8, 7, possible_numbers=[1]),
-        ]
+        self.board.set_notes(8, 1, [1])
+        self.board.set_notes(8, 7, [1])
 
-        cycles = self.finder.find_cycles(squares, 1)
+        lookup = SquareLookup(self.board)
+        conn_lookup = SquareConnectionLookup(lookup)
+        self.finder = CycleFinder(lookup, conn_lookup)
+
+        cycles = self.finder.find_cycles(1)
 
         filtered_cycles = [c for c in cycles if
                            len(c.parts) == 6
