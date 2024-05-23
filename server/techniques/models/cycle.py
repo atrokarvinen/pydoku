@@ -26,27 +26,33 @@ class Cycle:
 
         self.last = part
 
+        if (self.is_complete()):
+            self.check_weak_link(self.start)
+            self.check_strong_link(self.start)
+
     def check_weak_link(self, part: CyclePart):
         if (self.last is None):
             return
-        discontinuous_weak_link = \
-            part.connection.type == ConnectionType.WEAK \
-            and self.last.connection.type == ConnectionType.WEAK
-        if (discontinuous_weak_link):
-            if (self.has_discontinuous_weak_link):
+
+        has_link = self.is_same_link(part, self.last, ConnectionType.WEAK)
+        if (has_link):
+            if (self.has_discontinuous_weak_link or self.has_discontinuous_strong_link):
                 self.is_valid = False
             self.has_discontinuous_weak_link = True
 
     def check_strong_link(self, part: CyclePart):
         if (self.last is None):
             return
-        discontinuous_strong_link = \
-            part.connection.type == ConnectionType.STRONG \
-            and self.last.connection.type == ConnectionType.STRONG
-        if (discontinuous_strong_link):
-            if (self.has_discontinuous_strong_link):
+
+        has_link = self.is_same_link(part, self.last, ConnectionType.STRONG)
+        if (has_link):
+            if (self.has_discontinuous_strong_link or self.has_discontinuous_weak_link):
                 self.is_valid = False
             self.has_discontinuous_strong_link = True
+
+    def is_same_link(self, part: CyclePart, other: CyclePart, expected_type: ConnectionType) -> bool:
+        return part.connection.type == other.connection.type \
+            and part.connection.type == expected_type
 
     def check_duplicate_connections(self, part: CyclePart):
         if (part.connection in self.covered_connections):
@@ -78,9 +84,8 @@ class Cycle:
 
     def to_list_string(self) -> str:
         square_list = self.to_square_list()
-        sorted_list = sorted(square_list)
         list_string = ""
-        for square in sorted_list:
+        for square in square_list:
             list_string += f"({square.row}, {square.column}) -> "
         list_string += f"({self.last.end.row}, {self.last.end.column})"
         return list_string
