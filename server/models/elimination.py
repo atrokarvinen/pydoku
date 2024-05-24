@@ -1,3 +1,4 @@
+from models.highlightedRectangle import HighlightedRectangle
 from models.highlightedRegion import HighlightedRegion
 from models.numberedNote import NumberedNote
 from models.numberedSquare import NumberedSquare
@@ -13,6 +14,7 @@ class Elimination(SolutionStep):
                  causing_notes: list[NumberedNote],
                  eliminated_notes: list[NumberedNote],
                  highlighted_regions: list[HighlightedRegion] = [],
+                 highlighted_rectangles: list[HighlightedRectangle] = [],
                  pointers: list[Pointer] = []) -> None:
         self.type = "elimination"
         self.causing_square = causing_square
@@ -20,6 +22,7 @@ class Elimination(SolutionStep):
         self.technique = technique
         self.eliminated_notes = eliminated_notes
         self.highlighted_regions = highlighted_regions
+        self.highlighted_rectangles = highlighted_rectangles
         self.pointers = pointers
         self.solution_index = 0
 
@@ -45,6 +48,7 @@ class Elimination(SolutionStep):
             "technique": self.technique,
             "eliminatedNotes": [note.serialize() for note in self.eliminated_notes],
             "highlightedRegions": [region.serialize() for region in self.highlighted_regions],
+            "highlightedRectangles": [rectangle.serialize() for rectangle in self.highlighted_rectangles],
             "pointers": [pointer.serialize() for pointer in self.pointers],
             "solutionIndex": self.solution_index
         }

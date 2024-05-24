@@ -1,5 +1,7 @@
 from models.board import Board
+from models.highlightedRectangle import HighlightedRectangle
 from models.highlightedRegion import HighlightedRegion
+from models.point import Point
 from models.singleCandidate import SingleCandidate as SingleCandidateModel
 from models.square import Square
 from techniques.solverBase import SolverBase
@@ -59,12 +61,15 @@ class SingleCandidate(SolverBase):
                     n for n in square.possible_numbers if n != note]
                 highlighted_regions = self.get_highlighted_regions(
                     square, alignment)
+                highlighted_rectangles = self.get_highlighted_rectangles(
+                    square, alignment)
                 single_candidate = SingleCandidateModel(
                     row,
                     column,
                     note,
                     other_numbers,
                     highlighted_regions,
+                    highlighted_rectangles,
                     alignment)
                 return single_candidate
 
@@ -73,8 +78,13 @@ class SingleCandidate(SolverBase):
     def get_highlighted_regions(self, square: Square, alignment: str) -> list[HighlightedRegion]:
         if (alignment == "row"):
             return [HighlightedRegion(alignment, square.row)]
-        if (alignment == "column"):
+        elif (alignment == "column"):
             return [HighlightedRegion(alignment, square.column)]
-        if (alignment == "box"):
+        elif (alignment == "box"):
             return [HighlightedRegion(alignment, square.box)]
         return []
+
+    def get_highlighted_rectangles(self, square: Square, alignment: str) -> list[HighlightedRectangle]:
+        if (alignment != "cell"):
+            return []
+        return [HighlightedRectangle(square.to_point(), square.to_point())]

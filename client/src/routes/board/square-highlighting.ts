@@ -4,28 +4,26 @@ import type { SingleCandidate } from '$lib/types/single-candidate';
 import type { Square, Sudoku } from '$lib/types/sudoku';
 
 export const getHighlightedSquares = (
-	elimination: Elimination | undefined,
-	candidate: SingleCandidate | undefined,
+	solutionStep: Elimination | SingleCandidate | undefined,
 	square: Square | undefined,
 	sudoku: Sudoku
 ) => {
-	if (elimination) {
-		return highlightFromElimination(elimination, sudoku);
-	} else if (candidate) {
-		return highlightFromCandidate(candidate, sudoku);
+	let regions: Square[] = [];
+	let rectangles: Square[] = [];
+	if (solutionStep) {
+		regions = highlightRegionFromSolutionStep(solutionStep, sudoku);
+		rectangles = highlightRectangleFromSolutionStep(solutionStep, sudoku);
 	} else if (square) {
-		return highlightFromSelectedSquare(square, sudoku);
+		regions = highlightFromSelectedSquare(square, sudoku);
 	}
-	return [];
+	return [...regions, ...rectangles];
 };
 
-const highlightFromElimination = (elimination: Elimination, sudoku: Sudoku) => {
+const highlightRegionFromSolutionStep = (
+	elimination: Elimination | SingleCandidate,
+	sudoku: Sudoku
+) => {
 	const regions = elimination.highlightedRegions;
-	return highlightFromRegions(regions, sudoku);
-};
-
-const highlightFromCandidate = (candidate: SingleCandidate, sudoku: Sudoku) => {
-	const regions = candidate.highlightedRegions;
 	return highlightFromRegions(regions, sudoku);
 };
 
@@ -64,4 +62,25 @@ const getHighlightedColumn = (column: number, sudoku: Sudoku) => {
 
 const getHighlightedBox = (box: number, sudoku: Sudoku) => {
 	return sudoku.map((row) => row.filter((square) => square.box === box)).flat();
+};
+
+const highlightRectangleFromSolutionStep = (
+	solutionStep: Elimination | SingleCandidate,
+	sudoku: Sudoku
+) => {
+	const rects = solutionStep.highlightedRectangles;
+	const squares: Square[] = [];
+	for (const rect of rects) {
+		const { start, end } = rect;
+		const rowRange = Array.from({ length: end.row - start.row + 1 }, (_, i) => i + start.row);
+		const columnRange = Array.from(
+			{ length: end.column - start.column + 1 },
+			(_, i) => i + start.column
+		);
+		const rectSquares = rowRange
+			.map((row) => columnRange.map((column) => sudoku[row][column]))
+			.flat();
+		squares.push(...rectSquares);
+	}
+	return squares;
 };

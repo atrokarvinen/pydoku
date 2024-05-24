@@ -11,7 +11,7 @@ export type Elimination = {
 	causingNotes: NumberedNote[];
 	eliminatedNotes: NumberedNote[];
 	highlightedRegions: HighlightedRegion[];
-	highlightedRectangle: HighlightedRectangle;
+	highlightedRectangles: HighlightedRectangle[];
 	pointers: Pointer[];
 	solutionIndex: number;
 };

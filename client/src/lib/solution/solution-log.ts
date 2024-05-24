@@ -3,6 +3,7 @@ import type { SingleCandidate } from '$lib/types/single-candidate';
 import type { Solution } from '$lib/types/solution';
 import type { Sudoku } from '$lib/types/sudoku';
 import _ from 'lodash';
+import { getSolutionSteps } from './solution-parser';
 
 export const moveToSolutionStep = (
 	current: Sudoku,
@@ -30,18 +31,6 @@ export const moveToSolutionStep = (
 		operation(sudoku, step);
 	}
 	return sudoku;
-};
-
-export const getSolutionStepsCount = (solution: Solution) => {
-	return solution.eliminations.length + solution.singleCandidates.length;
-};
-
-export const getSolutionSteps = (solution: Solution) => {
-	const steps: (Elimination | SingleCandidate)[] = [
-		...solution.eliminations,
-		...solution.singleCandidates
-	].sort((a, b) => a.solutionIndex - b.solutionIndex);
-	return steps;
 };
 
 const undoStep = (sudoku: Sudoku, step: Elimination | SingleCandidate) => {

@@ -15,16 +15,11 @@
 	$: size = sudoku.length;
 
 	$: highlightedSquares = getHighlightedSquares(
-		selectedElimination,
-		selectedCandidate,
+		selectedElimination ?? selectedCandidate,
 		selectedSquare,
 		sudoku
 	);
 
-	// const pointers: Pointer[] = [
-	// 	{ start: { row: 0, column: 0 }, end: { row: 3, column: 2 } },
-	// 	{ start: { row: 4, column: 4 }, end: { row: 7, column: 8 } }
-	// ];
 	$: pointers = selectedElimination?.pointers ?? [];
 </script>
 

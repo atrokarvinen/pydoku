@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { axios } from '$lib/axios';
-	import { getSolutionStepsCount, moveToSolutionStep } from '$lib/sudoku-log/sudoku-log';
+	import { moveToSolutionStep } from '$lib/solution/solution-log';
+	import { getSolutionStepsCount } from '$lib/solution/solution-parser';
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Square, Sudoku } from '$lib/types/sudoku';
 	import GameActionButtons from './GameActionButtons.svelte';
-	import SolutionInfo from './SolutionInfo.svelte';
-	import SudokuBoard from './SudokuBoard.svelte';
+	import SudokuBoard from './board/SudokuBoard.svelte';
 	import SudokuExport from './export/SudokuExport.svelte';
 	import SudokuImport from './import/SudokuImport.svelte';
+	import SolutionInfo from './solution/SolutionInfo.svelte';
 
 	export let sudoku: Sudoku;
 	let selectedNumber: number | undefined;
@@ -152,5 +153,11 @@
 		<button class="btn variant-filled-primary" on:click={playSolution}>Play</button>
 		<button class="btn variant-filled-primary" on:click={reverseSolution}>Reverse</button>
 	</div>
-	<SolutionInfo {solution} {candidateClicked} {eliminationClicked} />
+	<SolutionInfo
+		{solution}
+		{candidateClicked}
+		{eliminationClicked}
+		{selectedElimination}
+		{selectedCandidate}
+	/>
 </div>
