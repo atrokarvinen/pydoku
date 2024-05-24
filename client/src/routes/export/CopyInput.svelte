@@ -10,11 +10,18 @@
 			copied = false;
 		}, 1500);
 	};
+
+	// Modals automatically receive focus, blur automatically here since it is readonly
+	const handleFocus = (e: FocusEvent) => {
+		if (e.target) {
+			(e.target as HTMLInputElement).blur();
+		}
+	};
 </script>
 
 <div>
 	<div class="flex flex-row gap-x-2">
-		<input class="input" bind:value={text} readonly />
+		<input class="input" bind:value={text} readonly on:focus={handleFocus} />
 		<div>
 			<button class="btn-icon variant-filled" on:click={() => copy(text)}
 				><i class="fas fa-copy" /></button

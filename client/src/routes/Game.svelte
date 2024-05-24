@@ -6,7 +6,8 @@
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Square, Sudoku } from '$lib/types/sudoku';
-	import GameActionButtons from './GameActionButtons.svelte';
+	import GameNumberButtons from './GameNumberButtons.svelte';
+	import GameSolveButtons from './GameSolveButtons.svelte';
 	import SudokuBoard from './board/SudokuBoard.svelte';
 	import SudokuExport from './export/SudokuExport.svelte';
 	import SudokuImport from './import/SudokuImport.svelte';
@@ -19,6 +20,8 @@
 	let selectedSquare: Square | undefined;
 	let solution: Solution = defaultSolution;
 	let currentSolutionStep = 0;
+	let isSolving = false;
+	let isPlaying = false;
 	$: boardSize = sudoku.length;
 
 	const resetSelections = () => {
@@ -56,14 +59,45 @@
 	};
 
 	const solve = async () => {
-		const response = await axios.post<Solution>('/sudoku/solve', { sudoku });
-		solution = response.data;
-		sudoku = solution.sudoku;
-		currentSolutionStep = 0;
-		resetSelections();
+		isSolving = true;
+		try {
+			const sudokuToSolve = solution.sudoku.length > 0 ? solution.sudoku : sudoku;
+			const response = await axios.post<Solution>('/sudoku/solve', { sudoku: sudokuToSolve });
+			solution = response.data;
+			sudoku = solution.sudoku;
+			currentSolutionStep = 0;
+			resetSelections();
+		} catch (error) {
+			console.log('solve error: ', error);
+		} finally {
+			isSolving = false;
+		}
 	};
 
-	const next = async () => {
+	const jumpToStart = () => {
+		resetSelections();
+		currentSolutionStep = 0;
+		sudoku = solution.sudoku;
+	};
+
+	const reverseSolution = async () => {
+		isPlaying = true;
+		try {
+			resetSelections();
+			for (let currentStep = currentSolutionStep; currentStep > 0; currentStep--) {
+				const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep - 1);
+				sudoku = newSudoku;
+				await new Promise((resolve) => setTimeout(resolve, 20));
+			}
+			currentSolutionStep = 0;
+		} catch (error) {
+			console.error('reverse solution error: ', error);
+		} finally {
+			isPlaying = false;
+		}
+	};
+
+	const next = () => {
 		if (currentSolutionStep >= getSolutionStepsCount(solution)) {
 			return;
 		}
@@ -87,24 +121,28 @@
 	};
 
 	const playSolution = async () => {
-		resetSelections();
-		const stepCount = getSolutionStepsCount(solution);
-		for (let currentStep = currentSolutionStep; currentStep < stepCount; currentStep++) {
-			const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep + 1);
-			sudoku = newSudoku;
-			await new Promise((resolve) => setTimeout(resolve, 20));
+		isPlaying = true;
+		try {
+			resetSelections();
+			const stepCount = getSolutionStepsCount(solution);
+			for (let currentStep = currentSolutionStep; currentStep < stepCount; currentStep++) {
+				const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep + 1);
+				sudoku = newSudoku;
+				await new Promise((resolve) => setTimeout(resolve, 20));
+			}
+			currentSolutionStep = stepCount;
+		} catch (error) {
+			console.error('play solution error: ', error);
+		} finally {
+			isPlaying = false;
 		}
-		currentSolutionStep = stepCount;
 	};
 
-	const reverseSolution = async () => {
+	const jumpToEnd = () => {
 		resetSelections();
-		for (let currentStep = currentSolutionStep; currentStep > 0; currentStep--) {
-			const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep - 1);
-			sudoku = newSudoku;
-			await new Promise((resolve) => setTimeout(resolve, 20));
-		}
-		currentSolutionStep = 0;
+		const stepCount = getSolutionStepsCount(solution);
+		currentSolutionStep = stepCount;
+		sudoku = solution.finalSudoku;
 	};
 
 	const numberClicked = (n: number) => {
@@ -146,13 +184,17 @@
 		{selectedSquare}
 		{squarePressed}
 	/>
-	<GameActionButtons {boardSize} {numberClicked} />
-	<div class="flex flex-row gap-5">
-		<button class="btn variant-filled-primary" on:click={solve}>Solve</button>
-		<button class="btn variant-filled-primary" on:click={next}>N</button>
-		<button class="btn variant-filled-primary" on:click={playSolution}>Play</button>
-		<button class="btn variant-filled-primary" on:click={reverseSolution}>Reverse</button>
-	</div>
+	<GameNumberButtons {boardSize} {numberClicked} />
+	<GameSolveButtons
+		{solve}
+		{jumpToStart}
+		{reverseSolution}
+		{next}
+		{playSolution}
+		{jumpToEnd}
+		{isSolving}
+		{isPlaying}
+	/>
 	<SolutionInfo
 		{solution}
 		{candidateClicked}

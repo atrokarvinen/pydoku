@@ -140,6 +140,7 @@ class Sudoku:
 
             iteration += 1
 
+        solution.final_sudoku = board
         print("Found eliminations: " + str(len(solution.eliminations)))
         print("Found single candidates: " +
               str(len(solution.single_candidates)))
