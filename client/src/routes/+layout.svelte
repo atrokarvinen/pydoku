@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { AppBar, AppShell, Modal, initializeStores } from '@skeletonlabs/skeleton';
+	import { AppShell, Modal, initializeStores } from '@skeletonlabs/skeleton';
 	import '../app.postcss';
+	import Header from './Header.svelte';
 	import ExportModal from './export/ExportModal.svelte';
 	import ImportModal from './import/ImportModal.svelte';
 
@@ -15,11 +16,12 @@
 <Modal components={modalRegistry} />
 
 <div class="w-screen h-screen">
-	<AppShell slotPageContent="md:p-5 md:pt-2 p-2 max-h-full flex flex-col items-center">
+	<AppShell
+		slotHeader="md:flex flex-row justify-center bg-surface-100-800-token"
+		slotPageContent="md:p-5 md:pt-2 p-2 max-h-full flex flex-col items-center"
+	>
 		<svelte:fragment slot="header">
-			<AppBar>
-				<h1>Sudoku</h1>
-			</AppBar>
+			<Header />
 		</svelte:fragment>
 		<slot />
 	</AppShell>
