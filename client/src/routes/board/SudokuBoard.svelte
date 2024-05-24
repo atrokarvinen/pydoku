@@ -6,6 +6,7 @@
 	import VisualizationCanvas from './VisualizationCanvas.svelte';
 	import { getHighlightedSquares } from './square-highlighting';
 	export let sudoku: Sudoku;
+	export let maxWidth: number;
 	export let selectedElimination: Elimination | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
 	export let selectedNumber: number | undefined;
@@ -24,12 +25,13 @@
 </script>
 
 <div>
-	<VisualizationCanvas {size} {pointers} />
+	<VisualizationCanvas {size} {pointers} {maxWidth} />
 	<div class="grid grid-cols-9">
 		{#each sudoku as row}
 			{#each row as square}
 				<SudokuSquare
 					{square}
+					{maxWidth}
 					{size}
 					{selectedElimination}
 					{selectedCandidate}

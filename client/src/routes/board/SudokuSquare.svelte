@@ -13,6 +13,7 @@
 	} from './theme';
 
 	export let square: Square;
+	export let maxWidth: number;
 	export let size: number;
 	export let selectedElimination: Elimination | undefined;
 	export let selectedCandidate: SingleCandidate | undefined;
@@ -38,9 +39,10 @@
 			highlightedSquare.row === square.row && highlightedSquare.column === square.column
 	);
 	$: isInitial = square.isInitial;
+	$: squareSizePx = maxWidth / size;
 
 	const getOuterBorderClass = (row: number, col: number, size: number) => {
-		let borderStyle = 'flex items-center justify-center h-10 w-10 border-solid border ';
+		let borderStyle = 'flex items-center justify-center border-solid border ';
 		borderStyle += BASE_BORDER_COLOR + ' ';
 		const boxSize = Math.sqrt(size);
 		if (row % boxSize === 0) {
@@ -88,7 +90,10 @@
 	};
 </script>
 
-<div class={getOuterBorderClass(rowNumber, colNumber, size)}>
+<div
+	class={getOuterBorderClass(rowNumber, colNumber, size)}
+	style="width:{squareSizePx}px;height:{squareSizePx}px;"
+>
 	<div
 		class={`w-full h-full flex ${getInnerBorderClass(isCausedBy)} ${getBackgroundClass(isNumberSelected, isSelected, isHighlighted)}`}
 	>

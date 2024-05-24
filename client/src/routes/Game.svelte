@@ -12,6 +12,7 @@
 	import SolutionInfo from './solution/SolutionInfo.svelte';
 
 	export let sudoku: Sudoku;
+	export let maxWidth: number;
 	let selectedNumber: number | undefined;
 	let selectedElimination: Elimination | undefined;
 	let selectedCandidate: SingleCandidate | undefined;
@@ -169,9 +170,10 @@
 	};
 </script>
 
-<div class="flex flex-col gap-2 max-h-full" style="width:360px">
+<div class="flex flex-col gap-2 max-h-full" style="width:{maxWidth}px">
 	<SudokuBoard
 		{sudoku}
+		{maxWidth}
 		{selectedElimination}
 		{selectedCandidate}
 		{selectedNumber}

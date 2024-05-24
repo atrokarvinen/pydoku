@@ -5,10 +5,10 @@
 
 	export let size: number;
 	export let pointers: Pointer[];
+	export let maxWidth: number;
 
-	const squareSizePx = 40;
-
-	$: canvas_size = size * squareSizePx;
+	$: squareSizePx = maxWidth / size;
+	$: canvas_size = maxWidth;
 	$: canvasPointers = pointers.map((p) => pointerToPointerCanvas(p, squareSizePx));
 </script>
 
