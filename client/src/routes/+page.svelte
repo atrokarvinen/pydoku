@@ -1,10 +1,16 @@
 <script lang="ts">
+	import { sudokuStore } from '$lib/stores/sudokuStore';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import Game from './Game.svelte';
 
 	export let data;
 
-	$: sudoku = data.sudoku;
+	$: existingSudoku = data.sudoku;
+	$: importedSudoku = $sudokuStore;
+	$: sudoku = importedSudoku ?? existingSudoku;
+	$: {
+		sudokuStore.set(existingSudoku);
+	}
 </script>
 
 {#if !sudoku}

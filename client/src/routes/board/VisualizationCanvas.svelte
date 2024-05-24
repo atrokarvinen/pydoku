@@ -12,16 +12,16 @@
 	$: canvasPointers = pointers.map((p) => pointerToPointerCanvas(p, squareSizePx));
 </script>
 
-<div class="absolute">
-	<svg
-		viewBox="0 0 {canvas_size} {canvas_size}"
-		style="width: {canvas_size}px; height: {canvas_size}px;"
-		stroke="#000"
-		fill="#000"
-		stroke-width={1}
-	>
-		{#each canvasPointers as pointer}
-			<Arrow {pointer} />
-		{/each}
-	</svg>
-</div>
+<svg
+	class="absolute"
+	pointer-events="none"
+	viewBox="0 0 {canvas_size} {canvas_size}"
+	style="width: {canvas_size}px; height: {canvas_size}px;"
+	stroke="#000"
+	fill="#000"
+	stroke-width={1}
+>
+	{#each canvasPointers as pointer}
+		<Arrow {pointer} />
+	{/each}
+</svg>

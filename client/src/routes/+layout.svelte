@@ -1,7 +1,14 @@
 <script lang="ts">
-	import { AppShell, Modal, initializeStores } from '@skeletonlabs/skeleton';
+	import {
+		AppShell,
+		Drawer,
+		Modal,
+		getDrawerStore,
+		initializeStores
+	} from '@skeletonlabs/skeleton';
 	import '../app.postcss';
 	import Header from './Header.svelte';
+	import Sidebar from './Sidebar.svelte';
 	import ExportModal from './export/ExportModal.svelte';
 	import ImportModal from './import/ImportModal.svelte';
 
@@ -11,9 +18,16 @@
 		ImportModal: { ref: ImportModal },
 		ExportModal: { ref: ExportModal }
 	};
+
+	const drawerStore = getDrawerStore();
 </script>
 
 <Modal components={modalRegistry} />
+<Drawer position="right" width="w-64">
+	{#if $drawerStore.id === 'sidebar'}
+		<Sidebar />
+	{/if}
+</Drawer>
 
 <div class="w-screen h-screen">
 	<AppShell

@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { AppBar } from '@skeletonlabs/skeleton';
+	import { AppBar, getDrawerStore } from '@skeletonlabs/skeleton';
+
+	const drawerStore = getDrawerStore();
+
+	const onBarsClicked = () => {
+		drawerStore.open({ id: 'sidebar' });
+	};
 </script>
 
 <AppBar
@@ -16,7 +22,8 @@
 	</svelte:fragment>
 	<h1 class="h3">Sudoku</h1>
 	<svelte:fragment slot="trail"
-		><button class="btn-icon variant-ghost-primary"><i class="fas fa-bars" /></button
+		><button class="btn-icon variant-ghost-primary" on:click={onBarsClicked}
+			><i class="fas fa-bars" /></button
 		></svelte:fragment
 	>
 </AppBar>

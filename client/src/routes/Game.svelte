@@ -9,8 +9,6 @@
 	import GameNumberButtons from './GameNumberButtons.svelte';
 	import GameSolveButtons from './GameSolveButtons.svelte';
 	import SudokuBoard from './board/SudokuBoard.svelte';
-	import SudokuExport from './export/SudokuExport.svelte';
-	import SudokuImport from './import/SudokuImport.svelte';
 	import SolutionInfo from './solution/SolutionInfo.svelte';
 
 	export let sudoku: Sudoku;
@@ -172,10 +170,6 @@
 </script>
 
 <div class="flex flex-col gap-2 max-h-full" style="width:360px">
-	<div class="flex flex-row gap-5">
-		<SudokuImport {onSudokuImported} />
-		<SudokuExport {sudoku} />
-	</div>
 	<SudokuBoard
 		{sudoku}
 		{selectedElimination}
