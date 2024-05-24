@@ -8,7 +8,9 @@
 </script>
 
 {#if !sudoku}
-	<ProgressRadial width="w-16" />
+	<div class="flex items-center justify-center h-full">
+		<ProgressRadial width="w-16" />
+	</div>
 {:else}
 	<Game {sudoku} />
 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
-	import { strategyToString } from './solution-string-conversion';
+	import { techniqueToString } from './solution-string-conversion';
 
 	export let step: number;
 	export let solutionStep: Elimination | SingleCandidate;
@@ -29,6 +29,6 @@
 	>
 		<span>#{numToThreeDigits(step)}</span>
 		<span>,</span>
-		<span>{strategyToString(solutionStep.technique)}</span>
+		<span>{techniqueToString(solutionStep.technique)}</span>
 	</button>
 </div>

@@ -14,13 +14,13 @@
 
 <Modal components={modalRegistry} />
 
-<AppShell>
-	<svelte:fragment slot="header">
-		<AppBar>
-			<h1>Sudoku</h1>
-		</AppBar>
-	</svelte:fragment>
-	<div class="md:p-5 p-2 flex items-center justify-center">
+<div class="w-screen h-screen">
+	<AppShell slotPageContent="md:p-5 md:pt-2 p-2 max-h-full flex flex-col items-center">
+		<svelte:fragment slot="header">
+			<AppBar>
+				<h1>Sudoku</h1>
+			</AppBar>
+		</svelte:fragment>
 		<slot />
-	</div>
-</AppShell>
+	</AppShell>
+</div>

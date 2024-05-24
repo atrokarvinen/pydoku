@@ -1,4 +1,4 @@
-export const strategyToString = (strategy: string) => {
+export const techniqueToString = (strategy: string) => {
 	switch (strategy) {
 		case 'claiming':
 			return 'Claiming';

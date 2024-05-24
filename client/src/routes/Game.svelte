@@ -171,7 +171,7 @@
 	};
 </script>
 
-<div class="flex flex-col gap-5">
+<div class="flex flex-col gap-2 max-h-full" style="width:360px">
 	<div class="flex flex-row gap-5">
 		<SudokuImport {onSudokuImported} />
 		<SudokuExport {sudoku} />

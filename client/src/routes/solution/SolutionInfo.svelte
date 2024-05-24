@@ -5,6 +5,7 @@
 	import type { Solution } from '$lib/types/solution';
 	import type { SolutionGroup } from '$lib/types/solution-menu';
 	import SolutionInfoItem from './SolutionInfoItem.svelte';
+	import { techniqueToString } from './solution-string-conversion';
 
 	export let solution: Solution;
 	export let selectedElimination: Elimination | undefined;
@@ -35,7 +36,7 @@
 	};
 </script>
 
-<div class="flex flex-col gap-2 h-48 overflow-auto">
+<div class="flex flex-col gap-2 overflow-auto h-max-full">
 	{#if solution.isSolved}
 		<span>Solved after ({solutionSteps.length}) steps.</span>
 	{:else if solution.isSolved === false}
@@ -44,7 +45,7 @@
 	{#each solutionStepsByCount.groups as group}
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-row gap-5 items-center">
-				<span class="font-bold">{group.technique} ({group.steps.length})</span>
+				<span class="font-bold">{techniqueToString(group.technique)} ({group.steps.length})</span>
 				<button class="btn-icon variant-filled" on:click={() => groupClicked(group)}
 					><i class="fas fa-arrow-right" /></button
 				>

@@ -14,7 +14,7 @@
 	$: disabled = isSolving || isPlaying;
 </script>
 
-<div class="flex flex-row gap-2">
+<div class="flex flex-row justify-around">
 	<GameSolveButton
 		onClick={solve}
 		icon="fas fa-lightbulb"
