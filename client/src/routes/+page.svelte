@@ -5,19 +5,18 @@
 
 	export let data;
 
-	$: existingSudoku = data.sudoku;
-	$: importedSudoku = $sudokuStore;
-	$: sudoku = importedSudoku ?? existingSudoku;
-	$: {
-		sudokuStore.set(existingSudoku);
-	}
-
+	$: sudoku = data.sudoku;
 	let innerHeight = 0;
 	let innerWidth = 0;
 
 	const margin = 20;
 	$: widthWithoutMargin = innerWidth - margin;
 	$: maxWidth = calculateWidth(widthWithoutMargin);
+	$: {
+		if ($sudokuStore === undefined) {
+			sudokuStore.set(sudoku);
+		}
+	}
 
 	const calculateWidth = (width: number) => {
 		const min = 0;

@@ -2,6 +2,7 @@
 	import { axios } from '$lib/axios';
 	import { moveToSolutionStep } from '$lib/solution/solution-log';
 	import { getSolutionStepsCount } from '$lib/solution/solution-parser';
+	import { sudokuStore } from '$lib/stores/sudokuStore';
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
@@ -22,6 +23,7 @@
 	let isSolving = false;
 	let isPlaying = false;
 	$: boardSize = sudoku.length;
+	$: onSudokuImported($sudokuStore);
 
 	const resetSelections = () => {
 		selectedNumber = undefined;
@@ -153,7 +155,7 @@
 		selectedNumber = n;
 	};
 
-	const onSudokuImported = (importedSudoku: Sudoku) => {
+	const onSudokuImported = (importedSudoku: Sudoku | undefined) => {
 		if (!importedSudoku) {
 			return;
 		}
