@@ -3,7 +3,7 @@
 
 	export let solve: () => void;
 	export let jumpToStart: () => void;
-	export let reverseSolution: () => void;
+	export let back: () => void;
 	export let next: () => void;
 	export let playSolution: () => void;
 	export let jumpToEnd: () => void;
@@ -22,9 +22,9 @@
 		{disabled}
 		isLoading={isSolving}
 	/>
-	<GameSolveButton onClick={jumpToStart} icon="fas fa-backward-step" {disabled} />
-	<GameSolveButton onClick={reverseSolution} icon="fas fa-backward" {disabled} />
-	<GameSolveButton onClick={next} icon="fas fa-play" {disabled} />
-	<GameSolveButton onClick={playSolution} icon="fas fa-forward" {disabled} />
-	<GameSolveButton onClick={jumpToEnd} icon="fas fa-forward-step" {disabled} />
+	<GameSolveButton onClick={jumpToStart} icon="fas fa-backward-fast" {disabled} />
+	<GameSolveButton onClick={back} icon="fas fa-backward-step" {disabled} />
+	<GameSolveButton onClick={playSolution} icon="fas fa-play" {disabled} />
+	<GameSolveButton onClick={next} icon="fas fa-forward-step" {disabled} />
+	<GameSolveButton onClick={jumpToEnd} icon="fas fa-forward-fast" {disabled} />
 </div>

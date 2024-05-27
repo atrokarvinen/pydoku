@@ -16,7 +16,7 @@
 
 	$: {
 		if (isSelected) {
-			buttonRef.focus();
+			buttonRef?.focus();
 		}
 	}
 </script>

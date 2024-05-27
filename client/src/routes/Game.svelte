@@ -7,7 +7,6 @@
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Square, Sudoku } from '$lib/types/sudoku';
-	import GameNumberButtons from './GameNumberButtons.svelte';
 	import GameSolveButtons from './GameSolveButtons.svelte';
 	import SudokuBoard from './board/SudokuBoard.svelte';
 	import SolutionInfo from './solution/SolutionInfo.svelte';
@@ -19,10 +18,9 @@
 	let selectedCandidate: SingleCandidate | undefined;
 	let selectedSquare: Square | undefined;
 	let solution: Solution = defaultSolution;
-	let currentSolutionStep = 0;
+	let currentSolutionStep: number | undefined = undefined;
 	let isSolving = false;
 	let isPlaying = false;
-	$: boardSize = sudoku.length;
 	$: onSudokuImported($sudokuStore);
 
 	const resetSelections = () => {
@@ -33,6 +31,10 @@
 	};
 
 	const eliminationClicked = (elimination: Elimination) => {
+		resetSelections();
+		selectedElimination = elimination;
+		currentSolutionStep = elimination.solutionIndex;
+
 		const newSudoku = moveToSolutionStep(
 			sudoku,
 			currentSolutionStep,
@@ -40,22 +42,21 @@
 			elimination.solutionIndex
 		);
 
-		resetSelections();
-		selectedElimination = elimination;
-		currentSolutionStep = elimination.solutionIndex;
 		sudoku = newSudoku;
 	};
 
 	const candidateClicked = (candidate: SingleCandidate) => {
+		resetSelections();
+		selectedCandidate = candidate;
+		currentSolutionStep = candidate.solutionIndex;
+
 		const newSudoku = moveToSolutionStep(
 			sudoku,
 			currentSolutionStep,
 			solution,
 			candidate.solutionIndex
 		);
-		resetSelections();
-		selectedCandidate = candidate;
-		currentSolutionStep = candidate.solutionIndex;
+
 		sudoku = newSudoku;
 	};
 
@@ -66,7 +67,7 @@
 			const response = await axios.post<Solution>('/sudoku/solve', { sudoku: sudokuToSolve });
 			solution = response.data;
 			sudoku = solution.sudoku;
-			currentSolutionStep = 0;
+			currentSolutionStep = undefined;
 			resetSelections();
 		} catch (error) {
 			console.log('solve error: ', error);
@@ -77,53 +78,47 @@
 
 	const jumpToStart = () => {
 		resetSelections();
-		currentSolutionStep = 0;
-		sudoku = solution.sudoku;
+		currentSolutionStep = undefined;
+		sudoku = solution.sudoku.length > 0 ? solution.sudoku : sudoku;
 	};
 
-	const reverseSolution = async () => {
-		isPlaying = true;
-		try {
-			resetSelections();
-			for (let currentStep = currentSolutionStep; currentStep > 0; currentStep--) {
-				const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, currentStep - 1);
-				sudoku = newSudoku;
-				await new Promise((resolve) => setTimeout(resolve, 20));
-			}
-			currentSolutionStep = 0;
-		} catch (error) {
-			console.error('reverse solution error: ', error);
-		} finally {
-			isPlaying = false;
+	const back = async () => {
+		if (currentSolutionStep === undefined || currentSolutionStep <= 0) {
+			return;
 		}
+		const currentStep = currentSolutionStep;
+		const nextStep = currentSolutionStep - 1;
+		const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, nextStep);
+		resetSelections();
+		selectedElimination = solution.eliminations.find((e) => e.solutionIndex === nextStep);
+		selectedCandidate = solution.singleCandidates.find((c) => c.solutionIndex === nextStep);
+		sudoku = newSudoku;
+		currentSolutionStep = nextStep;
 	};
 
 	const next = () => {
-		if (currentSolutionStep >= getSolutionStepsCount(solution)) {
+		if (
+			currentSolutionStep !== undefined &&
+			currentSolutionStep >= getSolutionStepsCount(solution)
+		) {
 			return;
 		}
-		const newSudoku = moveToSolutionStep(
-			sudoku,
-			currentSolutionStep,
-			solution,
-			currentSolutionStep + 1
-		);
+		const currentStep = currentSolutionStep ?? 0;
+		const nextStep = currentSolutionStep === undefined ? 0 : currentSolutionStep + 1;
+		const newSudoku = moveToSolutionStep(sudoku, currentStep, solution, nextStep);
 		resetSelections();
-		selectedElimination = solution.eliminations.find(
-			(e) => e.solutionIndex === currentSolutionStep + 1
-		);
-		if (!selectedElimination) {
-			selectedCandidate = solution.singleCandidates.find(
-				(c) => c.solutionIndex === currentSolutionStep + 1
-			);
-		}
+		selectedElimination = solution.eliminations.find((e) => e.solutionIndex === nextStep);
+		selectedCandidate = solution.singleCandidates.find((c) => c.solutionIndex === nextStep);
 		sudoku = newSudoku;
-		currentSolutionStep++;
+		currentSolutionStep = nextStep;
 	};
 
 	const playSolution = async () => {
 		isPlaying = true;
 		try {
+			if (currentSolutionStep === undefined) {
+				currentSolutionStep = 0;
+			}
 			resetSelections();
 			const stepCount = getSolutionStepsCount(solution);
 			for (let currentStep = currentSolutionStep; currentStep < stepCount; currentStep++) {
@@ -143,7 +138,7 @@
 		resetSelections();
 		const stepCount = getSolutionStepsCount(solution);
 		currentSolutionStep = stepCount;
-		sudoku = solution.finalSudoku;
+		sudoku = solution.finalSudoku.length > 0 ? solution.finalSudoku : sudoku;
 	};
 
 	const numberClicked = (n: number) => {
@@ -182,11 +177,10 @@
 		{selectedSquare}
 		{squarePressed}
 	/>
-	<GameNumberButtons {boardSize} {numberClicked} />
 	<GameSolveButtons
 		{solve}
 		{jumpToStart}
-		{reverseSolution}
+		{back}
 		{next}
 		{playSolution}
 		{jumpToEnd}

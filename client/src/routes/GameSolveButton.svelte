@@ -7,11 +7,15 @@
 	export let text: string = '';
 	export let isLoading: boolean = false;
 
-	const btnClass = 'btn-icon variant-filled-primary';
+	const btnClass = 'md:btn-icon btn-icon-sm variant-filled-primary rounded-full';
 </script>
 
 <div class="flex flex-col items-center">
-	<button class={btnClass} on:click={onClick} {disabled}>
+	<button
+		class="{btnClass} flex flex-col items-center justify-center"
+		on:click={onClick}
+		{disabled}
+	>
 		{#if isLoading}
 			<ProgressRadial width="w-6" />
 		{:else}
