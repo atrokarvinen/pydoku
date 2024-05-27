@@ -75,6 +75,9 @@ class Pointing(EliminatorBase):
         first_square = squares[0]
         is_same_row = SquareLogic.squares_have_same_row(squares)
         if (is_same_row):
-            return [HighlightedRegion("row", first_square.row)]
+            pointing_region = HighlightedRegion("row", first_square.row)
+        else:
+            pointing_region = HighlightedRegion("column", first_square.column)
 
-        return [HighlightedRegion("column", first_square.column)]
+        box_region = HighlightedRegion("box", first_square.box)
+        return [pointing_region, box_region]
