@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { axios } from '$lib/axios';
 	import { moveToSolutionStep } from '$lib/solution/solution-log';
 	import { getSolutionStepsCount } from '$lib/solution/solution-parser';
 	import { sudokuStore } from '$lib/stores/sudokuStore';
@@ -8,6 +7,7 @@
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Square, Sudoku } from '$lib/types/sudoku';
 	import GameSolveButtons from './GameSolveButtons.svelte';
+	import { solveSudoku } from './api';
 	import SudokuBoard from './board/SudokuBoard.svelte';
 	import SolutionInfo from './solution/SolutionInfo.svelte';
 
@@ -31,32 +31,30 @@
 	};
 
 	const eliminationClicked = (elimination: Elimination) => {
-		resetSelections();
-		selectedElimination = elimination;
-		currentSolutionStep = elimination.solutionIndex;
-
 		const newSudoku = moveToSolutionStep(
 			sudoku,
-			currentSolutionStep,
+			currentSolutionStep ?? 0,
 			solution,
 			elimination.solutionIndex
 		);
 
+		resetSelections();
+		selectedElimination = elimination;
+		currentSolutionStep = elimination.solutionIndex;
 		sudoku = newSudoku;
 	};
 
 	const candidateClicked = (candidate: SingleCandidate) => {
-		resetSelections();
-		selectedCandidate = candidate;
-		currentSolutionStep = candidate.solutionIndex;
-
 		const newSudoku = moveToSolutionStep(
 			sudoku,
-			currentSolutionStep,
+			currentSolutionStep ?? 0,
 			solution,
 			candidate.solutionIndex
 		);
 
+		resetSelections();
+		selectedCandidate = candidate;
+		currentSolutionStep = candidate.solutionIndex;
 		sudoku = newSudoku;
 	};
 
@@ -64,8 +62,7 @@
 		isSolving = true;
 		try {
 			const sudokuToSolve = solution.sudoku.length > 0 ? solution.sudoku : sudoku;
-			const response = await axios.post<Solution>('/sudoku/solve', { sudoku: sudokuToSolve });
-			solution = response.data;
+			solution = await solveSudoku(sudokuToSolve);
 			sudoku = solution.sudoku;
 			currentSolutionStep = undefined;
 			resetSelections();

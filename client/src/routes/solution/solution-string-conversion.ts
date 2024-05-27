@@ -10,6 +10,8 @@ export const techniqueToString = (strategy: string) => {
 			return 'Hidden Quadruple';
 		case 'hidden-triple':
 			return 'Hidden Triple';
+		case 'initial scan':
+			return 'Initial Scan';
 		case 'jellyfish':
 			return 'Jellyfish';
 		case 'naked-pair':
