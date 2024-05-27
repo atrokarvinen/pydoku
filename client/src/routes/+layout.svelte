@@ -3,6 +3,7 @@
 		AppShell,
 		Drawer,
 		Modal,
+		Toast,
 		getDrawerStore,
 		initializeStores
 	} from '@skeletonlabs/skeleton';
@@ -28,6 +29,7 @@
 		<Sidebar />
 	{/if}
 </Drawer>
+<Toast position="t" />
 
 <div class="w-screen h-screen">
 	<AppShell

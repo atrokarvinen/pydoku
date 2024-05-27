@@ -3,7 +3,7 @@ import type { Sudoku } from '$lib/types/sudoku';
 
 export const importFromImage = async (files: FileList | undefined) => {
 	if (!files || files.length === 0) {
-		return;
+		throw new Error('No file selected');
 	}
 
 	const formData = new FormData();
@@ -21,7 +21,7 @@ export const importFromImage = async (files: FileList | undefined) => {
 
 export const importFromString = async (sudokuString: string | undefined) => {
 	if (!sudokuString) {
-		return;
+		throw new Error('No string provided');
 	}
 
 	try {
@@ -30,6 +30,20 @@ export const importFromString = async (sudokuString: string | undefined) => {
 		return sudoku;
 	} catch (error) {
 		console.log('import sudoku from string error: ', error);
+		throw error;
+	}
+};
+
+export const importFromPreset = async (presetId: string | undefined) => {
+	if (!presetId) {
+		throw new Error('No preset selected');
+	}
+	try {
+		const response = await axios.get<Sudoku>(`/sudoku/import/preset/${presetId}`);
+		const sudoku = response.data;
+		return sudoku;
+	} catch (error) {
+		console.log('import sudoku from preset error: ', error);
 		throw error;
 	}
 };

@@ -53,7 +53,7 @@ class Sudoku:
             row = []
             for j in range(size):
                 char = char_array[i*size+j]
-                if (char == '.'):
+                if (char == '.' or char == '0' or char == ' '):
                     char_as_number = 0
                 else:
                     char_as_number = int(char)

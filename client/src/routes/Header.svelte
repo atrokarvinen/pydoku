@@ -16,9 +16,9 @@
 	regionRowMain="md:w-96"
 >
 	<svelte:fragment slot="lead">
-		<button class="btn-icon variant-ghost-primary">
+		<a class="btn-icon variant-ghost-primary" href="/">
 			<i class="fas fa-home" />
-		</button>
+		</a>
 	</svelte:fragment>
 	<h1 class="h3">Sudoku</h1>
 	<svelte:fragment slot="trail"

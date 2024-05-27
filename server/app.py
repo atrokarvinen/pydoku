@@ -4,12 +4,14 @@ from flask_sqlalchemy import SQLAlchemy
 
 from database.baseModel import Base
 from database.userRepository import UserRepository
+from mappers.presetMapper import PresetMapper
 from models.sudoku import Sudoku
 from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
 from machineVision.imageSaver import ImageSaver
-from testing.sudokus import x_cycle_example2
+from presetSudokus.presetProvider import PresetProvider
+from presetSudokus.sudokus import x_cycle_example2
 import os
 from dotenv import load_dotenv
 
@@ -58,8 +60,7 @@ def import_sudoku_from_image():
     try:
         img = mv.load_image(filename)
         sudoku_string = mv.detect(img)
-        solver = Sudoku()
-        sudoku = solver.parse(sudoku_string)
+        sudoku = Sudoku().parse(sudoku_string)
         return sudoku.serialize()
     except:
         return "Error"
@@ -70,8 +71,21 @@ def import_sudoku_from_image():
 @app.route("/sudoku/import/string", methods=["POST"])
 def import_sudoku_from_string():
     sudoku_string = request.get_json()["sudoku"]
-    solver = Sudoku()
-    sudoku = solver.parse(sudoku_string)
+    sudoku = Sudoku().parse(sudoku_string)
+    return sudoku.serialize()
+
+
+@app.route("/sudoku/import/preset")
+def get_import_presets():
+    presets = PresetProvider().get_preset_sudokus()
+    return [preset.serialize() for preset in presets]
+
+
+@app.route("/sudoku/import/preset/<preset_id>")
+def import_from_preset(preset_id: str):
+    print("Importing preset:", preset_id)
+    preset = PresetProvider().get_preset_sudoku(preset_id)
+    sudoku = Sudoku().parse(preset.sudoku)
     return sudoku.serialize()
 
 

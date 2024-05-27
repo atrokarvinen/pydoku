@@ -1,13 +1,19 @@
 <script lang="ts">
 	import { sudokuStore } from '$lib/stores/sudokuStore';
 	import type { Sudoku } from '$lib/types/sudoku';
-	import { getDrawerStore } from '@skeletonlabs/skeleton';
+	import { getDrawerStore, getModalStore } from '@skeletonlabs/skeleton';
 	import SudokuExport from './export/SudokuExport.svelte';
 	import SudokuImport from './import/SudokuImport.svelte';
 
 	const drawerStore = getDrawerStore();
+	const modalStore = getModalStore();
 
 	$: sudoku = $sudokuStore ?? [];
+	$: {
+		if ($modalStore[0]) {
+			drawerStore.close();
+		}
+	}
 
 	const onSudokuImported = (sudoku: Sudoku) => {
 		if (!sudoku) return;

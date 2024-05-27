@@ -1,0 +1,40 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { sudokuStore } from '$lib/stores/sudokuStore';
+	import { getToastStore } from '@skeletonlabs/skeleton';
+	import ImportButton from '../common/ImportButton.svelte';
+	import { importFromImage } from '../common/api';
+
+	let files: FileList | undefined;
+
+	const toastStore = getToastStore();
+</script>
+
+<div class="flex flex-col gap-2">
+	<p>Import a sudoku from an image.</p>
+	<p>
+		The image should contain a sudoku puzzle. The app will try to extract the sudoku from the image.
+	</p>
+	<p>The image recognition works best on sudokus with white background and black numbers.</p>
+
+	<form class="flex flex-col gap-5 mt-10 items-end">
+		<input class="input" type="file" bind:files />
+		<ImportButton
+			disabled={!files || files.length === 0}
+			importFunction={() => importFromImage(files)}
+			onSuccess={(sudoku) => {
+				sudokuStore.set(sudoku);
+				goto('/');
+			}}
+			onError={(error) => {
+				console.log('error importing from image', error);
+				toastStore.trigger({
+					message: 'Error importing sudoku from image',
+					autohide: true,
+					timeout: 5000,
+					background: 'bg-error-500'
+				});
+			}}
+		/>
+	</form>
+</div>
