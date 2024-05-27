@@ -14,4 +14,7 @@
 	};
 </script>
 
-<button class="btn variant-filled-primary" on:click={exportSudoku}>Export</button>
+<button class="btn variant-ghost-primary" on:click={exportSudoku}>
+	<i class="fas fa-file-export" />
+	<span>Export</span>
+</button>

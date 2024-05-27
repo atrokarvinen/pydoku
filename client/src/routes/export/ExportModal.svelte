@@ -27,7 +27,7 @@
 	<div class="card p-4 w-modal space-y-4 shadow-xl">
 		<header class="text-2xl font-bold">Export sudoku</header>
 		<div>
-			<span> Sudoku as string:</span>
+			<span> Current sudoku as string:</span>
 			<CopyInput text={sudokuString} />
 		</div>
 		<footer class="modal-footer flex flex-row space-x-2 justify-end">

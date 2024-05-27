@@ -1,9 +1,8 @@
 <script lang="ts">
+	import { navigating } from '$app/stores';
 	import { sudokuStore } from '$lib/stores/sudokuStore';
-	import type { Sudoku } from '$lib/types/sudoku';
 	import { getDrawerStore, getModalStore } from '@skeletonlabs/skeleton';
 	import SudokuExport from './export/SudokuExport.svelte';
-	import SudokuImport from './import/SudokuImport.svelte';
 
 	const drawerStore = getDrawerStore();
 	const modalStore = getModalStore();
@@ -12,14 +11,10 @@
 	$: {
 		if ($modalStore[0]) {
 			drawerStore.close();
+		} else if ($navigating) {
+			drawerStore.close();
 		}
 	}
-
-	const onSudokuImported = (sudoku: Sudoku) => {
-		if (!sudoku) return;
-		sudokuStore.set(sudoku);
-		drawerStore.close();
-	};
 </script>
 
 <div class="p-1 space-y-5">
@@ -29,7 +24,10 @@
 		>
 	</div>
 	<div class="flex flex-col gap-2 items-end">
-		<SudokuImport {onSudokuImported} />
+		<a class="btn variant-ghost-primary" href="/import">
+			<i class="fas fa-file-import" />
+			<span>Import</span>
+		</a>
 		<SudokuExport {sudoku} />
 	</div>
 </div>
