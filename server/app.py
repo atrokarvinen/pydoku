@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from database.baseModel import Base
 from database.userRepository import UserRepository
 from mappers.presetMapper import PresetMapper
+from mappers.settingsMapper import SettingsMapper
 from models.sudoku import Sudoku
 from mappers.sudokuMapper import SudokuMapper
 from models.solution import Solution
@@ -14,6 +15,8 @@ from presetSudokus.presetProvider import PresetProvider
 from presetSudokus.sudokus import x_cycle_example2
 import os
 from dotenv import load_dotenv
+
+from solver.settings import Settings
 
 load_dotenv()
 
@@ -66,6 +69,19 @@ def import_sudoku_from_image():
         return "Error"
     finally:
         file_saver.try_delete_image(filename)
+
+
+@app.route("/settings")
+def get_settings():
+    settings = Settings()
+    return settings.serialize()
+
+
+@app.route("/settings", methods=["PUT"])
+def update_settings():
+    json = request.get_json()
+    settings = SettingsMapper().map_from_json(json)
+    return settings.serialize()
 
 
 @app.route("/sudoku/import/string", methods=["POST"])

@@ -29,5 +29,9 @@
 			<span>Import</span>
 		</a>
 		<SudokuExport {sudoku} />
+		<a class="btn variant-ghost-primary" href="/settings">
+			<i class="fas fa-cog" />
+			<span>Solver settings</span>
+		</a>
 	</div>
 </div>

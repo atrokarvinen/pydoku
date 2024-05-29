@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { triggerFadingError } from '$lib/feedback/fading-error';
 	import { sudokuStore } from '$lib/stores/sudokuStore';
 	import { getToastStore } from '@skeletonlabs/skeleton';
 	import ImportButton from '../common/ImportButton.svelte';
@@ -33,12 +34,7 @@
 			}}
 			onError={(error) => {
 				console.log('error importing from string', error);
-				toastStore.trigger({
-					message: 'Error importing sudoku from string',
-					autohide: true,
-					timeout: 5000,
-					background: 'bg-error-500'
-				});
+				triggerFadingError('Error importing sudoku from text');
 			}}
 		/>
 	</form>
