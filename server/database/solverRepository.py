@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from database.solverModel import SolverModel
+from database.databaseModels import SolverModel
 
 
 class SolverRepository:

@@ -1,12 +1,16 @@
-from database.userModel import UserModel
+from sqlalchemy.orm import Session
+from database.databaseModels import UserModel
 
 
 class UserRepository:
-    def get_user(self, session, user_id):
-        return session.query(UserModel).filter(UserModel.id == user_id).first()
+    def __init__(self, session: Session):
+        self.session = session
 
-    def create_user(self, session):
+    def get_user(self, user_id):
+        return self.session.query(UserModel).filter(UserModel.id == user_id).first()
+
+    def create_user(self):
         user = UserModel()
-        session.add(user)
-        session.commit()
+        self.session.add(user)
+        self.session.commit()
         return user

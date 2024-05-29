@@ -17,13 +17,13 @@ class SolverSettingsRepository:
         settings = self.session\
             .query(SolverSettingsModel)\
             .filter(SolverSettingsModel.user_id == user_id)\
-            .first()
-        if settings is None:
+            .all()
+        if settings == []:
             print("Settings not found, creating new settings")
             return self.create_settings(user_id)
         return settings
 
-    def create_settings(self, user_id):
+    def create_settings(self, user_id) -> list[SolverSettingsModel]:
         solvers = self.solver_repository.get_solvers()
         solver_settings = []
         for (index, solver) in enumerate(solvers):
@@ -40,6 +40,7 @@ class SolverSettingsRepository:
 
     def delete_settings(self, user_id):
         settings = self.get_settings_by_user_id(user_id)
-        self.session.delete(settings)
+        for setting in settings:
+            self.session.delete(setting)
         self.session.commit()
         print("Deleted settings for user:", user_id)

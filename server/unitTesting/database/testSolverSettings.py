@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
 from database.baseModel import Base
-from database.relaModel import Child, Parent
+from database.databaseModels import UserModel
 from database.solverSettingsRepository import SolverSettingsRepository
 
 
@@ -18,28 +18,27 @@ class TestSolverSettings(unittest.TestCase):
         settings = self.repository.get_settings()
         self.assertIsNone(settings)
 
-    def test_create_settings(self):
-        settings = self.repository.create_settings(1)
-        self.assertIsNotNone(settings)
-
     def test_get_settings_by_user_id(self):
         settings = self.repository.get_settings_by_user_id(1)
         self.assertGreater(len(settings), 0)
 
-    def test_relationship(self):
-        parent = self.session.query(Parent).first()
-        child = self.session.query(Child).first()
+    def test_create_settings(self):
+        settings = self.repository.create_settings(1)
+        self.assertGreater(len(settings), 0)
 
-        self.session.add(Parent())
+    def test_create_relationship(self):
+        self.session.add(UserModel())
         self.session.commit()
 
-        parent2 = self.session.query(Parent).first()
-        self.assertIsNotNone(parent2)
+        created_user = self.session.query(UserModel).first()
+        self.assertEqual(created_user.id, 1)
 
-        self.session.add(Child(parent_id=parent2.id))
-        self.session.commit()
+        self.repository.create_settings(1)
+        settings = self.repository.get_settings_by_user_id(1)
 
-        child2 = self.session.query(Child).first()
-        self.assertIsNotNone(child2)
-        self.assertIsNotNone(child2.parent)
-        pass
+        self.assertEqual(settings[0].user_id, 1)
+        self.assertEqual(settings[0].user.id, 1)
+
+    def test_delete_settings(self):
+        settings = self.repository.create_settings(1)
+        self.repository.delete_settings(1)

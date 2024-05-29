@@ -45,7 +45,7 @@ def after_request(response):
 @app.route("/auth/create")
 def create_user():
     with db.session() as session:
-        user = UserRepository().create_user(session)
+        user = UserRepository(session).create_user()
         return user.serialize()
 
 
