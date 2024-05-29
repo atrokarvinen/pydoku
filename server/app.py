@@ -3,6 +3,8 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 from database.baseModel import Base
+from database.solverRepository import SolverRepository
+from database.solverSettingsRepository import SolverSettingsRepository
 from database.userRepository import UserRepository
 from mappers.presetMapper import PresetMapper
 from mappers.settingsMapper import SettingsMapper
@@ -73,6 +75,15 @@ def import_sudoku_from_image():
 
 @app.route("/settings")
 def get_settings():
+    user_id = get_user_id()
+    if user_id is None:
+        return "User not found", 404
+    with db.session() as session:
+        SolverRepository(session).ensure_seeded()
+        SolverSettingsRepository(session).delete_settings(user_id)
+        sett = SolverSettingsRepository(
+            session).get_settings_by_user_id(user_id)
+        print(sett)
     settings = Settings()
     return settings.serialize()
 
@@ -124,5 +135,7 @@ def serialize_solution(solution: Solution):
 
 
 def get_user_id():
+    if "UserId" not in request.headers:
+        return None
     headers = request.headers
     return headers["UserId"]
