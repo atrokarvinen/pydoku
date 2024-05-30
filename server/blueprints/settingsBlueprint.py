@@ -34,3 +34,14 @@ def update_settings():
     with db.session() as session:
         SolverSettingsRepository(session).update_settings(user_id, settings)
     return settings.serialize()
+
+
+@settings_blueprint.route("/restore")
+def restore_default_settings():
+    user_id = get_user_id()
+    if user_id is None:
+        return "User not found", 404
+    with db.session() as session:
+        defaults = SolverSettingsRepository(session).restore_defaults(user_id)
+        settings = SettingsMapper().map_from_db_models(defaults)
+    return settings.serialize()

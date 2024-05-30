@@ -2,6 +2,7 @@
 	import { axios } from '$lib/axios';
 	import { triggerFadingError } from '$lib/feedback/fading-error';
 	import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
+	import type { Settings } from './settings';
 	import type { Solver } from './solver';
 
 	export let onDefaultsRestored: (defaults: Solver[]) => void;
@@ -14,8 +15,8 @@
 		console.log('Restoring defaults');
 
 		try {
-			const response = await axios.post('/api/solvers/restore');
-			const defaults = response.data;
+			const response = await axios.get<Settings>('/settings/restore');
+			const defaults = response.data.solvers;
 			onDefaultsRestored(defaults);
 		} catch (error) {
 			console.error('Failed to restore defaults', error);

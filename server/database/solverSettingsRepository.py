@@ -54,6 +54,13 @@ class SolverSettingsRepository:
         self.session.commit()
         print("Updated settings for user:", user_id)
 
+    def restore_defaults(self, user_id: int) -> list[SolverSettingsModel]:
+        current_settings = self.get_settings_by_user_id(user_id)
+        for setting in current_settings:
+            self.session.delete(setting)
+        self.session.commit()
+        return self.create_settings(user_id)
+
     def delete_settings(self, user_id):
         settings = self.get_settings_by_user_id(user_id)
         for setting in settings:
