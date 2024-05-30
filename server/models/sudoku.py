@@ -1,4 +1,5 @@
 import copy
+from models.solutionStep import SolutionStep
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
@@ -72,52 +73,30 @@ class Sudoku:
                 unique_error_squares.append(error_square)
         return unique_error_squares
 
-    def solve(self, empty_board: Board) -> Solution:
-        board = copy.deepcopy(empty_board)
-        if (self.is_solved(board)):
-            print("Sudoku already solved")
-            return Solution(board)
-        if (self.is_board_empty(board)):
-            print("Sudoku is empty")
-            return Solution(board)
-        is_not_initialized = all(
-            [len(s.possible_numbers) == 0 for s in board.flatten()])
-        if (is_not_initialized):
-            self.add_initial_possibilities(board)
-        iteration = 0
-        initial_board = copy.deepcopy(board)
-        solution = Solution(initial_board)
+    def solve(self, input_board: Board) -> Solution:
+        error = self.validate_board(input_board)
+        if (error is not None):
+            return Solution(input_board)
+        board = self.preprocess_board(input_board)
+        solution = Solution(copy.deepcopy(board))
         techniques = self.settings.create_solvers()
+
+        iteration = 0
         empty_square_count = len([s for s in board.flatten() if s.is_empty()])
         max_iterations = (board.size + 1) * empty_square_count
         while (True):
             print("Iteration: " + str(iteration))
-            next_solution = None
-            for solver in techniques:
-                next_solution = solver.get_next_solution(board)
-                if (next_solution is not None):
-                    break
-
-            if (next_solution is None):
+            next_step = self.get_next_solution_step(board, techniques)
+            if (next_step is None):
                 print("No new solution found. Unable to solve sudoku")
                 break
 
-            board = next_solution.apply(board)
-            if (next_solution.is_elimination()):
-                solution.add_elimination(next_solution)
-            else:
-                solution.add_single_candidate(next_solution)
+            board = self.apply_solution_step(board, solution, next_step)
 
-            if (self.is_board_full(board)):
-                error_squares = self.get_error_squares(board)
-                if (len(error_squares) == 0):
-                    solution.is_solved = True
-                    print("Sudoku solved")
-                    break
-                if (iteration == max_iterations):
-                    print("Max iterations reached, unable to solve sudoku")
-                    break
-
+            if (self.is_solved(board)):
+                solution.is_solved = True
+                print("Sudoku solved")
+                break
             if (iteration == max_iterations):
                 print("Max iterations reached, unable to solve sudoku")
                 break
@@ -125,10 +104,36 @@ class Sudoku:
             iteration += 1
 
         solution.final_sudoku = board
-        print("Found eliminations: " + str(len(solution.eliminations)))
-        print("Found single candidates: " +
-              str(len(solution.single_candidates)))
         return solution
+
+    def validate_board(self, board: Board) -> str:
+        if (self.is_solved(board)):
+            return "Sudoku already solved"
+        if (self.is_board_empty(board)):
+            return "Sudoku is empty"
+        return None
+
+    def preprocess_board(self, board: Board) -> Board:
+        board = copy.deepcopy(board)
+        is_not_initialized = all(
+            [len(s.possible_numbers) == 0 for s in board.flatten()])
+        if (is_not_initialized):
+            self.add_initial_possibilities(board)
+        return board
+
+    def get_next_solution_step(self, board: Board, techniques: list[SolverBase]) -> SolutionStep:
+        for solver in techniques:
+            next_step = solver.get_next_solution(board)
+            if (next_step is not None):
+                return next_step
+        return None
+
+    def apply_solution_step(self, board: Board, solution: Solution, solution_step: SolutionStep) -> Board:
+        if (solution_step.is_elimination()):
+            solution.add_elimination(solution_step)
+        else:
+            solution.add_single_candidate(solution_step)
+        return solution_step.apply(board)
 
     def is_board_full(self, board: Board) -> bool:
         return all([not s.is_empty() for s in board.flatten()])
