@@ -3,7 +3,7 @@ import type { PresetSudoku } from './preset-sudoku';
 
 export const load = async () => {
 	try {
-		const loadPromise = axios.get<PresetSudoku[]>('/sudoku/import/preset');
+		const loadPromise = axios.get<PresetSudoku[]>('/import/preset');
 		return { loadPromise, error: undefined };
 	} catch (error) {
 		console.log('load presets error: ', error);

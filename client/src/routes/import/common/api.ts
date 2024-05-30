@@ -10,7 +10,7 @@ export const importFromImage = async (files: FileList | undefined) => {
 	formData.append('file', files[0]);
 
 	try {
-		const response = await axios.postForm<Sudoku>('/sudoku/import/image', formData);
+		const response = await axios.postForm<Sudoku>('/import/image', formData);
 		const sudoku = response.data;
 		return sudoku;
 	} catch (error) {
@@ -25,7 +25,7 @@ export const importFromString = async (sudokuString: string | undefined) => {
 	}
 
 	try {
-		const response = await axios.post<Sudoku>('/sudoku/import/string', { sudoku: sudokuString });
+		const response = await axios.post<Sudoku>('/import/string', { sudoku: sudokuString });
 		const sudoku = response.data;
 		return sudoku;
 	} catch (error) {
@@ -39,7 +39,7 @@ export const importFromPreset = async (presetId: string | undefined) => {
 		throw new Error('No preset selected');
 	}
 	try {
-		const response = await axios.get<Sudoku>(`/sudoku/import/preset/${presetId}`);
+		const response = await axios.get<Sudoku>(`/import/preset/${presetId}`);
 		const sudoku = response.data;
 		return sudoku;
 	} catch (error) {
