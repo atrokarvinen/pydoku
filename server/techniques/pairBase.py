@@ -20,17 +20,17 @@ class PairBase():
 
     def find_pair_of_n(self, board: Board, pair_count: int) -> Elimination:
         board_range = range(board.size)
-        rows = [board.get_empty_squares_in_row(i) for i in board_range]
+        rows = [board.get_squares_in_row(i) for i in board_range]
         row_elimination = self.find_pair_from_regions(rows, pair_count)
         if (row_elimination is not None):
             return row_elimination
 
-        columns = [board.get_empty_squares_in_column(i) for i in board_range]
+        columns = [board.get_squares_in_column(i) for i in board_range]
         column_elimination = self.find_pair_from_regions(columns, pair_count)
         if (column_elimination is not None):
             return column_elimination
 
-        boxes = [board.get_empty_squares_in_box(i) for i in board_range]
+        boxes = [board.get_squares_in_box(i) for i in board_range]
         box_elimination = self.find_pair_from_regions(boxes, pair_count)
         if (box_elimination is not None):
             return box_elimination

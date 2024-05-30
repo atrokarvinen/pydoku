@@ -56,6 +56,11 @@ class HiddenPair(EliminatorBase, PairBase):
             [note in s.possible_numbers for s in other_squares for note in note_pair])
         if (other_squares_have_note):
             return False
+        for note in note_pair:
+            any_has_number = any([s.number == note for s in other_squares])
+            if (any_has_number):
+                return False
+
         unique_notes = SquareLogic.get_unique_notes(pair)
         note_pair_is_contained = all(
             [note in unique_notes for note in note_pair]

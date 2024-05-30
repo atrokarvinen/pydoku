@@ -100,12 +100,16 @@ class Sudoku:
 
     def solve(self, empty_board: Board) -> Solution:
         board = copy.deepcopy(empty_board)
-        is_empty = all([len(s.possible_numbers) == 0 for s in board.flatten()])
-        if (is_empty):
-            self.add_initial_possibilities(board)
         if (self.is_solved(board)):
             print("Sudoku already solved")
             return Solution(board)
+        if (self.is_board_empty(board)):
+            print("Sudoku is empty")
+            return Solution(board)
+        is_not_initialized = all(
+            [len(s.possible_numbers) == 0 for s in board.flatten()])
+        if (is_not_initialized):
+            self.add_initial_possibilities(board)
         iteration = 0
         initial_board = copy.deepcopy(board)
         solution = Solution(initial_board)
@@ -154,3 +158,6 @@ class Sudoku:
 
     def is_board_full(self, board: Board) -> bool:
         return all([not s.is_empty() for s in board.flatten()])
+
+    def is_board_empty(self, board: Board) -> bool:
+        return all([s.is_empty() for s in board.flatten()])

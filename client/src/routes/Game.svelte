@@ -64,6 +64,7 @@
 			const originalSudoku = solution.sudoku.length > 0 ? solution.sudoku : undefined;
 			solution = await solveSudoku(sudoku);
 			solution.sudoku = originalSudoku ?? solution.sudoku;
+			sudoku = solution.sudoku;
 			currentSolutionStep = undefined;
 			resetSelections();
 		} catch (error) {

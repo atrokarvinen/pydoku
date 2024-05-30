@@ -10,9 +10,9 @@ from techniques.solverBase import SolverBase
 class SingleCandidate(SolverBase):
     def get_next_solution(self, board: Board) -> SingleCandidateModel:
         boardRange = range(board.size)
-        rows = [board.get_empty_squares_in_row(i) for i in boardRange]
-        columns = [board.get_empty_squares_in_column(i) for i in boardRange]
-        boxes = [board.get_empty_squares_in_box(i) for i in boardRange]
+        rows = [board.get_squares_in_row(i) for i in boardRange]
+        columns = [board.get_squares_in_column(i) for i in boardRange]
+        boxes = [board.get_squares_in_box(i) for i in boardRange]
         single_squares = [[s] for s in board.flatten() if s.is_empty()]
 
         single_candidate = self.iterate_sets(single_squares, "cell")
@@ -51,6 +51,9 @@ class SingleCandidate(SolverBase):
 
         for note, count in notes_by_count.items():
             if count != 1:
+                continue
+            any_has_number = any([s.number == note for s in square_set])
+            if any_has_number:
                 continue
             for square in square_set:
                 if not note in square.possible_numbers:
