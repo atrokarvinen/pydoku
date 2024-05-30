@@ -34,7 +34,7 @@
 			}}
 			onError={(error) => {
 				console.log('error importing from string', error);
-				triggerFadingError('Error importing sudoku from text');
+				triggerFadingError(toastStore, 'Error importing sudoku from text');
 			}}
 		/>
 	</form>

@@ -8,9 +8,8 @@ from techniques.eliminatorBase import EliminatorBase
 
 class Claiming(EliminatorBase):
     def get_next_solution(self, board: Board) -> Elimination:
-        rows = [board.get_empty_squares_in_row(i) for i in range(board.size)]
-        columns = [board.get_empty_squares_in_column(
-            i) for i in range(board.size)]
+        rows = [board.get_squares_in_row(i) for i in range(board.size)]
+        columns = [board.get_squares_in_column(i) for i in range(board.size)]
         square_sets = rows + columns
         elimination = self.iterate_square_sets(board, square_sets)
         return elimination
@@ -26,6 +25,9 @@ class Claiming(EliminatorBase):
         return None
 
     def find_elimination(self, board: Board, all_squares: list[Square], note: int) -> Elimination:
+        any_has_number = any([s.number == note for s in all_squares])
+        if any_has_number:
+            return None
         squares = [s for s in all_squares if note in s.possible_numbers]
         is_valid = self.validate_squares(squares, board.box_size)
         if not is_valid:

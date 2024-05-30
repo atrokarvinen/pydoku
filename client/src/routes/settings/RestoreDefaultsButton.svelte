@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { axios } from '$lib/axios';
 	import { triggerFadingError } from '$lib/feedback/fading-error';
-	import { getModalStore } from '@skeletonlabs/skeleton';
+	import { getModalStore, getToastStore } from '@skeletonlabs/skeleton';
 	import type { Solver } from './solver';
 
 	export let onDefaultsRestored: (defaults: Solver[]) => void;
 
 	const modalStore = getModalStore();
+	const toastStore = getToastStore();
 
 	const onConfirm = async (confirmed: boolean) => {
 		if (!confirmed) return;
@@ -18,7 +19,7 @@
 			onDefaultsRestored(defaults);
 		} catch (error) {
 			console.error('Failed to restore defaults', error);
-			triggerFadingError('Failed to restore defaults');
+			triggerFadingError(toastStore, 'Failed to restore defaults');
 		}
 	};
 

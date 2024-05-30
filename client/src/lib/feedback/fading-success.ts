@@ -1,7 +1,4 @@
-import { getToastStore } from '@skeletonlabs/skeleton';
-
-export const triggerFadingSuccess = (message: string) => {
-	const toastStore = getToastStore();
+export const triggerFadingSuccess = (toastStore: any, message: string) => {
 	toastStore.trigger({
 		message,
 		background: 'bg-success-500',

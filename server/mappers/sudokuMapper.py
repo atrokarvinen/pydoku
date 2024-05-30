@@ -1,10 +1,9 @@
-from models.sudoku import Sudoku
 from models.square import Square
 from models.board import Board
 
 
 class SudokuMapper:
-    def map_from_json(self, data) -> Sudoku:
+    def map_from_json(self, data) -> Board:
         sudokuJson = data["sudoku"]
 
         board = Board(len(sudokuJson))
@@ -23,7 +22,4 @@ class SudokuMapper:
                 squares.append(mappedSquare)
             board.append(squares)
 
-        sudoku = Sudoku()
-        sudoku.set_board(board)
-
-        return sudoku
+        return board

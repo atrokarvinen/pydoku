@@ -6,7 +6,6 @@ from database.baseModel import Base
 from database.solverRepository import SolverRepository
 from database.solverSettingsRepository import SolverSettingsRepository
 from database.userRepository import UserRepository
-from mappers.presetMapper import PresetMapper
 from mappers.settingsMapper import SettingsMapper
 from models.sudoku import Sudoku
 from mappers.sudokuMapper import SudokuMapper
@@ -14,11 +13,9 @@ from models.solution import Solution
 from machineVision.sudokuDetector import SudokuDetector
 from machineVision.imageSaver import ImageSaver
 from presetSudokus.presetProvider import PresetProvider
-from presetSudokus.sudokus import x_cycle_example2
+from presetSudokus.sudokus import hard_sudoku1
 import os
 from dotenv import load_dotenv
-
-from solver.settings import Settings
 
 load_dotenv()
 
@@ -52,7 +49,7 @@ def create_user():
 @app.route("/sudoku")
 def get_sudoku():
     sudoku = Sudoku()
-    board = sudoku.parse(x_cycle_example2)
+    board = sudoku.parse(hard_sudoku1)
     return board.serialize()
 
 
@@ -80,18 +77,21 @@ def get_settings():
         return "User not found", 404
     with db.session() as session:
         SolverRepository(session).ensure_seeded()
-        SolverSettingsRepository(session).delete_settings(user_id)
-        sett = SolverSettingsRepository(
+        dbSettings = SolverSettingsRepository(
             session).get_settings_by_user_id(user_id)
-        print(sett)
-    settings = Settings()
+        settings = SettingsMapper().map_from_db_models(dbSettings)
     return settings.serialize()
 
 
 @app.route("/settings", methods=["PUT"])
 def update_settings():
+    user_id = get_user_id()
+    if user_id is None:
+        return "User not found", 404
     json = request.get_json()
     settings = SettingsMapper().map_from_json(json)
+    with db.session() as session:
+        SolverSettingsRepository(session).update_settings(user_id, settings)
     return settings.serialize()
 
 
@@ -118,10 +118,20 @@ def import_from_preset(preset_id: str):
 
 @app.route("/sudoku/solve", methods=["POST"])
 def solve_sudoku():
+    user_id = get_user_id()
+    if user_id is None:
+        return "User not found", 404
     sudoku_json = request.get_json()
     mapper = SudokuMapper()
-    sudoku = mapper.map_from_json(sudoku_json)
-    board = sudoku.board
+    board = mapper.map_from_json(sudoku_json)
+    with db.session() as session:
+        solver_settings = SolverSettingsRepository(
+            session).get_settings_by_user_id(user_id)
+        settings = SettingsMapper().map_from_db_models(solver_settings)
+    sudoku = Sudoku()
+    sudoku.board = board
+    sudoku.settings = settings
+
     solution = sudoku.solve(board)
     return serialize_solution(solution)
 

@@ -3,6 +3,7 @@ import math
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
+from solver.settings import Settings
 from techniques.biValueUniversalGrave import BiValueUniversalGrave
 from techniques.emptyRectangle import EmptyRectangle
 from techniques.xCycle import XCycle
@@ -35,9 +36,7 @@ class Sudoku:
             BiValueUniversalGrave(),
             XCycle(),
         ]
-
-    def set_board(self, board: Board):
-        self.board = board
+        self.settings: Settings = Settings()
 
     def parse(self, sudoku_string) -> Board:
         size = 9
@@ -69,12 +68,15 @@ class Sudoku:
         return board
 
     def is_solved(self, board: Board) -> list[Square]:
+        return len(self.get_error_squares(board)) == 0
+
+    def get_error_squares(self, board: Board) -> list[Square]:
         flat_squares = board.flatten()
         error_squares = []
         for square in flat_squares:
             row = square.row
             column = square.column
-            if (square.is_empty()):
+            if (square.number == 0):
                 error_squares.append(square)
                 continue
 
@@ -101,15 +103,19 @@ class Sudoku:
         is_empty = all([len(s.possible_numbers) == 0 for s in board.flatten()])
         if (is_empty):
             self.add_initial_possibilities(board)
+        if (self.is_solved(board)):
+            print("Sudoku already solved")
+            return Solution(board)
         iteration = 0
         initial_board = copy.deepcopy(board)
         solution = Solution(initial_board)
+        techniques = self.settings.create_solvers()
         empty_square_count = len([s for s in board.flatten() if s.is_empty()])
         max_iterations = (board.size + 1) * empty_square_count
         while (True):
             print("Iteration: " + str(iteration))
             next_solution = None
-            for solver in self.techniques:
+            for solver in techniques:
                 next_solution = solver.get_next_solution(board)
                 if (next_solution is not None):
                     break
@@ -125,7 +131,7 @@ class Sudoku:
                 solution.add_single_candidate(next_solution)
 
             if (self.is_board_full(board)):
-                error_squares = self.is_solved(board)
+                error_squares = self.get_error_squares(board)
                 if (len(error_squares) == 0):
                     solution.is_solved = True
                     print("Sudoku solved")

@@ -10,7 +10,7 @@ from techniques.utils.squareLogic import SquareLogic
 class Pointing(EliminatorBase):
     def get_next_solution(self, board: Board) -> Elimination:
         board_range = board.get_range_zero_indexed()
-        square_sets = [board.get_empty_squares_in_box(i) for i in board_range]
+        square_sets = [board.get_squares_in_box(i) for i in board_range]
         elimination = self.iterate_square_sets(board, square_sets)
         return elimination
 
@@ -29,6 +29,10 @@ class Pointing(EliminatorBase):
         too_many_squares_with_note = len(squares) > board.box_size
         too_few_squares_with_note = len(squares) <= 1
         if too_few_squares_with_note or too_many_squares_with_note:
+            return None
+
+        any_has_number = any([s.number == note for s in all_squares])
+        if any_has_number:
             return None
 
         other_squares = self.validate_pointing(board, squares, note)

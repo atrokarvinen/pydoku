@@ -1,12 +1,11 @@
-import { browser } from '$app/environment';
 import { setUserIdHeader } from '$lib/axios';
 import { session } from '$lib/session/session';
 import { redirect } from '@sveltejs/kit';
 import { createUser } from './api';
 
-export const load = async () => {
-	if (!browser) return;
+export const ssr = false;
 
+export const load = async () => {
 	console.log('loading auth page');
 	let userId = localStorage.getItem('userId');
 	if (!userId) {
@@ -21,7 +20,6 @@ export const load = async () => {
 		}
 	}
 	session.update((s) => ({ ...s, userId }));
-	console.log('userId: ', userId);
 
 	setUserIdHeader(userId);
 	throw redirect(300, '/');

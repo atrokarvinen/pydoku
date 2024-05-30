@@ -29,7 +29,7 @@
 			}}
 			onError={(error) => {
 				console.log('error importing from image', error);
-				triggerFadingError('Error importing sudoku from image');
+				triggerFadingError(toastStore, 'Error importing sudoku from image');
 			}}
 		/>
 	</form>

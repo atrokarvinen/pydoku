@@ -1,7 +1,4 @@
-import { getToastStore } from '@skeletonlabs/skeleton';
-
-export const triggerFadingError = (message: string) => {
-	const toastStore = getToastStore();
+export const triggerFadingError = (toastStore: any, message: string) => {
 	toastStore.trigger({
 		message,
 		background: 'bg-error-500',

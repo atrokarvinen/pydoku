@@ -61,9 +61,9 @@
 	const solve = async () => {
 		isSolving = true;
 		try {
-			const sudokuToSolve = solution.sudoku.length > 0 ? solution.sudoku : sudoku;
-			solution = await solveSudoku(sudokuToSolve);
-			sudoku = solution.sudoku;
+			const originalSudoku = solution.sudoku.length > 0 ? solution.sudoku : undefined;
+			solution = await solveSudoku(sudoku);
+			solution.sudoku = originalSudoku ?? solution.sudoku;
 			currentSolutionStep = undefined;
 			resetSelections();
 		} catch (error) {
@@ -151,7 +151,6 @@
 		if (!importedSudoku) {
 			return;
 		}
-		console.log('sudoku imported: ', importedSudoku);
 		resetSelections();
 		currentSolutionStep = 0;
 		solution = defaultSolution;

@@ -30,7 +30,7 @@ class Settings:
         return solvers
 
     def create_solvers(self) -> list[SolverBase]:
-        return [self.solver_factory.create_solver(solver) for solver in self.solvers]
+        return [self.solver_factory.create_solver(solver) for solver in self.solvers if solver.enabled]
 
     def serialize(self):
         return {"solvers": [solver.serialize() for solver in self.solvers]}
