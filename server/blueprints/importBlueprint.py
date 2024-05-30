@@ -4,6 +4,7 @@ from machineVision.imageSaver import ImageSaver
 from machineVision.sudokuDetector import SudokuDetector
 from models.sudoku import Sudoku
 from presetSudokus.presetProvider import PresetProvider
+from solver.sudokuParser import SudokuParser
 
 
 import_blueprint = Blueprint("import", __name__)
@@ -18,7 +19,7 @@ def import_sudoku_from_image():
     try:
         img = mv.load_image(filename)
         sudoku_string = mv.detect(img)
-        sudoku = Sudoku().parse(sudoku_string)
+        sudoku = SudokuParser.parse(sudoku_string)
         return sudoku.serialize()
     except:
         return "Error"
@@ -29,7 +30,7 @@ def import_sudoku_from_image():
 @import_blueprint.route("/string", methods=["POST"])
 def import_sudoku_from_string():
     sudoku_string = request.get_json()["sudoku"]
-    sudoku = Sudoku().parse(sudoku_string)
+    sudoku = SudokuParser.parse(sudoku_string)
     return sudoku.serialize()
 
 
@@ -43,5 +44,5 @@ def get_import_presets():
 def import_from_preset(preset_id: str):
     print("Importing preset:", preset_id)
     preset = PresetProvider().get_preset_sudoku(preset_id)
-    sudoku = Sudoku().parse(preset.sudoku)
+    sudoku = SudokuParser.parse(preset.sudoku)
     return sudoku.serialize()

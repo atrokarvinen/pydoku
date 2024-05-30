@@ -1,5 +1,4 @@
 import copy
-import math
 from models.square import Square
 from models.solution import Solution
 from models.board import Board
@@ -37,31 +36,6 @@ class Sudoku:
             XCycle(),
         ]
         self.settings: Settings = Settings()
-
-    def parse(self, sudoku_string) -> Board:
-        size = 9
-        box_size = math.sqrt(size)
-        sudoku_length = len(sudoku_string)
-        if (sudoku_length != size*size):
-            print("Invalid sudoku length")
-            return
-
-        char_array = list(sudoku_string)
-        board = Board(size)
-        for i in range(size):
-            row = []
-            for j in range(size):
-                char = char_array[i*size+j]
-                if (char == '.' or char == '0' or char == ' '):
-                    char_as_number = 0
-                else:
-                    char_as_number = int(char)
-                box = math.floor(i/box_size)*box_size + math.floor(j/box_size)
-                square = Square(i, j, box, char_as_number)
-                row.append(square)
-            board.append(row)
-
-        return board
 
     def add_initial_possibilities(self, board: Board) -> Board:
         board.add_initial_possibilities()

@@ -8,6 +8,7 @@ from models.solution import Solution
 from models.sudoku import Sudoku
 from presetSudokus.sudokus import hard_sudoku1
 from database.db import db
+from solver.sudokuParser import SudokuParser
 
 
 sudoku_blueprint = Blueprint("sudoku", __name__)
@@ -15,8 +16,7 @@ sudoku_blueprint = Blueprint("sudoku", __name__)
 
 @sudoku_blueprint.route("")
 def get_sudoku():
-    sudoku = Sudoku()
-    board = sudoku.parse(hard_sudoku1)
+    board = SudokuParser.parse(hard_sudoku1)
     return board.serialize()
 
 
