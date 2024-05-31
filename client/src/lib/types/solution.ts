@@ -8,6 +8,7 @@ export type Solution = {
 	finalSudoku: Sudoku;
 	eliminations: Elimination[];
 	singleCandidates: SingleCandidate[];
+	error?: string;
 };
 
 export const defaultSolution: Solution = {

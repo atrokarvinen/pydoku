@@ -25,18 +25,19 @@
 	};
 </script>
 
-{#if solution.isSolved}
-	<span>Solved after ({solutionSteps.length}) steps.</span>
-{:else if solution.isSolved === false}
-	<span>Unable to solve sudoku</span>
-{/if}
-{#each solutionStepsByCount.groups as group}
-	<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-y-2">
+	{#if solution.isSolved}
+		<span>Solved after ({solutionSteps.length}) steps.</span>
+	{:else if solution.isSolved === false}
+		<span class="text-error-500 font-bold">Unable to solve sudoku</span>
+	{/if}
+	{#each solutionStepsByCount.groups as group}
 		<div class="flex flex-row gap-5 items-center">
-			<span class="font-bold">{techniqueToString(group.technique)} ({group.steps.length})</span>
-			<button class="btn-icon variant-filled" on:click={() => groupClicked(group)}
+			<span class="font-bold w-48">{techniqueToString(group.technique)} ({group.steps.length})</span
+			>
+			<button class="btn-icon-sm rounded-full variant-filled" on:click={() => groupClicked(group)}
 				><i class="fas fa-arrow-right" /></button
 			>
 		</div>
-	</div>
-{/each}
+	{/each}
+</div>

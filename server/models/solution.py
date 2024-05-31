@@ -11,6 +11,7 @@ class Solution:
         self.sudoku = initial_board
         self.final_sudoku = initial_board
         self.is_solved = False
+        self.error: str = None
 
     def add_elimination(self, elimination: Elimination) -> None:
         elimination.solution_index = self.solution_index
@@ -28,5 +29,6 @@ class Solution:
             "sudoku": self.sudoku.serialize(),
             "finalSudoku": self.final_sudoku.serialize(),
             "eliminations": [elimination.serialize() for elimination in self.eliminations],
-            "singleCandidates": [single_candidate.serialize() for single_candidate in self.single_candidates]
+            "singleCandidates": [single_candidate.serialize() for single_candidate in self.single_candidates],
+            "error": self.error
         }

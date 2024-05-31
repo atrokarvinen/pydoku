@@ -2,8 +2,9 @@
 	import { getSolutionSteps } from '$lib/solution/solution-parser';
 	import type { Elimination } from '$lib/types/elimination';
 	import type { SingleCandidate } from '$lib/types/single-candidate';
-	import type { Solution } from '$lib/types/solution';
+	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import { Accordion, AccordionItem } from '@skeletonlabs/skeleton';
+	import _ from 'lodash';
 	import SolutionInfoItem from './SolutionInfoItem.svelte';
 	import SolutionSummary from './SolutionSummary.svelte';
 
@@ -22,29 +23,37 @@
 			candidateClicked(step);
 		}
 	};
+
+	const isDefaultSolution = (solution: Solution) => {
+		return _.isEqual(solution, defaultSolution);
+	};
 </script>
 
-<div class="flex flex-col gap-2 overflow-auto h-max-full">
-	<Accordion>
-		<AccordionItem open>
-			<svelte:fragment slot="summary">Solution steps</svelte:fragment>
-			<svelte:fragment slot="content">
-				{#each solutionSteps as action, step}
-					<SolutionInfoItem
-						step={step + 1}
-						solutionStep={action}
-						stepClicked={solutionStepClick}
-						isSelected={step === selectedElimination?.solutionIndex ||
-							step === selectedCandidate?.solutionIndex}
-					/>
-				{/each}
-			</svelte:fragment>
-		</AccordionItem>
-		<AccordionItem>
-			<svelte:fragment slot="summary">Summary</svelte:fragment>
-			<svelte:fragment slot="content">
-				<SolutionSummary {solution} {solutionSteps} {eliminationClicked} {candidateClicked} />
-			</svelte:fragment>
-		</AccordionItem>
-	</Accordion>
-</div>
+{#if isDefaultSolution(solution)}
+	<div />
+{:else}
+	<div class="flex flex-col gap-2 overflow-auto h-max-full">
+		<Accordion>
+			<AccordionItem open>
+				<svelte:fragment slot="summary">Solution steps</svelte:fragment>
+				<svelte:fragment slot="content">
+					{#each solutionSteps as action, step}
+						<SolutionInfoItem
+							step={step + 1}
+							solutionStep={action}
+							stepClicked={solutionStepClick}
+							isSelected={step === selectedElimination?.solutionIndex ||
+								step === selectedCandidate?.solutionIndex}
+						/>
+					{/each}
+				</svelte:fragment>
+			</AccordionItem>
+			<AccordionItem>
+				<svelte:fragment slot="summary">Summary</svelte:fragment>
+				<svelte:fragment slot="content">
+					<SolutionSummary {solution} {solutionSteps} {eliminationClicked} {candidateClicked} />
+				</svelte:fragment>
+			</AccordionItem>
+		</Accordion>
+	</div>
+{/if}

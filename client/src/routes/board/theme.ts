@@ -8,7 +8,7 @@ export const COLORING_2_COLOR = 'border-2 border-yellow-500';
 
 export const INITIAL_NUMBER_STYLE = 'font-bold';
 
-export const SELECTED_NUMBER_STYLE = 'bg-green-700';
-export const SELECTED_STYLE = 'bg-blue-500';
+export const SELECTED_NUMBER_STYLE = 'bg-green-500';
+export const SELECTED_STYLE = 'bg-primary-500';
 
 export const HIGHLIGHTED_STYLE = 'bg-yellow-300';

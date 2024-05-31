@@ -4,9 +4,8 @@ from blueprints.common import get_user_id
 from database.solverSettingsRepository import SolverSettingsRepository
 from mappers.settingsMapper import SettingsMapper
 from mappers.sudokuMapper import SudokuMapper
-from models.solution import Solution
 from models.sudoku import Sudoku
-from presetSudokus.sudokus import hard_sudoku1
+from presetSudokus.sudokus import x_wing_example
 from database.db import db
 from solver.sudokuParser import SudokuParser
 
@@ -16,7 +15,7 @@ sudoku_blueprint = Blueprint("sudoku", __name__)
 
 @sudoku_blueprint.route("")
 def get_sudoku():
-    board = SudokuParser.parse(hard_sudoku1)
+    board = SudokuParser.parse(x_wing_example)
     return board.serialize()
 
 
@@ -24,10 +23,9 @@ def get_sudoku():
 def solve_sudoku():
     user_id = get_user_id()
     if user_id is None:
-        return "User not found", 404
+        return {"message": "User not found"}, 404
     sudoku_json = request.get_json()
-    mapper = SudokuMapper()
-    board = mapper.map_from_json(sudoku_json)
+    board = SudokuMapper().map_from_json(sudoku_json)
     with db.session() as session:
         solver_settings = SolverSettingsRepository(
             session).get_settings_by_user_id(user_id)
@@ -36,9 +34,7 @@ def solve_sudoku():
     sudoku.board = board
     sudoku.settings = settings
 
-    solution = sudoku.solve(board)
-    return serialize_solution(solution)
-
-
-def serialize_solution(solution: Solution):
+    (solution, error) = sudoku.solve(board)
+    if error is not None:
+        return {"message": error}, 400
     return solution.serialize()

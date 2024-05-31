@@ -76,10 +76,10 @@ class Sudoku:
                 unique_error_squares.append(error_square)
         return unique_error_squares
 
-    def solve(self, input_board: Board) -> Solution:
+    def solve(self, input_board: Board) -> tuple[Solution, str]:
         error = self.validate_board(input_board)
         if (error is not None):
-            return Solution(input_board)
+            return (None, error)
         board = self.preprocess_board(input_board)
         solution = Solution(copy.deepcopy(board))
         techniques = self.settings.create_solvers()
@@ -91,10 +91,7 @@ class Sudoku:
             print("Iteration: " + str(iteration))
             (next_step, error) = self.get_next_solution_step(board, techniques)
             if (error is not None):
-                print("Error: " + error)
-                break
-            if (next_step is None):
-                print("No new solution found. Unable to solve sudoku")
+                solution.error = error
                 break
 
             board = self.apply_solution_step(board, solution, next_step)
@@ -104,15 +101,18 @@ class Sudoku:
                 print("Sudoku solved")
                 break
             if (iteration == max_iterations):
-                print("Max iterations reached, unable to solve sudoku")
+                solution.error = f"Max iterations ({
+                    max_iterations}) reached, unable to solve sudoku"
                 break
 
             iteration += 1
 
         solution.final_sudoku = board
-        return solution
+        return (solution, None)
 
     def validate_board(self, board: Board) -> str:
+        if (board.size != 9):
+            return "Sudoku size is expected to be 9x9"
         if (self.is_solved(board)):
             return "Sudoku already solved"
         if (self.is_board_empty(board)):
@@ -132,16 +132,19 @@ class Sudoku:
             board: Board,
             techniques: list[SolverBase]) -> tuple[SolutionStep, str]:
         for solver in techniques:
+            timeout = 2
             try:
                 next_step = func_timeout.func_timeout(
-                    timeout=2,
+                    timeout=timeout,
                     func=solver.get_next_solution,
                     args=(board,))
                 if (next_step is not None):
                     return (next_step, None)
             except func_timeout.FunctionTimedOut:
-                error = f"Timeout error for solver {solver.__class__.__name__}"
+                error = f"Timeout for solver '{
+                    solver.__class__.__name__}' after {timeout} seconds"
                 return (None, error)
+        return (None, "No new solution step found")
 
     def apply_solution_step(self, board: Board, solution: Solution, solution_step: SolutionStep) -> Board:
         if (solution_step.is_elimination()):

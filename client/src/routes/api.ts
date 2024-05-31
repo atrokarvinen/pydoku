@@ -23,15 +23,32 @@ export const solveSudoku = async (sudokuToSolve: Sudoku) => {
 	const initialScan = allSteps.slice(0, firstNonScanIndex);
 	const afterInitialScan = allSteps.slice(firstNonScanIndex);
 
-	const eliminatedInitialNotes = initialScan.reduce((acc: NumberedNote[], step) => {
+	const initialScanStep = getInitialScanStep(initialScan);
+
+	const newSteps = initialScanStep ? [initialScanStep, ...afterInitialScan] : [...afterInitialScan];
+	newSteps.forEach((step, index) => (step.solutionIndex = index));
+
+	solution.eliminations = newSteps.filter((step) => step.type === 'elimination') as Elimination[];
+	solution.singleCandidates = newSteps.filter(
+		(step) => step.type === 'single-candidate'
+	) as SingleCandidate[];
+
+	return solution;
+};
+
+const getInitialScanStep = (eliminations: (Elimination | SingleCandidate)[]) => {
+	const eliminatedNotes = eliminations.reduce((acc: NumberedNote[], step) => {
 		if (step.type === 'elimination') {
 			return [...acc, ...step.eliminatedNotes];
 		}
 		return acc;
 	}, []);
+	if (eliminatedNotes.length === 0) {
+		return undefined;
+	}
 	const initialScanStep: Elimination = {
 		causingNotes: [],
-		eliminatedNotes: eliminatedInitialNotes,
+		eliminatedNotes: eliminatedNotes,
 		technique: 'initial scan',
 		highlightedRectangles: [],
 		highlightedRegions: [],
@@ -40,16 +57,5 @@ export const solveSudoku = async (sudokuToSolve: Sudoku) => {
 		type: 'elimination',
 		causingSquare: undefined
 	};
-
-	const newSteps = [initialScanStep, ...afterInitialScan];
-	newSteps.forEach((step, index) => {
-		step.solutionIndex = index;
-	});
-
-	solution.eliminations = newSteps.filter((step) => step.type === 'elimination') as Elimination[];
-	solution.singleCandidates = newSteps.filter(
-		(step) => step.type === 'single-candidate'
-	) as SingleCandidate[];
-
-	return solution;
+	return initialScanStep;
 };

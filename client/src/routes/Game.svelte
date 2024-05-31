@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { getApiErrorMessage } from '$lib/feedback/api-error-parser';
+	import { triggerFadingError } from '$lib/feedback/fading-error';
 	import { moveToSolutionStep } from '$lib/solution/solution-log';
 	import { getSolutionStepsCount } from '$lib/solution/solution-parser';
 	import { sudokuStore } from '$lib/stores/sudokuStore';
@@ -6,6 +8,7 @@
 	import type { SingleCandidate } from '$lib/types/single-candidate';
 	import { defaultSolution, type Solution } from '$lib/types/solution';
 	import type { Square, Sudoku } from '$lib/types/sudoku';
+	import { getToastStore } from '@skeletonlabs/skeleton';
 	import GameSolveButtons from './GameSolveButtons.svelte';
 	import { solveSudoku } from './api';
 	import SudokuBoard from './board/SudokuBoard.svelte';
@@ -22,6 +25,8 @@
 	let isSolving = false;
 	let isPlaying = false;
 	$: onSudokuImported($sudokuStore);
+
+	const toastStore = getToastStore();
 
 	const resetSelections = () => {
 		selectedNumber = undefined;
@@ -67,8 +72,12 @@
 			sudoku = solution.sudoku;
 			currentSolutionStep = undefined;
 			resetSelections();
+			if (solution.error) {
+				triggerFadingError(toastStore, `Failed to solve sudoku: ${solution.error}`);
+			}
 		} catch (error) {
-			console.log('solve error: ', error);
+			const errorMessage = getApiErrorMessage(error, 'Failed to solve sudoku');
+			triggerFadingError(toastStore, errorMessage);
 		} finally {
 			isSolving = false;
 		}
