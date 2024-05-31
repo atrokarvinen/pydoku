@@ -1,4 +1,3 @@
-import copy
 from models.board import Board
 from models.elimination import Elimination
 from models.pointer import Pointer
@@ -29,7 +28,6 @@ class SimpleColoring(EliminatorBase):
                 chain = []
                 visited_squares = []
                 all_squares = squares_with_note
-                possible_squares = squares_with_note
                 start_color = 1
                 self.recurse_chain(chain,
                                    all_squares,

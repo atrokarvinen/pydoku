@@ -1,4 +1,7 @@
+import asyncio
 import copy
+import time
+import func_timeout
 from models.solutionStep import SolutionStep
 from models.square import Square
 from models.solution import Solution
@@ -86,7 +89,10 @@ class Sudoku:
         max_iterations = (board.size + 1) * empty_square_count
         while (True):
             print("Iteration: " + str(iteration))
-            next_step = self.get_next_solution_step(board, techniques)
+            (next_step, error) = self.get_next_solution_step(board, techniques)
+            if (error is not None):
+                print("Error: " + error)
+                break
             if (next_step is None):
                 print("No new solution found. Unable to solve sudoku")
                 break
@@ -121,12 +127,21 @@ class Sudoku:
             self.add_initial_possibilities(board)
         return board
 
-    def get_next_solution_step(self, board: Board, techniques: list[SolverBase]) -> SolutionStep:
+    def get_next_solution_step(
+            self,
+            board: Board,
+            techniques: list[SolverBase]) -> tuple[SolutionStep, str]:
         for solver in techniques:
-            next_step = solver.get_next_solution(board)
-            if (next_step is not None):
-                return next_step
-        return None
+            try:
+                next_step = func_timeout.func_timeout(
+                    timeout=2,
+                    func=solver.get_next_solution,
+                    args=(board,))
+                if (next_step is not None):
+                    return (next_step, None)
+            except func_timeout.FunctionTimedOut:
+                error = f"Timeout error for solver {solver.__class__.__name__}"
+                return (None, error)
 
     def apply_solution_step(self, board: Board, solution: Solution, solution_step: SolutionStep) -> Board:
         if (solution_step.is_elimination()):
