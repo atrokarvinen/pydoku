@@ -39,4 +39,4 @@ class SolverSettingsModel(Base):
         back_populates="solver_settings")
 
     priority: Mapped[int] = mapped_column()
-    enabled: Mapped[int] = mapped_column()
+    enabled: Mapped[bool] = mapped_column()
