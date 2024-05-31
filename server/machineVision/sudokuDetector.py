@@ -1,6 +1,7 @@
 import math
 import os
 import cv2 as cv
+from func_timeout import func_timeout, FunctionTimedOut
 import pytesseract
 
 from typing import Sequence
@@ -11,37 +12,52 @@ class SudokuDetector:
     def __init__(self) -> None:
         pass
 
-    def detect(self, img: cv.Mat) -> str:
+    def detect(self, img: cv.Mat) -> tuple[str, str]:
+        timeout = 10
+        try:
+            (sudoku, error) = func_timeout(
+                timeout=timeout,
+                func=self.detect_sudoku_from_image,
+                args=(img,))
+            return (sudoku, error)
+        except FunctionTimedOut:
+            return (None, f"Detection timeout after ({timeout}) seconds")
+
+    def detect_sudoku_from_image(self, img: cv.Mat) -> tuple[str, str]:
         preprocessed = self.preprocess(img)
         edges = self.detect_edges(preprocessed)
 
-        contours = self.get_sudoku_contours(edges)
+        (contours, error) = self.get_sudoku_contours(edges)
+        if (error):
+            return (None, error)
         largest_contour = self.take_largest_contour(contours)
         roi = self.get_region_of_interest(preprocessed, largest_contour)
 
         squares = self.get_squares(roi)
-        numbers = self.recognize_numbers(squares)
+        (numbers, error) = self.recognize_numbers(squares)
+        if (error):
+            return (None, error)
         print("sudoku length: " + str(len(numbers)))
         print(numbers)
         full_sudoku = "".join(numbers)
 
-        return full_sudoku
+        return (full_sudoku, None)
 
     def preprocess(self, img: cv.Mat) -> cv.Mat:
         img = cv.GaussianBlur(img, (1, 1), 0)
         return img
 
-    def get_sudoku_contours(self, img: cv.Mat) -> Sequence[cv.Mat]:
+    def get_sudoku_contours(self, img: cv.Mat) -> tuple[Sequence[cv.Mat], str]:
         contours = cv.findContours(
             img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
         if (len(contours) == 0):
-            raise Exception("No contours found")
+            return (None, "No contours found")
 
         cnt = contours[0]
         print("contours count: " + str(len(cnt)))
 
-        return cnt
+        return (cnt, None)
 
     def take_largest_contour(self, contours: Sequence[cv.Mat]) -> cv.Mat:
         contour_areas = [cv.contourArea(c) for c in contours]
@@ -66,7 +82,7 @@ class SudokuDetector:
                 squares.append(square)
         return squares
 
-    def recognize_numbers(self, squares: Sequence[cv.Mat]) -> Sequence[str]:
+    def recognize_numbers(self, squares: Sequence[cv.Mat]) -> tuple[Sequence[str], str]:
         processed_squares = self.form_squares(squares)
         non_empty_squares = [
             square for square in processed_squares if not square.is_empty]
@@ -81,16 +97,16 @@ class SudokuDetector:
         print("detected string: " + numberStr)
 
         if len(numberStr) != len(non_empty_squares):
-            print(f"Detected string length ({
-                  len(numberStr)}) does not match number of squares ({len(non_empty_squares)})")
-            return []
+            error = (f"Detected ({
+                len(numberStr)}) numbers but expected to detect ({len(non_empty_squares)}) numbers")
+            return (None, error)
 
         for i in range(len(numberStr)):
             digit = numberStr[i]
             non_empty_squares[i].set_number(digit)
 
         sudoku_numbers = [square.number_str for square in processed_squares]
-        return sudoku_numbers
+        return (sudoku_numbers, None)
 
     def form_squares(self, squares: Sequence[cv.Mat]) -> list[RecognizedSquare]:
         recog = []
@@ -127,7 +143,7 @@ class SudokuDetector:
         return cropped
 
     def center_number(self, img: cv.Mat) -> cv.Mat:
-        contours = self.get_sudoku_contours(img)
+        (contours, error) = self.get_sudoku_contours(img)
         largest_contour = self.take_largest_contour(contours)
         (x, y, w, h) = cv.boundingRect(largest_contour)
         x2 = math.floor((img.shape[0] - w) / 2)

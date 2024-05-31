@@ -18,11 +18,13 @@ def import_sudoku_from_image():
     filename = file_saver.save(file)
     try:
         img = mv.load_image(filename)
-        sudoku_string = mv.detect(img)
+        (sudoku_string, error) = mv.detect(img)
+        if error:
+            return {"message": error}, 400
         sudoku = SudokuParser.parse(sudoku_string)
         return sudoku.serialize()
     except:
-        return "Error"
+        return "Sudoku detection failed", 400
     finally:
         file_saver.try_delete_image(filename)
 

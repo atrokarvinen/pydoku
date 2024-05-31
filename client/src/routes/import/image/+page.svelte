@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { getApiErrorMessage } from '$lib/feedback/api-error-parser';
 	import { triggerFadingError } from '$lib/feedback/fading-error';
 	import { sudokuStore } from '$lib/stores/sudokuStore';
 	import { getToastStore } from '@skeletonlabs/skeleton';
@@ -28,8 +29,8 @@
 				goto('/');
 			}}
 			onError={(error) => {
-				console.log('error importing from image', error);
-				triggerFadingError(toastStore, 'Error importing sudoku from image');
+				const errorMessage = getApiErrorMessage(error, 'Error importing sudoku from image');
+				triggerFadingError(toastStore, errorMessage);
 			}}
 		/>
 	</form>
