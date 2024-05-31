@@ -1,17 +1,13 @@
 import { setUserIdHeader } from '$lib/axios';
+import { session } from '$lib/session/session';
 import { emptySudoku9x9 } from '$lib/types/sudoku';
-import { redirect } from '@sveltejs/kit';
 import { getSudoku } from './api';
+import { createUser } from './auth/api';
 
 export const ssr = false;
 
 export const load = async () => {
-	const userId = localStorage.getItem('userId');
-	const isAuthenticated = !!userId;
-	if (!isAuthenticated) {
-		console.log('not authenticated, redirecting to auth...');
-		throw redirect(300, '/auth');
-	}
+	const userId = await getUserId();
 	setUserIdHeader(userId);
 
 	let sudoku;
@@ -23,4 +19,23 @@ export const load = async () => {
 	}
 
 	return { sudoku };
+};
+
+const getUserId = async (): Promise<string> => {
+	let userId = localStorage.getItem('userId');
+	if (!userId) {
+		try {
+			const response = await createUser();
+			const user = response.data;
+			localStorage.setItem('userId', user.id);
+			userId = user.id;
+		} catch (error) {
+			console.log('create user error: ', error);
+			throw new Error('Failed to create new user.');
+		}
+	}
+	session.update((s) => ({ ...s, userId }));
+
+	setUserIdHeader(userId);
+	return userId!;
 };
