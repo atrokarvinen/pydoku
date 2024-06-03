@@ -157,4 +157,4 @@ class Sudoku:
         return all([not s.is_empty() for s in board.flatten()])
 
     def is_board_empty(self, board: Board) -> bool:
-        return all([s.is_empty() for s in board.flatten()])
+        return all([s.number == 0 for s in board.flatten()])

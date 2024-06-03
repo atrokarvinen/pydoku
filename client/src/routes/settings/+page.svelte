@@ -9,7 +9,7 @@
 	Error
 {:else}
 	{#await data.loadPromise}
-		<div class="flex flex-col items-center justify-center w-full">
+		<div class="flex flex-col items-center justify-center h-full w-full">
 			<ProgressRadial width="w-16" />
 		</div>
 	{:then value}
